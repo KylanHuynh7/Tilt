@@ -2,6 +2,26 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-05-18 — METHODOLOGY.md v2.2 + V2.C (live in-game win probability)
+
+v2 continues. v2.2 adds the third pre-registered v2 feature: live in-game win probability, implemented as **Interpretation B** — a separate empirical lookup model independent of the Elo rating engine. New §15 documents the bin structure (period × mins_remaining × clamped_score_diff), Bayesian smoothing for sparse bins (α=50, threshold=100), training window 2010-11 → 2024-25, and the relationship to §10 #1 (2025-26 is held out from the WP training corpus).
+
+Code:
+  - `app/pbp_pipeline.py`: async goal-event ingest from `/v1/gamecenter/{gameId}/play-by-play` per training-window game. Per-season parquet at `data_cache/pbp_goals/{season}.parquet` + manifest. CLI: `python -m app.pbp_pipeline ingest --all|--season|--since|--force`, `status`.
+  - `app/live_wp.py`: minute-by-minute sample expansion, smoothed bin lookup, artifact roundtrip JSON.
+  - `scripts/build_live_wp.py`: one-shot script that walks every PBP parquet, builds the model, writes `artifacts/live_wp_v2.json`, and prints spot-check WP at canonical states (game start, P3 with 1-goal lead, OT tied, etc.).
+  - `app/main.py`: new endpoint `GET /wp?period=&time_remaining_s=&score_diff=` — stateless lookup returning home win probability + sample count + smoothing flag.
+  - 11 new tests in `test_live_wp.py` covering clamp/bucket helpers, smoothing math, sample expansion for zero-goal and one-goal games, artifact roundtrip, integration sanity (home-win baseline, monotonicity in well-sampled bins).
+
+V2.C results (15 training seasons, 19,092 games, 1.17M samples, 631 bins):
+  - Game start (P1, 19:30 left, 0-0): WP=0.542 (matches empirical home win rate over 2010-2025)
+  - P3 start with 1-goal lead: WP=0.772 (in §15 pre-registered [0.75, 0.85] band)
+  - P3 1 min remaining, up 1: WP=0.933
+  - P3 1 min remaining, up 5 (clamped): WP=1.000
+  - All well-sampled bins monotone in score_diff at fixed (period, mins_remaining).
+
+Live polling of in-progress games is deferred to v2.3 — V2.C exposes the stateless model only.
+
 ## 2026-05-18 — METHODOLOGY.md §13.F (Cup-sim approximations documented)
 
 New subsection F under §13 (Known limitations) lists the five approximations the Cup simulator makes: rating-independent outcome-type sampling, hardcoded conference membership, regular-season-points-only higher-seed inference for not-yet-started series, single-season outcome distribution baseline, no special goalie/fatigue handling in playoff series. The original "F. Methodology process limitations" is renamed to G to preserve its content while making room.

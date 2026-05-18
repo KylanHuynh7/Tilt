@@ -23,7 +23,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from dataclasses import asdict
 
-from . import cup_simulator, engine, historical, standings
+from . import cup_simulator, engine, historical, live_wp, standings
 from .franchises import current_code
 from .seasons import parse as parse_season
 from .teams import TEAMS
@@ -33,6 +33,26 @@ DEFAULT_CUP_SIMS = 10_000
 
 # Cached Cup-sim result; rebuilt on /admin/refresh and at first request.
 _cup_result: cup_simulator.CupSimResult | None = None
+
+# Cached live-WP model; loaded lazily on first request.
+_wp_model: live_wp.WPModel | None = None
+
+
+def _wp_model_or_503() -> live_wp.WPModel:
+    global _wp_model
+    if _wp_model is not None:
+        return _wp_model
+    try:
+        _wp_model = live_wp.load_artifact()
+        return _wp_model
+    except FileNotFoundError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "no live-WP artifact yet; "
+                "run `uv run python -m scripts.build_live_wp` after ingesting PBP"
+            ),
+        ) from exc
 
 RESULTS_PATH = Path(__file__).resolve().parent.parent / "results" / "test_evaluation.json"
 
@@ -242,6 +262,39 @@ async def simulation_cup(n: int | None = None, refresh: bool = False):
             "k_playoff": cache.params.k_playoff,
             "home_bump": cache.params.home_bump,
             "methodology_version": cache.params.methodology_version,
+        },
+    }
+
+
+@app.get("/wp")
+async def wp(period: int, time_remaining_s: int, score_diff: int):
+    """v2.2 §15 — empirical state-aware home win probability.
+
+    Stateless lookup. The caller knows the game state; the endpoint returns
+    P(home wins | state) from the lookup table.
+    """
+    model = _wp_model_or_503()
+    if period not in (1, 2, 3, 4):
+        raise HTTPException(status_code=400, detail="period must be 1, 2, 3, or 4")
+    if time_remaining_s < 0:
+        raise HTTPException(status_code=400, detail="time_remaining_s must be >= 0")
+    r = live_wp.query(
+        model, period=period, time_remaining_s=time_remaining_s, score_diff=score_diff,
+    )
+    return {
+        "home_win_prob": r.home_win_prob,
+        "n_samples": r.n,
+        "smoothed": r.smoothed,
+        "bin": {
+            "period": r.bin.period,
+            "mins_remaining": r.bin.mins_remaining,
+            "score_diff": r.bin.score_diff,
+        },
+        "model": {
+            "methodology_version": "2.2",
+            "n_games": model.n_games,
+            "n_samples": model.n_samples,
+            "training_seasons": model.training_seasons,
         },
     }
 

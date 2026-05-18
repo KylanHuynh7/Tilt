@@ -1,0 +1,5076 @@
+{
+  "trained_at": "2026-05-18T22:58:37.105108+00:00",
+  "methodology_version": "2.2",
+  "training_seasons": [
+    20102011,
+    20112012,
+    20122013,
+    20132014,
+    20142015,
+    20152016,
+    20162017,
+    20172018,
+    20182019,
+    20192020,
+    20202021,
+    20212022,
+    20222023,
+    20232024,
+    20242025
+  ],
+  "n_games": 19092,
+  "n_samples": 1167445,
+  "n_bins": 631,
+  "smoothing_alpha": 50,
+  "smoothing_threshold": 100,
+  "bins": [
+    {
+      "period": 1,
+      "mins_remaining": 19,
+      "score_diff": -1,
+      "n": 1,
+      "home_win_rate": 0.495,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 19,
+      "score_diff": 0,
+      "n": 19091,
+      "home_win_rate": 0.5422,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 18,
+      "score_diff": -2,
+      "n": 4,
+      "home_win_rate": 0.4904,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 18,
+      "score_diff": -1,
+      "n": 523,
+      "home_win_rate": 0.3556,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 18,
+      "score_diff": 0,
+      "n": 17977,
+      "home_win_rate": 0.5423,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 18,
+      "score_diff": 1,
+      "n": 578,
+      "home_win_rate": 0.7024,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 18,
+      "score_diff": 2,
+      "n": 10,
+      "home_win_rate": 0.5455,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 17,
+      "score_diff": -2,
+      "n": 30,
+      "home_win_rate": 0.3923,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 17,
+      "score_diff": -1,
+      "n": 1068,
+      "home_win_rate": 0.383,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 17,
+      "score_diff": 0,
+      "n": 16697,
+      "home_win_rate": 0.54,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 17,
+      "score_diff": 1,
+      "n": 1264,
+      "home_win_rate": 0.7097,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 17,
+      "score_diff": 2,
+      "n": 33,
+      "home_win_rate": 0.5865,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 16,
+      "score_diff": -3,
+      "n": 2,
+      "home_win_rate": 0.5,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 16,
+      "score_diff": -2,
+      "n": 70,
+      "home_win_rate": 0.3824,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 16,
+      "score_diff": -1,
+      "n": 1569,
+      "home_win_rate": 0.3773,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 16,
+      "score_diff": 0,
+      "n": 15579,
+      "home_win_rate": 0.5397,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 16,
+      "score_diff": 1,
+      "n": 1791,
+      "home_win_rate": 0.7108,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 16,
+      "score_diff": 2,
+      "n": 79,
+      "home_win_rate": 0.6201,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 16,
+      "score_diff": 3,
+      "n": 2,
+      "home_win_rate": 0.5098,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 15,
+      "score_diff": -3,
+      "n": 7,
+      "home_win_rate": 0.4766,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 15,
+      "score_diff": -2,
+      "n": 121,
+      "home_win_rate": 0.2314,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 15,
+      "score_diff": -1,
+      "n": 2067,
+      "home_win_rate": 0.3716,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 15,
+      "score_diff": 0,
+      "n": 14456,
+      "home_win_rate": 0.5403,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 15,
+      "score_diff": 1,
+      "n": 2274,
+      "home_win_rate": 0.7076,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 15,
+      "score_diff": 2,
+      "n": 164,
+      "home_win_rate": 0.811,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 15,
+      "score_diff": 3,
+      "n": 3,
+      "home_win_rate": 0.5049,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 14,
+      "score_diff": -3,
+      "n": 11,
+      "home_win_rate": 0.4595,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 14,
+      "score_diff": -2,
+      "n": 192,
+      "home_win_rate": 0.2188,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 14,
+      "score_diff": -1,
+      "n": 2497,
+      "home_win_rate": 0.3785,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 14,
+      "score_diff": 0,
+      "n": 13394,
+      "home_win_rate": 0.5394,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 14,
+      "score_diff": 1,
+      "n": 2723,
+      "home_win_rate": 0.7011,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 14,
+      "score_diff": 2,
+      "n": 261,
+      "home_win_rate": 0.8314,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 14,
+      "score_diff": 3,
+      "n": 14,
+      "home_win_rate": 0.5526,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 13,
+      "score_diff": -3,
+      "n": 19,
+      "home_win_rate": 0.437,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 13,
+      "score_diff": -2,
+      "n": 299,
+      "home_win_rate": 0.2375,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 13,
+      "score_diff": -1,
+      "n": 2785,
+      "home_win_rate": 0.3727,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 13,
+      "score_diff": 0,
+      "n": 12510,
+      "home_win_rate": 0.5403,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 13,
+      "score_diff": 1,
+      "n": 3099,
+      "home_win_rate": 0.697,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 13,
+      "score_diff": 2,
+      "n": 351,
+      "home_win_rate": 0.8433,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 13,
+      "score_diff": 3,
+      "n": 29,
+      "home_win_rate": 0.5891,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 12,
+      "score_diff": -4,
+      "n": 2,
+      "home_win_rate": 0.5,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 12,
+      "score_diff": -3,
+      "n": 29,
+      "home_win_rate": 0.4031,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 12,
+      "score_diff": -2,
+      "n": 399,
+      "home_win_rate": 0.2306,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 12,
+      "score_diff": -1,
+      "n": 3072,
+      "home_win_rate": 0.3737,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 12,
+      "score_diff": 0,
+      "n": 11695,
+      "home_win_rate": 0.5391,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 12,
+      "score_diff": 1,
+      "n": 3384,
+      "home_win_rate": 0.7004,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 12,
+      "score_diff": 2,
+      "n": 462,
+      "home_win_rate": 0.8442,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 12,
+      "score_diff": 3,
+      "n": 45,
+      "home_win_rate": 0.6207,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 12,
+      "score_diff": 4,
+      "n": 4,
+      "home_win_rate": 0.5192,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 11,
+      "score_diff": -4,
+      "n": 4,
+      "home_win_rate": 0.4904,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 11,
+      "score_diff": -3,
+      "n": 41,
+      "home_win_rate": 0.3759,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 11,
+      "score_diff": -2,
+      "n": 505,
+      "home_win_rate": 0.2277,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 11,
+      "score_diff": -1,
+      "n": 3271,
+      "home_win_rate": 0.3742,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 11,
+      "score_diff": 0,
+      "n": 11003,
+      "home_win_rate": 0.537,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 11,
+      "score_diff": 1,
+      "n": 3606,
+      "home_win_rate": 0.7038,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 11,
+      "score_diff": 2,
+      "n": 592,
+      "home_win_rate": 0.8378,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 11,
+      "score_diff": 3,
+      "n": 61,
+      "home_win_rate": 0.6646,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 11,
+      "score_diff": 4,
+      "n": 9,
+      "home_win_rate": 0.5413,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 10,
+      "score_diff": -5,
+      "n": 1,
+      "home_win_rate": 0.495,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 10,
+      "score_diff": -4,
+      "n": 4,
+      "home_win_rate": 0.4904,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 10,
+      "score_diff": -3,
+      "n": 55,
+      "home_win_rate": 0.3419,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 10,
+      "score_diff": -2,
+      "n": 604,
+      "home_win_rate": 0.2318,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 10,
+      "score_diff": -1,
+      "n": 3434,
+      "home_win_rate": 0.3675,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 10,
+      "score_diff": 0,
+      "n": 10426,
+      "home_win_rate": 0.5387,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 10,
+      "score_diff": 1,
+      "n": 3771,
+      "home_win_rate": 0.7043,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 10,
+      "score_diff": 2,
+      "n": 704,
+      "home_win_rate": 0.8338,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 10,
+      "score_diff": 3,
+      "n": 78,
+      "home_win_rate": 0.6854,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 10,
+      "score_diff": 4,
+      "n": 14,
+      "home_win_rate": 0.5614,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 10,
+      "score_diff": 5,
+      "n": 1,
+      "home_win_rate": 0.505,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 9,
+      "score_diff": -4,
+      "n": 7,
+      "home_win_rate": 0.4766,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 9,
+      "score_diff": -3,
+      "n": 73,
+      "home_win_rate": 0.3237,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 9,
+      "score_diff": -2,
+      "n": 668,
+      "home_win_rate": 0.2275,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 9,
+      "score_diff": -1,
+      "n": 3591,
+      "home_win_rate": 0.3676,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 9,
+      "score_diff": 0,
+      "n": 9909,
+      "home_win_rate": 0.5371,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 9,
+      "score_diff": 1,
+      "n": 3922,
+      "home_win_rate": 0.7027,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 9,
+      "score_diff": 2,
+      "n": 800,
+      "home_win_rate": 0.8488,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 9,
+      "score_diff": 3,
+      "n": 101,
+      "home_win_rate": 0.9406,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 9,
+      "score_diff": 4,
+      "n": 20,
+      "home_win_rate": 0.5833,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 9,
+      "score_diff": 5,
+      "n": 1,
+      "home_win_rate": 0.505,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 8,
+      "score_diff": -4,
+      "n": 10,
+      "home_win_rate": 0.4636,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 8,
+      "score_diff": -3,
+      "n": 90,
+      "home_win_rate": 0.3053,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 8,
+      "score_diff": -2,
+      "n": 755,
+      "home_win_rate": 0.2252,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 8,
+      "score_diff": -1,
+      "n": 3746,
+      "home_win_rate": 0.3663,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 8,
+      "score_diff": 0,
+      "n": 9399,
+      "home_win_rate": 0.5373,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 8,
+      "score_diff": 1,
+      "n": 4058,
+      "home_win_rate": 0.7043,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 8,
+      "score_diff": 2,
+      "n": 881,
+      "home_win_rate": 0.8502,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 8,
+      "score_diff": 3,
+      "n": 126,
+      "home_win_rate": 0.9286,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 8,
+      "score_diff": 4,
+      "n": 25,
+      "home_win_rate": 0.6,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 8,
+      "score_diff": 5,
+      "n": 2,
+      "home_win_rate": 0.5098,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 7,
+      "score_diff": -4,
+      "n": 12,
+      "home_win_rate": 0.4554,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 7,
+      "score_diff": -3,
+      "n": 120,
+      "home_win_rate": 0.125,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 7,
+      "score_diff": -2,
+      "n": 850,
+      "home_win_rate": 0.2188,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 7,
+      "score_diff": -1,
+      "n": 3767,
+      "home_win_rate": 0.3655,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 7,
+      "score_diff": 0,
+      "n": 8985,
+      "home_win_rate": 0.5332,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 7,
+      "score_diff": 1,
+      "n": 4187,
+      "home_win_rate": 0.707,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 7,
+      "score_diff": 2,
+      "n": 983,
+      "home_win_rate": 0.8586,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 7,
+      "score_diff": 3,
+      "n": 153,
+      "home_win_rate": 0.9412,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 7,
+      "score_diff": 4,
+      "n": 33,
+      "home_win_rate": 0.6165,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 7,
+      "score_diff": 5,
+      "n": 2,
+      "home_win_rate": 0.5098,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 6,
+      "score_diff": -5,
+      "n": 1,
+      "home_win_rate": 0.495,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 6,
+      "score_diff": -4,
+      "n": 18,
+      "home_win_rate": 0.4322,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 6,
+      "score_diff": -3,
+      "n": 138,
+      "home_win_rate": 0.1087,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 6,
+      "score_diff": -2,
+      "n": 921,
+      "home_win_rate": 0.2117,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 6,
+      "score_diff": -1,
+      "n": 3875,
+      "home_win_rate": 0.3649,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 6,
+      "score_diff": 0,
+      "n": 8529,
+      "home_win_rate": 0.5311,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 6,
+      "score_diff": 1,
+      "n": 4296,
+      "home_win_rate": 0.7111,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 6,
+      "score_diff": 2,
+      "n": 1092,
+      "home_win_rate": 0.8526,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 6,
+      "score_diff": 3,
+      "n": 180,
+      "home_win_rate": 0.9444,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 6,
+      "score_diff": 4,
+      "n": 40,
+      "home_win_rate": 0.6357,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 6,
+      "score_diff": 5,
+      "n": 2,
+      "home_win_rate": 0.5098,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 5,
+      "score_diff": -5,
+      "n": 2,
+      "home_win_rate": 0.4902,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 5,
+      "score_diff": -4,
+      "n": 22,
+      "home_win_rate": 0.4098,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 5,
+      "score_diff": -3,
+      "n": 172,
+      "home_win_rate": 0.0988,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 5,
+      "score_diff": -2,
+      "n": 985,
+      "home_win_rate": 0.2193,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 5,
+      "score_diff": -1,
+      "n": 3924,
+      "home_win_rate": 0.3565,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 5,
+      "score_diff": 0,
+      "n": 8216,
+      "home_win_rate": 0.5336,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 5,
+      "score_diff": 1,
+      "n": 4312,
+      "home_win_rate": 0.7127,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 5,
+      "score_diff": 2,
+      "n": 1191,
+      "home_win_rate": 0.843,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 5,
+      "score_diff": 3,
+      "n": 216,
+      "home_win_rate": 0.963,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 5,
+      "score_diff": 4,
+      "n": 50,
+      "home_win_rate": 0.66,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 5,
+      "score_diff": 5,
+      "n": 2,
+      "home_win_rate": 0.5098,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 4,
+      "score_diff": -5,
+      "n": 3,
+      "home_win_rate": 0.4854,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 4,
+      "score_diff": -4,
+      "n": 26,
+      "home_win_rate": 0.3968,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 4,
+      "score_diff": -3,
+      "n": 197,
+      "home_win_rate": 0.1269,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 4,
+      "score_diff": -2,
+      "n": 1064,
+      "home_win_rate": 0.2133,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 4,
+      "score_diff": -1,
+      "n": 3944,
+      "home_win_rate": 0.3509,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 4,
+      "score_diff": 0,
+      "n": 7885,
+      "home_win_rate": 0.5344,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 4,
+      "score_diff": 1,
+      "n": 4377,
+      "home_win_rate": 0.7108,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 4,
+      "score_diff": 2,
+      "n": 1271,
+      "home_win_rate": 0.8466,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 4,
+      "score_diff": 3,
+      "n": 262,
+      "home_win_rate": 0.9656,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 4,
+      "score_diff": 4,
+      "n": 59,
+      "home_win_rate": 0.6792,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 4,
+      "score_diff": 5,
+      "n": 4,
+      "home_win_rate": 0.5192,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 3,
+      "score_diff": -5,
+      "n": 3,
+      "home_win_rate": 0.4854,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 3,
+      "score_diff": -4,
+      "n": 32,
+      "home_win_rate": 0.3788,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 3,
+      "score_diff": -3,
+      "n": 227,
+      "home_win_rate": 0.1189,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 3,
+      "score_diff": -2,
+      "n": 1141,
+      "home_win_rate": 0.2095,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 3,
+      "score_diff": -1,
+      "n": 3940,
+      "home_win_rate": 0.3508,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 3,
+      "score_diff": 0,
+      "n": 7577,
+      "home_win_rate": 0.5329,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 3,
+      "score_diff": 1,
+      "n": 4429,
+      "home_win_rate": 0.7092,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 3,
+      "score_diff": 2,
+      "n": 1368,
+      "home_win_rate": 0.8509,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 3,
+      "score_diff": 3,
+      "n": 299,
+      "home_win_rate": 0.9565,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 3,
+      "score_diff": 4,
+      "n": 71,
+      "home_win_rate": 0.7018,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 3,
+      "score_diff": 5,
+      "n": 5,
+      "home_win_rate": 0.5238,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 2,
+      "score_diff": -5,
+      "n": 4,
+      "home_win_rate": 0.4808,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 2,
+      "score_diff": -4,
+      "n": 33,
+      "home_win_rate": 0.3835,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 2,
+      "score_diff": -3,
+      "n": 254,
+      "home_win_rate": 0.122,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 2,
+      "score_diff": -2,
+      "n": 1211,
+      "home_win_rate": 0.2139,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 2,
+      "score_diff": -1,
+      "n": 3958,
+      "home_win_rate": 0.3444,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 2,
+      "score_diff": 0,
+      "n": 7350,
+      "home_win_rate": 0.5333,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 2,
+      "score_diff": 1,
+      "n": 4411,
+      "home_win_rate": 0.7119,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 2,
+      "score_diff": 2,
+      "n": 1449,
+      "home_win_rate": 0.8482,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 2,
+      "score_diff": 3,
+      "n": 336,
+      "home_win_rate": 0.9643,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 2,
+      "score_diff": 4,
+      "n": 79,
+      "home_win_rate": 0.7151,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 2,
+      "score_diff": 5,
+      "n": 7,
+      "home_win_rate": 0.5327,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 1,
+      "score_diff": -5,
+      "n": 5,
+      "home_win_rate": 0.4762,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 1,
+      "score_diff": -4,
+      "n": 39,
+      "home_win_rate": 0.3669,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 1,
+      "score_diff": -3,
+      "n": 277,
+      "home_win_rate": 0.1227,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 1,
+      "score_diff": -2,
+      "n": 1287,
+      "home_win_rate": 0.2152,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 1,
+      "score_diff": -1,
+      "n": 3967,
+      "home_win_rate": 0.3365,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 1,
+      "score_diff": 0,
+      "n": 7131,
+      "home_win_rate": 0.5355,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 1,
+      "score_diff": 1,
+      "n": 4361,
+      "home_win_rate": 0.7147,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 1,
+      "score_diff": 2,
+      "n": 1561,
+      "home_win_rate": 0.8469,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 1,
+      "score_diff": 3,
+      "n": 366,
+      "home_win_rate": 0.9563,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 1,
+      "score_diff": 4,
+      "n": 86,
+      "home_win_rate": 0.7258,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 1,
+      "score_diff": 5,
+      "n": 12,
+      "home_win_rate": 0.5536,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 0,
+      "score_diff": -5,
+      "n": 4,
+      "home_win_rate": 0.4808,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 0,
+      "score_diff": -4,
+      "n": 52,
+      "home_win_rate": 0.3355,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 0,
+      "score_diff": -3,
+      "n": 311,
+      "home_win_rate": 0.1318,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 0,
+      "score_diff": -2,
+      "n": 1349,
+      "home_win_rate": 0.2009,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 0,
+      "score_diff": -1,
+      "n": 3965,
+      "home_win_rate": 0.3382,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 0,
+      "score_diff": 0,
+      "n": 6884,
+      "home_win_rate": 0.5334,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 0,
+      "score_diff": 1,
+      "n": 4376,
+      "home_win_rate": 0.7182,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 0,
+      "score_diff": 2,
+      "n": 1627,
+      "home_win_rate": 0.8494,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 0,
+      "score_diff": 3,
+      "n": 412,
+      "home_win_rate": 0.9466,
+      "smoothed": false
+    },
+    {
+      "period": 1,
+      "mins_remaining": 0,
+      "score_diff": 4,
+      "n": 95,
+      "home_win_rate": 0.7385,
+      "smoothed": true
+    },
+    {
+      "period": 1,
+      "mins_remaining": 0,
+      "score_diff": 5,
+      "n": 17,
+      "home_win_rate": 0.5726,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 19,
+      "score_diff": -5,
+      "n": 6,
+      "home_win_rate": 0.4717,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 19,
+      "score_diff": -4,
+      "n": 61,
+      "home_win_rate": 0.3168,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 19,
+      "score_diff": -3,
+      "n": 338,
+      "home_win_rate": 0.1302,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 19,
+      "score_diff": -2,
+      "n": 1411,
+      "home_win_rate": 0.197,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 19,
+      "score_diff": -1,
+      "n": 3967,
+      "home_win_rate": 0.3355,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 19,
+      "score_diff": 0,
+      "n": 6671,
+      "home_win_rate": 0.5314,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 19,
+      "score_diff": 1,
+      "n": 4357,
+      "home_win_rate": 0.7216,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 19,
+      "score_diff": 2,
+      "n": 1692,
+      "home_win_rate": 0.8564,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 19,
+      "score_diff": 3,
+      "n": 459,
+      "home_win_rate": 0.9412,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 19,
+      "score_diff": 4,
+      "n": 108,
+      "home_win_rate": 0.9815,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 19,
+      "score_diff": 5,
+      "n": 22,
+      "home_win_rate": 0.5902,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 18,
+      "score_diff": -5,
+      "n": 6,
+      "home_win_rate": 0.4717,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 18,
+      "score_diff": -4,
+      "n": 70,
+      "home_win_rate": 0.3,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 18,
+      "score_diff": -3,
+      "n": 363,
+      "home_win_rate": 0.1212,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 18,
+      "score_diff": -2,
+      "n": 1438,
+      "home_win_rate": 0.1919,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 18,
+      "score_diff": -1,
+      "n": 3982,
+      "home_win_rate": 0.3343,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 18,
+      "score_diff": 0,
+      "n": 6503,
+      "home_win_rate": 0.5325,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 18,
+      "score_diff": 1,
+      "n": 4354,
+      "home_win_rate": 0.7198,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 18,
+      "score_diff": 2,
+      "n": 1738,
+      "home_win_rate": 0.8625,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 18,
+      "score_diff": 3,
+      "n": 486,
+      "home_win_rate": 0.9362,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 18,
+      "score_diff": 4,
+      "n": 130,
+      "home_win_rate": 0.9769,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 18,
+      "score_diff": 5,
+      "n": 22,
+      "home_win_rate": 0.5902,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 17,
+      "score_diff": -5,
+      "n": 15,
+      "home_win_rate": 0.4348,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 17,
+      "score_diff": -4,
+      "n": 78,
+      "home_win_rate": 0.2865,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 17,
+      "score_diff": -3,
+      "n": 388,
+      "home_win_rate": 0.116,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 17,
+      "score_diff": -2,
+      "n": 1503,
+      "home_win_rate": 0.1916,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 17,
+      "score_diff": -1,
+      "n": 3985,
+      "home_win_rate": 0.3292,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 17,
+      "score_diff": 0,
+      "n": 6292,
+      "home_win_rate": 0.5345,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 17,
+      "score_diff": 1,
+      "n": 4319,
+      "home_win_rate": 0.7215,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 17,
+      "score_diff": 2,
+      "n": 1800,
+      "home_win_rate": 0.8622,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 17,
+      "score_diff": 3,
+      "n": 532,
+      "home_win_rate": 0.9398,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 17,
+      "score_diff": 4,
+      "n": 153,
+      "home_win_rate": 0.9673,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 17,
+      "score_diff": 5,
+      "n": 27,
+      "home_win_rate": 0.6063,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 16,
+      "score_diff": -5,
+      "n": 17,
+      "home_win_rate": 0.4274,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 16,
+      "score_diff": -4,
+      "n": 86,
+      "home_win_rate": 0.2796,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 16,
+      "score_diff": -3,
+      "n": 420,
+      "home_win_rate": 0.0952,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 16,
+      "score_diff": -2,
+      "n": 1566,
+      "home_win_rate": 0.1814,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 16,
+      "score_diff": -1,
+      "n": 3960,
+      "home_win_rate": 0.3351,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 16,
+      "score_diff": 0,
+      "n": 6084,
+      "home_win_rate": 0.5316,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 16,
+      "score_diff": 1,
+      "n": 4346,
+      "home_win_rate": 0.7214,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 16,
+      "score_diff": 2,
+      "n": 1815,
+      "home_win_rate": 0.8672,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 16,
+      "score_diff": 3,
+      "n": 597,
+      "home_win_rate": 0.938,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 16,
+      "score_diff": 4,
+      "n": 165,
+      "home_win_rate": 0.9697,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 16,
+      "score_diff": 5,
+      "n": 36,
+      "home_win_rate": 0.6324,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 15,
+      "score_diff": -5,
+      "n": 22,
+      "home_win_rate": 0.4098,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 15,
+      "score_diff": -4,
+      "n": 97,
+      "home_win_rate": 0.264,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 15,
+      "score_diff": -3,
+      "n": 476,
+      "home_win_rate": 0.0882,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 15,
+      "score_diff": -2,
+      "n": 1584,
+      "home_win_rate": 0.1793,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 15,
+      "score_diff": -1,
+      "n": 3908,
+      "home_win_rate": 0.3283,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 15,
+      "score_diff": 0,
+      "n": 5946,
+      "home_win_rate": 0.5311,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 15,
+      "score_diff": 1,
+      "n": 4303,
+      "home_win_rate": 0.7244,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 15,
+      "score_diff": 2,
+      "n": 1883,
+      "home_win_rate": 0.8683,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 15,
+      "score_diff": 3,
+      "n": 650,
+      "home_win_rate": 0.9415,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 15,
+      "score_diff": 4,
+      "n": 181,
+      "home_win_rate": 0.9779,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 15,
+      "score_diff": 5,
+      "n": 42,
+      "home_win_rate": 0.6479,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 14,
+      "score_diff": -5,
+      "n": 25,
+      "home_win_rate": 0.4,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 14,
+      "score_diff": -4,
+      "n": 118,
+      "home_win_rate": 0.0254,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 14,
+      "score_diff": -3,
+      "n": 499,
+      "home_win_rate": 0.0762,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 14,
+      "score_diff": -2,
+      "n": 1631,
+      "home_win_rate": 0.1717,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 14,
+      "score_diff": -1,
+      "n": 3889,
+      "home_win_rate": 0.3268,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 14,
+      "score_diff": 0,
+      "n": 5799,
+      "home_win_rate": 0.5296,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 14,
+      "score_diff": 1,
+      "n": 4286,
+      "home_win_rate": 0.7312,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 14,
+      "score_diff": 2,
+      "n": 1901,
+      "home_win_rate": 0.8716,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 14,
+      "score_diff": 3,
+      "n": 686,
+      "home_win_rate": 0.9373,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 14,
+      "score_diff": 4,
+      "n": 204,
+      "home_win_rate": 0.9853,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 14,
+      "score_diff": 5,
+      "n": 54,
+      "home_win_rate": 0.6753,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 13,
+      "score_diff": -5,
+      "n": 30,
+      "home_win_rate": 0.3846,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 13,
+      "score_diff": -4,
+      "n": 130,
+      "home_win_rate": 0.0231,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 13,
+      "score_diff": -3,
+      "n": 531,
+      "home_win_rate": 0.0659,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 13,
+      "score_diff": -2,
+      "n": 1652,
+      "home_win_rate": 0.1671,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 13,
+      "score_diff": -1,
+      "n": 3845,
+      "home_win_rate": 0.3248,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 13,
+      "score_diff": 0,
+      "n": 5657,
+      "home_win_rate": 0.5277,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 13,
+      "score_diff": 1,
+      "n": 4282,
+      "home_win_rate": 0.7296,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 13,
+      "score_diff": 2,
+      "n": 1946,
+      "home_win_rate": 0.8762,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 13,
+      "score_diff": 3,
+      "n": 735,
+      "home_win_rate": 0.9442,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 13,
+      "score_diff": 4,
+      "n": 221,
+      "home_win_rate": 0.9864,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 13,
+      "score_diff": 5,
+      "n": 63,
+      "home_win_rate": 0.6933,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 12,
+      "score_diff": -5,
+      "n": 33,
+      "home_win_rate": 0.3759,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 12,
+      "score_diff": -4,
+      "n": 144,
+      "home_win_rate": 0.0278,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 12,
+      "score_diff": -3,
+      "n": 557,
+      "home_win_rate": 0.0592,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 12,
+      "score_diff": -2,
+      "n": 1687,
+      "home_win_rate": 0.1701,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 12,
+      "score_diff": -1,
+      "n": 3829,
+      "home_win_rate": 0.3184,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 12,
+      "score_diff": 0,
+      "n": 5575,
+      "home_win_rate": 0.5279,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 12,
+      "score_diff": 1,
+      "n": 4198,
+      "home_win_rate": 0.733,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 12,
+      "score_diff": 2,
+      "n": 1992,
+      "home_win_rate": 0.8815,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 12,
+      "score_diff": 3,
+      "n": 773,
+      "home_win_rate": 0.9444,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 12,
+      "score_diff": 4,
+      "n": 234,
+      "home_win_rate": 0.9957,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 12,
+      "score_diff": 5,
+      "n": 70,
+      "home_win_rate": 0.7059,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 11,
+      "score_diff": -5,
+      "n": 36,
+      "home_win_rate": 0.3676,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 11,
+      "score_diff": -4,
+      "n": 162,
+      "home_win_rate": 0.0247,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 11,
+      "score_diff": -3,
+      "n": 587,
+      "home_win_rate": 0.063,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 11,
+      "score_diff": -2,
+      "n": 1759,
+      "home_win_rate": 0.1694,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 11,
+      "score_diff": -1,
+      "n": 3736,
+      "home_win_rate": 0.3051,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 11,
+      "score_diff": 0,
+      "n": 5421,
+      "home_win_rate": 0.5294,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 11,
+      "score_diff": 1,
+      "n": 4205,
+      "home_win_rate": 0.7363,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 11,
+      "score_diff": 2,
+      "n": 2031,
+      "home_win_rate": 0.8843,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 11,
+      "score_diff": 3,
+      "n": 816,
+      "home_win_rate": 0.9461,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 11,
+      "score_diff": 4,
+      "n": 258,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 11,
+      "score_diff": 5,
+      "n": 81,
+      "home_win_rate": 0.7238,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 10,
+      "score_diff": -5,
+      "n": 44,
+      "home_win_rate": 0.3472,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 10,
+      "score_diff": -4,
+      "n": 167,
+      "home_win_rate": 0.0299,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 10,
+      "score_diff": -3,
+      "n": 623,
+      "home_win_rate": 0.0578,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 10,
+      "score_diff": -2,
+      "n": 1820,
+      "home_win_rate": 0.1599,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 10,
+      "score_diff": -1,
+      "n": 3666,
+      "home_win_rate": 0.3066,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 10,
+      "score_diff": 0,
+      "n": 5299,
+      "home_win_rate": 0.5314,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 10,
+      "score_diff": 1,
+      "n": 4162,
+      "home_win_rate": 0.7299,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 10,
+      "score_diff": 2,
+      "n": 2094,
+      "home_win_rate": 0.893,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 10,
+      "score_diff": 3,
+      "n": 848,
+      "home_win_rate": 0.9481,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 10,
+      "score_diff": 4,
+      "n": 276,
+      "home_win_rate": 0.9964,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 10,
+      "score_diff": 5,
+      "n": 93,
+      "home_win_rate": 0.7409,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 9,
+      "score_diff": -5,
+      "n": 53,
+      "home_win_rate": 0.3268,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 9,
+      "score_diff": -4,
+      "n": 176,
+      "home_win_rate": 0.0284,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 9,
+      "score_diff": -3,
+      "n": 650,
+      "home_win_rate": 0.0492,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 9,
+      "score_diff": -2,
+      "n": 1853,
+      "home_win_rate": 0.157,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 9,
+      "score_diff": -1,
+      "n": 3663,
+      "home_win_rate": 0.3017,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 9,
+      "score_diff": 0,
+      "n": 5165,
+      "home_win_rate": 0.5317,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 9,
+      "score_diff": 1,
+      "n": 4118,
+      "home_win_rate": 0.7343,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 9,
+      "score_diff": 2,
+      "n": 2141,
+      "home_win_rate": 0.8972,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 9,
+      "score_diff": 3,
+      "n": 881,
+      "home_win_rate": 0.9489,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 9,
+      "score_diff": 4,
+      "n": 292,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 9,
+      "score_diff": 5,
+      "n": 100,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 8,
+      "score_diff": -5,
+      "n": 53,
+      "home_win_rate": 0.3268,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 8,
+      "score_diff": -4,
+      "n": 203,
+      "home_win_rate": 0.0246,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 8,
+      "score_diff": -3,
+      "n": 663,
+      "home_win_rate": 0.0422,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 8,
+      "score_diff": -2,
+      "n": 1868,
+      "home_win_rate": 0.1504,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 8,
+      "score_diff": -1,
+      "n": 3696,
+      "home_win_rate": 0.2976,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 8,
+      "score_diff": 0,
+      "n": 5013,
+      "home_win_rate": 0.5344,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 8,
+      "score_diff": 1,
+      "n": 4061,
+      "home_win_rate": 0.7355,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 8,
+      "score_diff": 2,
+      "n": 2214,
+      "home_win_rate": 0.8988,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 8,
+      "score_diff": 3,
+      "n": 895,
+      "home_win_rate": 0.9564,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 8,
+      "score_diff": 4,
+      "n": 311,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 8,
+      "score_diff": 5,
+      "n": 115,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 7,
+      "score_diff": -5,
+      "n": 56,
+      "home_win_rate": 0.3205,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 7,
+      "score_diff": -4,
+      "n": 212,
+      "home_win_rate": 0.0189,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 7,
+      "score_diff": -3,
+      "n": 709,
+      "home_win_rate": 0.0409,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 7,
+      "score_diff": -2,
+      "n": 1885,
+      "home_win_rate": 0.1454,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 7,
+      "score_diff": -1,
+      "n": 3666,
+      "home_win_rate": 0.2984,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 7,
+      "score_diff": 0,
+      "n": 4897,
+      "home_win_rate": 0.534,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 7,
+      "score_diff": 1,
+      "n": 4009,
+      "home_win_rate": 0.7381,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 7,
+      "score_diff": 2,
+      "n": 2271,
+      "home_win_rate": 0.8943,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 7,
+      "score_diff": 3,
+      "n": 915,
+      "home_win_rate": 0.9552,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 7,
+      "score_diff": 4,
+      "n": 347,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 7,
+      "score_diff": 5,
+      "n": 125,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 6,
+      "score_diff": -5,
+      "n": 62,
+      "home_win_rate": 0.3086,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 6,
+      "score_diff": -4,
+      "n": 225,
+      "home_win_rate": 0.0133,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 6,
+      "score_diff": -3,
+      "n": 723,
+      "home_win_rate": 0.0429,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 6,
+      "score_diff": -2,
+      "n": 1927,
+      "home_win_rate": 0.1328,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 6,
+      "score_diff": -1,
+      "n": 3599,
+      "home_win_rate": 0.2992,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 6,
+      "score_diff": 0,
+      "n": 4827,
+      "home_win_rate": 0.531,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 6,
+      "score_diff": 1,
+      "n": 3959,
+      "home_win_rate": 0.7398,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 6,
+      "score_diff": 2,
+      "n": 2339,
+      "home_win_rate": 0.8995,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 6,
+      "score_diff": 3,
+      "n": 935,
+      "home_win_rate": 0.9551,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 6,
+      "score_diff": 4,
+      "n": 354,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 6,
+      "score_diff": 5,
+      "n": 142,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 5,
+      "score_diff": -5,
+      "n": 62,
+      "home_win_rate": 0.3086,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 5,
+      "score_diff": -4,
+      "n": 248,
+      "home_win_rate": 0.0121,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 5,
+      "score_diff": -3,
+      "n": 742,
+      "home_win_rate": 0.0377,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 5,
+      "score_diff": -2,
+      "n": 1949,
+      "home_win_rate": 0.1288,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 5,
+      "score_diff": -1,
+      "n": 3559,
+      "home_win_rate": 0.2919,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 5,
+      "score_diff": 0,
+      "n": 4777,
+      "home_win_rate": 0.529,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 5,
+      "score_diff": 1,
+      "n": 3923,
+      "home_win_rate": 0.7502,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 5,
+      "score_diff": 2,
+      "n": 2318,
+      "home_win_rate": 0.8999,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 5,
+      "score_diff": 3,
+      "n": 994,
+      "home_win_rate": 0.9638,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 5,
+      "score_diff": 4,
+      "n": 363,
+      "home_win_rate": 0.9917,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 5,
+      "score_diff": 5,
+      "n": 157,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 4,
+      "score_diff": -5,
+      "n": 70,
+      "home_win_rate": 0.2941,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 4,
+      "score_diff": -4,
+      "n": 265,
+      "home_win_rate": 0.0113,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 4,
+      "score_diff": -3,
+      "n": 774,
+      "home_win_rate": 0.0336,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 4,
+      "score_diff": -2,
+      "n": 1949,
+      "home_win_rate": 0.1247,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 4,
+      "score_diff": -1,
+      "n": 3549,
+      "home_win_rate": 0.288,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 4,
+      "score_diff": 0,
+      "n": 4681,
+      "home_win_rate": 0.5302,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 4,
+      "score_diff": 1,
+      "n": 3871,
+      "home_win_rate": 0.7536,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 4,
+      "score_diff": 2,
+      "n": 2365,
+      "home_win_rate": 0.8998,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 4,
+      "score_diff": 3,
+      "n": 1016,
+      "home_win_rate": 0.9656,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 4,
+      "score_diff": 4,
+      "n": 383,
+      "home_win_rate": 0.9948,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 4,
+      "score_diff": 5,
+      "n": 169,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 3,
+      "score_diff": -5,
+      "n": 77,
+      "home_win_rate": 0.2825,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 3,
+      "score_diff": -4,
+      "n": 289,
+      "home_win_rate": 0.0138,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 3,
+      "score_diff": -3,
+      "n": 804,
+      "home_win_rate": 0.0361,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 3,
+      "score_diff": -2,
+      "n": 1938,
+      "home_win_rate": 0.1125,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 3,
+      "score_diff": -1,
+      "n": 3528,
+      "home_win_rate": 0.2871,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 3,
+      "score_diff": 0,
+      "n": 4643,
+      "home_win_rate": 0.5316,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 3,
+      "score_diff": 1,
+      "n": 3804,
+      "home_win_rate": 0.7605,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 3,
+      "score_diff": 2,
+      "n": 2362,
+      "home_win_rate": 0.895,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 3,
+      "score_diff": 3,
+      "n": 1058,
+      "home_win_rate": 0.9698,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 3,
+      "score_diff": 4,
+      "n": 407,
+      "home_win_rate": 0.9951,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 3,
+      "score_diff": 5,
+      "n": 182,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 2,
+      "score_diff": -5,
+      "n": 93,
+      "home_win_rate": 0.2591,
+      "smoothed": true
+    },
+    {
+      "period": 2,
+      "mins_remaining": 2,
+      "score_diff": -4,
+      "n": 288,
+      "home_win_rate": 0.0035,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 2,
+      "score_diff": -3,
+      "n": 824,
+      "home_win_rate": 0.034,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 2,
+      "score_diff": -2,
+      "n": 1965,
+      "home_win_rate": 0.1084,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 2,
+      "score_diff": -1,
+      "n": 3526,
+      "home_win_rate": 0.2847,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 2,
+      "score_diff": 0,
+      "n": 4540,
+      "home_win_rate": 0.5308,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 2,
+      "score_diff": 1,
+      "n": 3780,
+      "home_win_rate": 0.7616,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 2,
+      "score_diff": 2,
+      "n": 2339,
+      "home_win_rate": 0.9034,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 2,
+      "score_diff": 3,
+      "n": 1104,
+      "home_win_rate": 0.9728,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 2,
+      "score_diff": 4,
+      "n": 428,
+      "home_win_rate": 0.993,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 2,
+      "score_diff": 5,
+      "n": 205,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 1,
+      "score_diff": -5,
+      "n": 101,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 1,
+      "score_diff": -4,
+      "n": 310,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 1,
+      "score_diff": -3,
+      "n": 845,
+      "home_win_rate": 0.0331,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 1,
+      "score_diff": -2,
+      "n": 1981,
+      "home_win_rate": 0.1065,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 1,
+      "score_diff": -1,
+      "n": 3472,
+      "home_win_rate": 0.28,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 1,
+      "score_diff": 0,
+      "n": 4487,
+      "home_win_rate": 0.5291,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 1,
+      "score_diff": 1,
+      "n": 3747,
+      "home_win_rate": 0.7638,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 1,
+      "score_diff": 2,
+      "n": 2338,
+      "home_win_rate": 0.9098,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 1,
+      "score_diff": 3,
+      "n": 1120,
+      "home_win_rate": 0.9732,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 1,
+      "score_diff": 4,
+      "n": 474,
+      "home_win_rate": 0.9937,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 1,
+      "score_diff": 5,
+      "n": 217,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 0,
+      "score_diff": -5,
+      "n": 114,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 0,
+      "score_diff": -4,
+      "n": 319,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 0,
+      "score_diff": -3,
+      "n": 866,
+      "home_win_rate": 0.0346,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 0,
+      "score_diff": -2,
+      "n": 1997,
+      "home_win_rate": 0.1012,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 0,
+      "score_diff": -1,
+      "n": 3448,
+      "home_win_rate": 0.2752,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 0,
+      "score_diff": 0,
+      "n": 4424,
+      "home_win_rate": 0.5264,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 0,
+      "score_diff": 1,
+      "n": 3702,
+      "home_win_rate": 0.7701,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 0,
+      "score_diff": 2,
+      "n": 2359,
+      "home_win_rate": 0.9165,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 0,
+      "score_diff": 3,
+      "n": 1129,
+      "home_win_rate": 0.9725,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 0,
+      "score_diff": 4,
+      "n": 505,
+      "home_win_rate": 0.9941,
+      "smoothed": false
+    },
+    {
+      "period": 2,
+      "mins_remaining": 0,
+      "score_diff": 5,
+      "n": 229,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 19,
+      "score_diff": -5,
+      "n": 121,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 19,
+      "score_diff": -4,
+      "n": 335,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 19,
+      "score_diff": -3,
+      "n": 886,
+      "home_win_rate": 0.0293,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 19,
+      "score_diff": -2,
+      "n": 2013,
+      "home_win_rate": 0.0984,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 19,
+      "score_diff": -1,
+      "n": 3434,
+      "home_win_rate": 0.272,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 19,
+      "score_diff": 0,
+      "n": 4340,
+      "home_win_rate": 0.5258,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 19,
+      "score_diff": 1,
+      "n": 3652,
+      "home_win_rate": 0.7719,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 19,
+      "score_diff": 2,
+      "n": 2376,
+      "home_win_rate": 0.9217,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 19,
+      "score_diff": 3,
+      "n": 1159,
+      "home_win_rate": 0.9741,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 19,
+      "score_diff": 4,
+      "n": 530,
+      "home_win_rate": 0.9962,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 19,
+      "score_diff": 5,
+      "n": 246,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 18,
+      "score_diff": -5,
+      "n": 130,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 18,
+      "score_diff": -4,
+      "n": 349,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 18,
+      "score_diff": -3,
+      "n": 902,
+      "home_win_rate": 0.0255,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 18,
+      "score_diff": -2,
+      "n": 2021,
+      "home_win_rate": 0.0955,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 18,
+      "score_diff": -1,
+      "n": 3409,
+      "home_win_rate": 0.2708,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 18,
+      "score_diff": 0,
+      "n": 4289,
+      "home_win_rate": 0.522,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 18,
+      "score_diff": 1,
+      "n": 3648,
+      "home_win_rate": 0.7796,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 18,
+      "score_diff": 2,
+      "n": 2373,
+      "home_win_rate": 0.922,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 18,
+      "score_diff": 3,
+      "n": 1176,
+      "home_win_rate": 0.9762,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 18,
+      "score_diff": 4,
+      "n": 534,
+      "home_win_rate": 0.9981,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 18,
+      "score_diff": 5,
+      "n": 261,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 17,
+      "score_diff": -5,
+      "n": 136,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 17,
+      "score_diff": -4,
+      "n": 365,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 17,
+      "score_diff": -3,
+      "n": 920,
+      "home_win_rate": 0.0196,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 17,
+      "score_diff": -2,
+      "n": 2033,
+      "home_win_rate": 0.0871,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 17,
+      "score_diff": -1,
+      "n": 3414,
+      "home_win_rate": 0.2683,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 17,
+      "score_diff": 0,
+      "n": 4196,
+      "home_win_rate": 0.5276,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 17,
+      "score_diff": 1,
+      "n": 3648,
+      "home_win_rate": 0.7796,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 17,
+      "score_diff": 2,
+      "n": 2366,
+      "home_win_rate": 0.9256,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 17,
+      "score_diff": 3,
+      "n": 1181,
+      "home_win_rate": 0.9831,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 17,
+      "score_diff": 4,
+      "n": 553,
+      "home_win_rate": 0.9982,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 17,
+      "score_diff": 5,
+      "n": 280,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 16,
+      "score_diff": -5,
+      "n": 140,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 16,
+      "score_diff": -4,
+      "n": 380,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 16,
+      "score_diff": -3,
+      "n": 942,
+      "home_win_rate": 0.0149,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 16,
+      "score_diff": -2,
+      "n": 2028,
+      "home_win_rate": 0.0843,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 16,
+      "score_diff": -1,
+      "n": 3351,
+      "home_win_rate": 0.256,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 16,
+      "score_diff": 0,
+      "n": 4189,
+      "home_win_rate": 0.5295,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 16,
+      "score_diff": 1,
+      "n": 3607,
+      "home_win_rate": 0.7815,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 16,
+      "score_diff": 2,
+      "n": 2404,
+      "home_win_rate": 0.9301,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 16,
+      "score_diff": 3,
+      "n": 1201,
+      "home_win_rate": 0.9883,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 16,
+      "score_diff": 4,
+      "n": 559,
+      "home_win_rate": 0.9982,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 16,
+      "score_diff": 5,
+      "n": 291,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 15,
+      "score_diff": -5,
+      "n": 160,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 15,
+      "score_diff": -4,
+      "n": 378,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 15,
+      "score_diff": -3,
+      "n": 932,
+      "home_win_rate": 0.0139,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 15,
+      "score_diff": -2,
+      "n": 2036,
+      "home_win_rate": 0.0742,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 15,
+      "score_diff": -1,
+      "n": 3349,
+      "home_win_rate": 0.2532,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 15,
+      "score_diff": 0,
+      "n": 4151,
+      "home_win_rate": 0.523,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 15,
+      "score_diff": 1,
+      "n": 3582,
+      "home_win_rate": 0.7903,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 15,
+      "score_diff": 2,
+      "n": 2394,
+      "home_win_rate": 0.9378,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 15,
+      "score_diff": 3,
+      "n": 1227,
+      "home_win_rate": 0.987,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 15,
+      "score_diff": 4,
+      "n": 572,
+      "home_win_rate": 0.9983,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 15,
+      "score_diff": 5,
+      "n": 311,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 14,
+      "score_diff": -5,
+      "n": 167,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 14,
+      "score_diff": -4,
+      "n": 393,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 14,
+      "score_diff": -3,
+      "n": 956,
+      "home_win_rate": 0.0126,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 14,
+      "score_diff": -2,
+      "n": 2037,
+      "home_win_rate": 0.0697,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 14,
+      "score_diff": -1,
+      "n": 3336,
+      "home_win_rate": 0.244,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 14,
+      "score_diff": 0,
+      "n": 4068,
+      "home_win_rate": 0.5214,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 14,
+      "score_diff": 1,
+      "n": 3562,
+      "home_win_rate": 0.7981,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 14,
+      "score_diff": 2,
+      "n": 2384,
+      "home_win_rate": 0.9421,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 14,
+      "score_diff": 3,
+      "n": 1268,
+      "home_win_rate": 0.989,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 14,
+      "score_diff": 4,
+      "n": 603,
+      "home_win_rate": 0.9983,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 14,
+      "score_diff": 5,
+      "n": 318,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 13,
+      "score_diff": -5,
+      "n": 174,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 13,
+      "score_diff": -4,
+      "n": 409,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 13,
+      "score_diff": -3,
+      "n": 968,
+      "home_win_rate": 0.0134,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 13,
+      "score_diff": -2,
+      "n": 2028,
+      "home_win_rate": 0.0651,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 13,
+      "score_diff": -1,
+      "n": 3283,
+      "home_win_rate": 0.2312,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 13,
+      "score_diff": 0,
+      "n": 4076,
+      "home_win_rate": 0.5216,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 13,
+      "score_diff": 1,
+      "n": 3512,
+      "home_win_rate": 0.8032,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 13,
+      "score_diff": 2,
+      "n": 2415,
+      "home_win_rate": 0.9462,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 13,
+      "score_diff": 3,
+      "n": 1281,
+      "home_win_rate": 0.9914,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 13,
+      "score_diff": 4,
+      "n": 605,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 13,
+      "score_diff": 5,
+      "n": 341,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 12,
+      "score_diff": -5,
+      "n": 190,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 12,
+      "score_diff": -4,
+      "n": 409,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 12,
+      "score_diff": -3,
+      "n": 996,
+      "home_win_rate": 0.0131,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 12,
+      "score_diff": -2,
+      "n": 2025,
+      "home_win_rate": 0.0612,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 12,
+      "score_diff": -1,
+      "n": 3276,
+      "home_win_rate": 0.2195,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 12,
+      "score_diff": 0,
+      "n": 4003,
+      "home_win_rate": 0.5264,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 12,
+      "score_diff": 1,
+      "n": 3502,
+      "home_win_rate": 0.8081,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 12,
+      "score_diff": 2,
+      "n": 2386,
+      "home_win_rate": 0.9493,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 12,
+      "score_diff": 3,
+      "n": 1314,
+      "home_win_rate": 0.9916,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 12,
+      "score_diff": 4,
+      "n": 637,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 12,
+      "score_diff": 5,
+      "n": 354,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 11,
+      "score_diff": -5,
+      "n": 202,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 11,
+      "score_diff": -4,
+      "n": 418,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 11,
+      "score_diff": -3,
+      "n": 1012,
+      "home_win_rate": 0.0119,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 11,
+      "score_diff": -2,
+      "n": 2037,
+      "home_win_rate": 0.0545,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 11,
+      "score_diff": -1,
+      "n": 3255,
+      "home_win_rate": 0.2147,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 11,
+      "score_diff": 0,
+      "n": 3947,
+      "home_win_rate": 0.5257,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 11,
+      "score_diff": 1,
+      "n": 3481,
+      "home_win_rate": 0.8141,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 11,
+      "score_diff": 2,
+      "n": 2373,
+      "home_win_rate": 0.9532,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 11,
+      "score_diff": 3,
+      "n": 1341,
+      "home_win_rate": 0.994,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 11,
+      "score_diff": 4,
+      "n": 662,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 11,
+      "score_diff": 5,
+      "n": 364,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 10,
+      "score_diff": -5,
+      "n": 209,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 10,
+      "score_diff": -4,
+      "n": 439,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 10,
+      "score_diff": -3,
+      "n": 1022,
+      "home_win_rate": 0.0098,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 10,
+      "score_diff": -2,
+      "n": 2019,
+      "home_win_rate": 0.0495,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 10,
+      "score_diff": -1,
+      "n": 3240,
+      "home_win_rate": 0.2096,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 10,
+      "score_diff": 0,
+      "n": 3918,
+      "home_win_rate": 0.5184,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 10,
+      "score_diff": 1,
+      "n": 3471,
+      "home_win_rate": 0.8271,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 10,
+      "score_diff": 2,
+      "n": 2370,
+      "home_win_rate": 0.9561,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 10,
+      "score_diff": 3,
+      "n": 1368,
+      "home_win_rate": 0.9934,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 10,
+      "score_diff": 4,
+      "n": 657,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 10,
+      "score_diff": 5,
+      "n": 379,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 9,
+      "score_diff": -5,
+      "n": 226,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 9,
+      "score_diff": -4,
+      "n": 438,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 9,
+      "score_diff": -3,
+      "n": 1059,
+      "home_win_rate": 0.0076,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 9,
+      "score_diff": -2,
+      "n": 2006,
+      "home_win_rate": 0.0439,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 9,
+      "score_diff": -1,
+      "n": 3183,
+      "home_win_rate": 0.197,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 9,
+      "score_diff": 0,
+      "n": 3908,
+      "home_win_rate": 0.5184,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 9,
+      "score_diff": 1,
+      "n": 3469,
+      "home_win_rate": 0.8354,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 9,
+      "score_diff": 2,
+      "n": 2344,
+      "home_win_rate": 0.9608,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 9,
+      "score_diff": 3,
+      "n": 1377,
+      "home_win_rate": 0.9956,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 9,
+      "score_diff": 4,
+      "n": 681,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 9,
+      "score_diff": 5,
+      "n": 401,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 8,
+      "score_diff": -5,
+      "n": 240,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 8,
+      "score_diff": -4,
+      "n": 450,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 8,
+      "score_diff": -3,
+      "n": 1055,
+      "home_win_rate": 0.0047,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 8,
+      "score_diff": -2,
+      "n": 1991,
+      "home_win_rate": 0.0392,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 8,
+      "score_diff": -1,
+      "n": 3182,
+      "home_win_rate": 0.1782,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 8,
+      "score_diff": 0,
+      "n": 3867,
+      "home_win_rate": 0.5203,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 8,
+      "score_diff": 1,
+      "n": 3473,
+      "home_win_rate": 0.8465,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 8,
+      "score_diff": 2,
+      "n": 2343,
+      "home_win_rate": 0.9663,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 8,
+      "score_diff": 3,
+      "n": 1365,
+      "home_win_rate": 0.9963,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 8,
+      "score_diff": 4,
+      "n": 702,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 8,
+      "score_diff": 5,
+      "n": 424,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 7,
+      "score_diff": -5,
+      "n": 258,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 7,
+      "score_diff": -4,
+      "n": 461,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 7,
+      "score_diff": -3,
+      "n": 1063,
+      "home_win_rate": 0.0028,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 7,
+      "score_diff": -2,
+      "n": 1971,
+      "home_win_rate": 0.0325,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 7,
+      "score_diff": -1,
+      "n": 3152,
+      "home_win_rate": 0.1678,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 7,
+      "score_diff": 0,
+      "n": 3888,
+      "home_win_rate": 0.5152,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 7,
+      "score_diff": 1,
+      "n": 3401,
+      "home_win_rate": 0.8603,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 7,
+      "score_diff": 2,
+      "n": 2368,
+      "home_win_rate": 0.9717,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 7,
+      "score_diff": 3,
+      "n": 1372,
+      "home_win_rate": 0.9971,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 7,
+      "score_diff": 4,
+      "n": 708,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 7,
+      "score_diff": 5,
+      "n": 450,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 6,
+      "score_diff": -5,
+      "n": 273,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 6,
+      "score_diff": -4,
+      "n": 478,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 6,
+      "score_diff": -3,
+      "n": 1052,
+      "home_win_rate": 0.0029,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 6,
+      "score_diff": -2,
+      "n": 1954,
+      "home_win_rate": 0.0246,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 6,
+      "score_diff": -1,
+      "n": 3181,
+      "home_win_rate": 0.1562,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 6,
+      "score_diff": 0,
+      "n": 3822,
+      "home_win_rate": 0.5186,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 6,
+      "score_diff": 1,
+      "n": 3428,
+      "home_win_rate": 0.867,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 6,
+      "score_diff": 2,
+      "n": 2326,
+      "home_win_rate": 0.9781,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 6,
+      "score_diff": 3,
+      "n": 1383,
+      "home_win_rate": 0.9978,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 6,
+      "score_diff": 4,
+      "n": 738,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 6,
+      "score_diff": 5,
+      "n": 457,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 5,
+      "score_diff": -5,
+      "n": 290,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 5,
+      "score_diff": -4,
+      "n": 486,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 5,
+      "score_diff": -3,
+      "n": 1037,
+      "home_win_rate": 0.0029,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 5,
+      "score_diff": -2,
+      "n": 1936,
+      "home_win_rate": 0.0186,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 5,
+      "score_diff": -1,
+      "n": 3171,
+      "home_win_rate": 0.1425,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 5,
+      "score_diff": 0,
+      "n": 3819,
+      "home_win_rate": 0.5164,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 5,
+      "score_diff": 1,
+      "n": 3406,
+      "home_win_rate": 0.8764,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 5,
+      "score_diff": 2,
+      "n": 2338,
+      "home_win_rate": 0.9825,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 5,
+      "score_diff": 3,
+      "n": 1381,
+      "home_win_rate": 0.9986,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 5,
+      "score_diff": 4,
+      "n": 742,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 5,
+      "score_diff": 5,
+      "n": 486,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 4,
+      "score_diff": -5,
+      "n": 295,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 4,
+      "score_diff": -4,
+      "n": 516,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 4,
+      "score_diff": -3,
+      "n": 1038,
+      "home_win_rate": 0.0019,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 4,
+      "score_diff": -2,
+      "n": 1905,
+      "home_win_rate": 0.0147,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 4,
+      "score_diff": -1,
+      "n": 3139,
+      "home_win_rate": 0.1246,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 4,
+      "score_diff": 0,
+      "n": 3853,
+      "home_win_rate": 0.5147,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 4,
+      "score_diff": 1,
+      "n": 3363,
+      "home_win_rate": 0.8915,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 4,
+      "score_diff": 2,
+      "n": 2325,
+      "home_win_rate": 0.9867,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 4,
+      "score_diff": 3,
+      "n": 1382,
+      "home_win_rate": 0.9986,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 4,
+      "score_diff": 4,
+      "n": 773,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 4,
+      "score_diff": 5,
+      "n": 503,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 3,
+      "score_diff": -5,
+      "n": 308,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 3,
+      "score_diff": -4,
+      "n": 545,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 3,
+      "score_diff": -3,
+      "n": 1032,
+      "home_win_rate": 0.0019,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 3,
+      "score_diff": -2,
+      "n": 1874,
+      "home_win_rate": 0.0128,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 3,
+      "score_diff": -1,
+      "n": 3121,
+      "home_win_rate": 0.1086,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 3,
+      "score_diff": 0,
+      "n": 3871,
+      "home_win_rate": 0.5136,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 3,
+      "score_diff": 1,
+      "n": 3330,
+      "home_win_rate": 0.9039,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 3,
+      "score_diff": 2,
+      "n": 2290,
+      "home_win_rate": 0.9904,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 3,
+      "score_diff": 3,
+      "n": 1385,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 3,
+      "score_diff": 4,
+      "n": 817,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 3,
+      "score_diff": 5,
+      "n": 519,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 2,
+      "score_diff": -5,
+      "n": 320,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 2,
+      "score_diff": -4,
+      "n": 581,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 2,
+      "score_diff": -3,
+      "n": 1061,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 2,
+      "score_diff": -2,
+      "n": 1797,
+      "home_win_rate": 0.01,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 2,
+      "score_diff": -1,
+      "n": 3110,
+      "home_win_rate": 0.0929,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 2,
+      "score_diff": 0,
+      "n": 3877,
+      "home_win_rate": 0.5117,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 2,
+      "score_diff": 1,
+      "n": 3322,
+      "home_win_rate": 0.9193,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 2,
+      "score_diff": 2,
+      "n": 2217,
+      "home_win_rate": 0.9923,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 2,
+      "score_diff": 3,
+      "n": 1400,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 2,
+      "score_diff": 4,
+      "n": 867,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 2,
+      "score_diff": 5,
+      "n": 540,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 1,
+      "score_diff": -5,
+      "n": 338,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 1,
+      "score_diff": -4,
+      "n": 610,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 1,
+      "score_diff": -3,
+      "n": 1188,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 1,
+      "score_diff": -2,
+      "n": 1630,
+      "home_win_rate": 0.0037,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 1,
+      "score_diff": -1,
+      "n": 3072,
+      "home_win_rate": 0.0758,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 1,
+      "score_diff": 0,
+      "n": 3934,
+      "home_win_rate": 0.5135,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 1,
+      "score_diff": 1,
+      "n": 3274,
+      "home_win_rate": 0.9331,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 1,
+      "score_diff": 2,
+      "n": 1999,
+      "home_win_rate": 0.9965,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 1,
+      "score_diff": 3,
+      "n": 1583,
+      "home_win_rate": 0.9994,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 1,
+      "score_diff": 4,
+      "n": 895,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 1,
+      "score_diff": 5,
+      "n": 569,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 0,
+      "score_diff": -5,
+      "n": 349,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 0,
+      "score_diff": -4,
+      "n": 656,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 0,
+      "score_diff": -3,
+      "n": 1449,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 0,
+      "score_diff": -2,
+      "n": 1648,
+      "home_win_rate": 0.0006,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 0,
+      "score_diff": -1,
+      "n": 2671,
+      "home_win_rate": 0.0547,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 0,
+      "score_diff": 0,
+      "n": 4062,
+      "home_win_rate": 0.5121,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 0,
+      "score_diff": 1,
+      "n": 2918,
+      "home_win_rate": 0.9551,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 0,
+      "score_diff": 2,
+      "n": 1934,
+      "home_win_rate": 0.9995,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 0,
+      "score_diff": 3,
+      "n": 1855,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 0,
+      "score_diff": 4,
+      "n": 954,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 3,
+      "mins_remaining": 0,
+      "score_diff": 5,
+      "n": 596,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 4,
+      "mins_remaining": 4,
+      "score_diff": -1,
+      "n": 403,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 4,
+      "mins_remaining": 4,
+      "score_diff": 0,
+      "n": 3657,
+      "home_win_rate": 0.5209,
+      "smoothed": false
+    },
+    {
+      "period": 4,
+      "mins_remaining": 4,
+      "score_diff": 1,
+      "n": 325,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 4,
+      "mins_remaining": 3,
+      "score_diff": -1,
+      "n": 648,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 4,
+      "mins_remaining": 3,
+      "score_diff": 0,
+      "n": 3136,
+      "home_win_rate": 0.5195,
+      "smoothed": false
+    },
+    {
+      "period": 4,
+      "mins_remaining": 3,
+      "score_diff": 1,
+      "n": 601,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 4,
+      "mins_remaining": 2,
+      "score_diff": -1,
+      "n": 927,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 4,
+      "mins_remaining": 2,
+      "score_diff": 0,
+      "n": 2566,
+      "home_win_rate": 0.5214,
+      "smoothed": false
+    },
+    {
+      "period": 4,
+      "mins_remaining": 2,
+      "score_diff": 1,
+      "n": 892,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 4,
+      "mins_remaining": 1,
+      "score_diff": -1,
+      "n": 1186,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 4,
+      "mins_remaining": 1,
+      "score_diff": 0,
+      "n": 2050,
+      "home_win_rate": 0.5273,
+      "smoothed": false
+    },
+    {
+      "period": 4,
+      "mins_remaining": 1,
+      "score_diff": 1,
+      "n": 1149,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    },
+    {
+      "period": 4,
+      "mins_remaining": 0,
+      "score_diff": -1,
+      "n": 1388,
+      "home_win_rate": 0.0,
+      "smoothed": false
+    },
+    {
+      "period": 4,
+      "mins_remaining": 0,
+      "score_diff": 0,
+      "n": 1616,
+      "home_win_rate": 0.5254,
+      "smoothed": false
+    },
+    {
+      "period": 4,
+      "mins_remaining": 0,
+      "score_diff": 1,
+      "n": 1381,
+      "home_win_rate": 1.0,
+      "smoothed": false
+    }
+  ]
+}

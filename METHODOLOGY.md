@@ -1,5 +1,5 @@
 # NHL Rating System — Methodology Document
-## Version 2.1
+## Version 2.2
 **Author:** Kylan Huynh
 **Status:** v1 shipped and locked (commit `f7548f6`). v2 in flight; the v1 model and v1 evaluation are immutable per §10 #2.
 **Last updated:** May 2026
@@ -9,6 +9,7 @@
 - *v1.2 (2026-05-17):* Resolves an ambiguity introduced in v1.1 §4 regarding the California Seals / Cleveland Barons → Minnesota North Stars merger. The v1.1 language "pre-merger games count toward the surviving franchise's rating" left open whether the absorbed franchise's pre-merger rating was discarded, averaged, or transferred at the 1978 merger. v1.2 specifies the **simple average** rule: at the start of 1978-79, the surviving franchise's rating is set to the arithmetic mean of its own and the absorbed franchise's final 1977-78 ratings, after which the standard between-season decay applies. This rule is the most defensible reading of the v1.1 intent and is the only merger ever applied in modern NHL history; if a future merger occurs the same rule will apply by default. Resolved before any backtest evaluation was run; no parameter tuning or test-set exposure has occurred. See CHANGELOG.md.
 - *v2.0 (2026-05-18):* Begins the v2 methodology with the first of four pre-registered v2 features (the appendix lists Monte Carlo Cup probabilities, live in-game probability updates, hero-chart live updates, and home-ice advantage). v2.0 introduces **home-ice advantage** as a new tunable rating parameter and defines the v2 train / validation / test split. Crucially, v2 is a new model with its own freeze cycle; the v1 model parameters and v1 test-set results are immutable per §10 #2 and remain the canonical v1 record. See the new Section 12 below and CHANGELOG.md.
 - *v2.1 (2026-05-18):* Adds **Monte Carlo Cup probabilities** — the second of the four pre-registered v2 features. No change to the rating model itself; Cup probabilities are a forward projection from current ratings, not an evaluation of model accuracy against future outcomes. Defines the sim algorithm (per-game rating updates within a single run, 10,000 sims per call), the data inputs (parquet for current state, derived bracket), and how this surface relates to the §10 #1 test-set quarantine (it does not). See the new Section 14 below.
+- *v2.2 (2026-05-18):* Adds **live in-game win probability** — the third of the four pre-registered v2 features — as **Interpretation B**: a separate empirical model layer that estimates `P(home wins | period, time remaining, score differential)` from historical play-by-play data. The Elo rating model is unchanged; nothing in `ratings.py` is touched. v2.2 introduces a new artifact (`live_wp_v2.json`) trained on the 2010-11 → 2024-25 seasons and exposes a stateless endpoint that callers query with a game state. Live polling of in-progress games is deferred to v2.3. See the new Section 15 below.
 
 ---
 
@@ -533,3 +534,69 @@ After all `N_SIMS` runs, `P(team wins Cup) = cup_count[team] / N_SIMS`. Confiden
 - The endpoint reports `n_simulations` and a `simulated_at` timestamp so the caller can judge freshness.
 - The endpoint reports the current playoff state used as the starting point (eliminated teams, completed series, in-progress series, current round) — this is the audit trail.
 - No comparison is made to published Cup probabilities elsewhere; like Vegas, those are markets, not predictions.
+
+---
+
+## Section 15 — v2.2 amendment: live in-game win probability (Interpretation B)
+
+**Motivation.** §5 v1.0 explicitly lists in-game win probability as a v2 candidate. v1 and v2.0 publish a single pre-game probability per matchup; once the puck drops the published value never moves until the next game. v2.2 adds a separate model that updates as the game state changes.
+
+**Interpretation B (chosen over Interpretation A).** Two readings of "live in-game win probability" exist:
+
+- **Interpretation A:** update the team rating as the game unfolds — every goal, every period, etc. produces a fractional rating delta. This semantically extends the Elo model.
+- **Interpretation B:** keep the rating model untouched. Build a *separate* state-aware model `P(home wins | game state)` that estimates the probability conditional on what's happening on the ice right now, independently of the team's underlying rating.
+
+v2.2 picks B. Reasoning: A would couple the rating system to play-by-play data (which has different coverage, different latency, and different failure modes than the box-score data the Elo model uses), and would require re-freezing the rating model. B leaves the v2.0 freeze undisturbed and lets the WP layer evolve independently. Per the v2 schematic posted in the project chat, B is also the prevailing convention at published NHL probability sites.
+
+**Model architecture (empirical lookup).** For each NHL game from 2010-11 through 2024-25 (the v2.2 training window — 2025-26 is held out as the v2 test set per §12), we extract every minute-mark the game passed through:
+
+- `period` ∈ {1, 2, 3, OT}
+- `mins_remaining_in_period` ∈ {0, 1, …, 19} (or {0, 1, …, 4} in regular-season OT)
+- `score_diff` from the home team's perspective, clamped to {-5, -4, -3, -2, -1, 0, +1, +2, +3, +4, +5}
+
+…and we record whether the home team eventually won. The empirical home-win rate per (period, mins_remaining, score_diff) bin is the published WP. Roughly 11 × 4 × 20 = 880 bins; at ~19,500 games × 65 minute-marks per game, total samples ≈ 1.27 million — typically 1,000+ per typical bin.
+
+**Sparse-bin handling.** A bin with fewer than 100 samples falls back to a smoothed Bayesian estimate `(wins + 50) / (total + 100)` (i.e. shrinking toward 0.5 with strength 100). A bin with zero samples returns exactly 0.5 with a `sparse: true` flag in the response so the caller can de-emphasize it. Smoothing is documented per-bin in the artifact for audit.
+
+**Training-data scope and the §10 #1 test set.** The 2010-11 → 2024-25 window is large and partially overlaps with v1's test seasons (2023-24 and 2024-25). v1's test evaluation is locked at the v1 model's results on those seasons and does not need to be re-touched by v2.2. The WP model is conceptually separate from the rating model and has its own training data; for the WP model, 2010-11 → 2024-25 is the training corpus and 2025-26 is the held-out validation/test surface (touched only when the operator runs a future WP evaluation script).
+
+**Outputs.** The artifact `backend/artifacts/live_wp_v2.json` contains:
+
+```json
+{
+  "trained_at": "2026-05-18T...",
+  "methodology_version": "2.2",
+  "training_seasons": [20102011, ..., 20242025],
+  "n_games": ...,
+  "n_samples": ...,
+  "bins": [
+    {
+      "period": 2,
+      "mins_remaining": 9,
+      "score_diff": -1,
+      "n": 4823,
+      "home_win_rate": 0.327,
+      "smoothed": false
+    },
+    ...
+  ]
+}
+```
+
+**Endpoint surface.** `GET /wp?period=2&time_remaining_s=540&score_diff=1` returns the home-win probability for that state. Stateless and idempotent; the only state is the lookup table loaded once at app startup.
+
+**Live polling of in-progress games is v2.3 scope, not v2.2.** Today the endpoint is a pure function; the caller is responsible for knowing the current state. In v2.3 the backend will poll `/v1/gamecenter/{gameId}/play-by-play` for any in-progress game in `/games/today` and surface the live WP automatically. Splitting v2.2 from v2.3 keeps the empirical model and the live-data layer reviewable independently.
+
+**Pre-registered expectations.**
+
+- At the start of every game (period 1, 20:00 remaining, score_diff 0) the WP should be very close to 0.5. A persistent bias away from 0.5 at that state would mean the model has absorbed an unintended home-team prior (e.g. from the historical home win rate baseline).
+- WP at the start of a 1-goal third-period lead should be in the 0.75-0.85 range based on published NHL studies — within sampling noise we should see that band.
+- WP at score_diff +5 in any period should be ≥ 0.95.
+- The model should be monotone in score_diff at fixed (period, mins_remaining): higher score_diff → higher WP. Non-monotonicity would indicate a small-sample bin issue and should be reviewed.
+
+**What v2.2 does not yet provide.**
+
+- No live data flow. The frontend cannot yet display WP for an in-progress game without manual state input. v2.3 wires the live data.
+- No team-specific adjustments. The model treats every team identically; the rating gap is not an input. A future amendment could blend the empirical WP with the rating-derived pre-game WP via a learned weight.
+- No 4-on-4 / 5-on-3 / pulled-goalie awareness. The lookup only knows period, time, and score; situational state is out of scope.
+- No calibration evaluation yet. A future v2.x amendment will run the WP model against 2025-26 once that season is complete and publish ECE/log-loss numbers analogous to the §6 metrics for the rating model.
