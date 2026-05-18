@@ -41,7 +41,9 @@ from app import backtest, metrics, tuner
 from app.ratings import K_PLAYOFF, K_REGULAR
 
 ARTIFACT_PATH = Path(__file__).resolve().parent.parent / "artifacts" / "frozen_params.json"
-DEFAULT_OUT = Path(__file__).resolve().parent.parent / "results" / "test_evaluation.json"
+RESULTS_DIR = Path(__file__).resolve().parent.parent / "results"
+DEFAULT_OUT = RESULTS_DIR / "test_evaluation.json"
+V1_RESULTS_SNAPSHOT = RESULTS_DIR / "test_evaluation_v1.json"
 
 
 def _load_frozen_params() -> tuple[backtest.BacktestParams, dict]:
@@ -52,12 +54,31 @@ def _load_frozen_params() -> tuple[backtest.BacktestParams, dict]:
         )
     artifact = json.loads(ARTIFACT_PATH.read_text())
     w = artifact["winner"]
+    # home_bump defaults to 0.0 for v1 artifacts that predate v2.0 (§12).
     params = backtest.BacktestParams(
         k_regular=float(w["k_regular"]),
         k_playoff=float(w["k_playoff"]),
         decay_carry=float(w["decay_carry"]),
+        home_bump=float(w.get("home_bump", 0.0)),
     )
     return params, artifact
+
+
+def _snapshot_v1_results_if_needed() -> bool:
+    """If the active results file at DEFAULT_OUT is a v1 evaluation and no v1
+    snapshot exists yet, copy it to test_evaluation_v1.json so the v1 record
+    is preserved when v2 evaluation overwrites the active file.
+    """
+    if V1_RESULTS_SNAPSHOT.exists():
+        return False
+    if not DEFAULT_OUT.exists():
+        return False
+    payload = json.loads(DEFAULT_OUT.read_text())
+    version = str(payload.get("methodology_version", ""))
+    if not version.startswith("1"):
+        return False
+    V1_RESULTS_SNAPSHOT.write_text(DEFAULT_OUT.read_text())
+    return True
 
 
 def _score_predictions(predictions, frozen_ratings):
@@ -109,6 +130,11 @@ def main(argv: list[str] | None = None) -> int:
         print("Re-run with --force only if you have a documented justification "
               "for re-evaluation (§10 #2).", file=sys.stderr)
         return 3
+
+    # If the active results are a v1 evaluation, snapshot them before this
+    # v2+ run overwrites the active file. v1 results are immutable per §10 #2.
+    if _snapshot_v1_results_if_needed():
+        print(f"snapshotted v1 results → {V1_RESULTS_SNAPSHOT}")
 
     params, artifact = _load_frozen_params()
 

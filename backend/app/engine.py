@@ -55,13 +55,18 @@ def _current_season_id(today: date) -> int:
 
 async def todays_matchups(today: date | None = None) -> list[dict]:
     """For each game scheduled today, look up both teams' current ratings and
-    compute a pre-game win probability. Live in-game updates are v2 scope.
+    compute a pre-game win probability using the frozen model — including the
+    v2.0 home-ice bump if the active artifact has one. Live in-game updates
+    are still v2 scope.
     """
     today = today or date.today()
     async with httpx.AsyncClient() as client:
         games = await fetch_today(client, today)
 
-    ratings = historical.current_ratings_by_franchise()
+    cache = historical.get_cache()
+    ratings = cache.current_ratings
+    home_bump = cache.params.home_bump
+
     out: list[dict] = []
     for g in games:
         home_fid = historical.franchise_for_active_code(g.home)
@@ -70,6 +75,7 @@ async def todays_matchups(today: date | None = None) -> list[dict]:
             continue  # exhibition / international code we don't model
         r_home = ratings.get(home_fid, 1500.0)
         r_away = ratings.get(away_fid, 1500.0)
+        p_home = win_probability(r_home, r_away, home_bump=home_bump)
         out.append({
             "game_id": g.game_id,
             "game_date": g.game_date.isoformat(),
@@ -78,8 +84,8 @@ async def todays_matchups(today: date | None = None) -> list[dict]:
             "away": g.away,
             "home_rating": round(r_home, 2),
             "away_rating": round(r_away, 2),
-            "home_win_prob": round(win_probability(r_home, r_away), 4),
-            "away_win_prob": round(win_probability(r_away, r_home), 4),
+            "home_win_prob": round(p_home, 4),
+            "away_win_prob": round(1.0 - p_home, 4),
             "home_score": g.home_score,
             "away_score": g.away_score,
         })

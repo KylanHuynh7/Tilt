@@ -1,14 +1,18 @@
-"""Elo-variant rating engine per METHODOLOGY.md v1.1 §§4-5.
+"""Elo-variant rating engine per METHODOLOGY.md §§4-5 (with v2.0 home-ice).
 
 Primitives:
-  - win_probability(R_a, R_b)              §5 win-prob formula
-  - apply_game(R_a, R_b, outcome, ...)     §5 single-game update
-  - apply_decay(rating, carry)             §4 between-season regression to 1500
-  - classify_outcome(...)                  §5 + v1.1 tie handling
+  - win_probability(R_home, R_away, home_bump=0)  §5 + §12 win-prob formula
+  - apply_game(R_a, R_b, outcome, ...)            §5 single-game update
+  - apply_decay(rating, carry)                    §4 between-season regression
+  - classify_outcome(...)                         §5 + v1.1 tie handling
 
 The constants are the v1.0 starting values; K_REGULAR, K_PLAYOFF, the OT/SO
-weights, and DECAY_CARRY are tunable during Phase C validation and frozen
-before the test set is touched.
+weights, DECAY_CARRY, and HOME_BUMP_DEFAULT are tunable during validation and
+frozen before any test-set evaluation.
+
+`home_bump` is the v2.0 addition. A value of 0 reproduces the v1 behavior
+exactly; positive values bias predictions toward the home team in Elo points.
+The v1 model is locked at home_bump=0 — see §10 #2.
 """
 
 from dataclasses import dataclass
@@ -22,6 +26,11 @@ K_REGULAR: float = 6.0
 K_PLAYOFF: float = 10.0  # uniform across all playoff games per v1.1 Section 5
 
 DECAY_CARRY: float = 0.75  # §4: R_new = mean + carry * (R - mean)
+
+# v2.0 §12: rating-point bias applied to the home team's effective rating in
+# `win_probability`. 0.0 = v1 behavior (neutral ice). Tuned during v2
+# validation; the v2 grid sweeps {0, 20, 40, 60, 80, 100}.
+HOME_BUMP_DEFAULT: float = 0.0
 
 # Tie outcomes are only valid in seasons before the shootout (introduced
 # 2005-06). The classifier enforces this; the engine should never see a TIE
@@ -43,9 +52,27 @@ OUTCOME_WEIGHTS: dict[Outcome, float] = {
 }
 
 
-def win_probability(rating_a: float, rating_b: float) -> float:
-    """P(A wins) per the Elo formula in Section 5."""
-    return 1.0 / (1.0 + 10.0 ** ((rating_b - rating_a) / DIVISOR))
+def win_probability(
+    rating_a: float,
+    rating_b: float,
+    *,
+    home_bump: float = HOME_BUMP_DEFAULT,
+) -> float:
+    """P(A wins) per the Elo formula in §5, with the v2.0 §12 home-ice bump.
+
+    Semantically `rating_a` is the home team and `rating_b` is the away team.
+    The bump is added to `rating_a`'s effective rating before computing the
+    Elo gap. To get the away team's perspective, compute `1 - this value`
+    rather than swapping arguments — swapping would incorrectly attribute
+    the home-ice advantage to the away team.
+
+    `home_bump = 0.0` exactly reproduces the v1 (neutral-ice) behavior, so
+    callers that don't model home ice (e.g. `ratings.apply_game` in test
+    paths) can ignore this argument. The v1 frozen model is locked at
+    home_bump=0 per §10 #2.
+    """
+    effective_gap = (rating_b - rating_a - home_bump) / DIVISOR
+    return 1.0 / (1.0 + 10.0 ** effective_gap)
 
 
 @dataclass

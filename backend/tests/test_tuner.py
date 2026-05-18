@@ -48,15 +48,29 @@ def test_grid_search_two_cells_picks_better_log_loss():
 
 
 def test_default_grid_has_expected_shape():
-    # 5 × 4 × 5 = 100 cells (K_regular × K_playoff × decay_carry).
-    assert len(tuner.DEFAULT_GRID) == 100
+    # v2 (§12) grid: 5 × 4 × 5 × 6 = 600 cells
+    # (K_regular × K_playoff × decay_carry × home_bump).
+    assert len(tuner.DEFAULT_GRID) == 600
+
+
+def test_v1_grid_preserved_for_reproducing_v1_freeze():
+    # v1 grid was 100 cells with home_bump implicitly 0.
+    assert len(tuner.V1_GRID) == 100
+    for gp in tuner.V1_GRID:
+        assert gp.home_bump == 0.0
 
 
 def test_test_seasons_constant_is_documented_not_referenced():
     # §10 #1 quarantine: the test seasons exist as a list for documentation
     # but the public API surface never accepts them as input.
-    assert tuner.TEST_SEASONS_DO_NOT_TOUCH == [20232024, 20242025]
-    assert 20232024 not in tuner.TRAINING_SEASONS
-    assert 20232024 not in tuner.VALIDATION_SEASONS
-    assert 20242025 not in tuner.TRAINING_SEASONS
-    assert 20242025 not in tuner.VALIDATION_SEASONS
+    # v2 split per §12: 2025-26 is the new held-out test.
+    assert tuner.TEST_SEASONS_DO_NOT_TOUCH == [20252026]
+    assert 20252026 not in tuner.TRAINING_SEASONS
+    assert 20252026 not in tuner.VALIDATION_SEASONS
+    # v1 test seasons are now in the v2 validation window — confirm they're
+    # in validation, not still in test.
+    assert 20232024 in tuner.VALIDATION_SEASONS
+    assert 20242025 in tuner.VALIDATION_SEASONS
+    # v1 split is also preserved as constants for reproducing the v1 freeze.
+    assert tuner.TEST_SEASONS_V1_DO_NOT_TOUCH == [20232024, 20242025]
+    assert tuner.VALIDATION_SEASONS_V1 == [20212022, 20222023]

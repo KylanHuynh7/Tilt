@@ -145,13 +145,22 @@ def actuals_from_predictions(predictions) -> list[float]:
     return out
 
 
-def static_rating_probs(predictions, frozen_ratings: dict[str, float]) -> list[float]:
+def static_rating_probs(
+    predictions,
+    frozen_ratings: dict[str, float],
+    *,
+    home_bump: float = 0.0,
+) -> list[float]:
     """Higher-rated-team baseline per §6: predict using the rating gap from a
     snapshot taken at the end of warm-up, without updating.
 
     `frozen_ratings` is the rating state at the END of training; every game's
     prediction uses those ratings unchanged. This isolates "does the rating
     system have signal at all?" from "does the update mechanism add value?"
+
+    `home_bump` is the v2.0 §12 home-ice bias. For a fair baseline comparison
+    the same bump used by the model is applied to the baseline — otherwise the
+    baseline would be doubly penalized (no updates AND no home ice).
     """
     from .ratings import win_probability  # local import avoids circular dep
 
@@ -159,5 +168,5 @@ def static_rating_probs(predictions, frozen_ratings: dict[str, float]) -> list[f
     for pred in predictions:
         r_home = frozen_ratings.get(pred.home_franchise, 1500.0)
         r_away = frozen_ratings.get(pred.away_franchise, 1500.0)
-        out.append(win_probability(r_home, r_away))
+        out.append(win_probability(r_home, r_away, home_bump=home_bump))
     return out

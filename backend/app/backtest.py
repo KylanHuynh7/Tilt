@@ -38,6 +38,7 @@ import pyarrow.parquet as pq
 from . import franchises, pipeline, ratings
 from .ratings import (
     DECAY_CARRY,
+    HOME_BUMP_DEFAULT,
     INITIAL_RATING,
     K_PLAYOFF,
     K_REGULAR,
@@ -85,11 +86,16 @@ class Snapshot:
 
 @dataclass
 class BacktestParams:
-    """The tunable knobs (frozen pre-test per §7)."""
+    """The tunable knobs (frozen pre-test per §7).
+
+    `home_bump` is the v2.0 addition (§12). Default 0.0 reproduces v1 behavior
+    so any caller that doesn't know about home ice gets the locked v1 model.
+    """
 
     k_regular: float = K_REGULAR
     k_playoff: float = K_PLAYOFF
     decay_carry: float = DECAY_CARRY
+    home_bump: float = HOME_BUMP_DEFAULT
     outcome_weights: dict[Outcome, float] = field(
         default_factory=lambda: dict(OUTCOME_WEIGHTS)
     )
@@ -184,10 +190,10 @@ def _apply_one_game(
         perspective="away",
     )
 
-    # apply_game uses the home perspective; weights for away are derived
-    # symmetrically inside apply_game. We pre-compute the weight via the
-    # params dict so a custom weight table is honored.
-    p_home = win_probability(r_home, r_away)
+    # Win probability includes the v2.0 home-ice bump (§12). r_home is the
+    # first argument and gets the bump; symmetry of P_home + P_away = 1 is
+    # preserved by computing P_away as (1 - P_home).
+    p_home = win_probability(r_home, r_away, home_bump=params.home_bump)
     w_home = _weighted_outcome(home_outcome, params.outcome_weights)
     w_away = _weighted_outcome(away_outcome, params.outcome_weights)
     k = params.k_playoff if is_playoff else params.k_regular

@@ -1,14 +1,23 @@
 """Validation-period hyperparameter tuner per METHODOLOGY.md §7 step 3.
 
-Sweeps a small grid over (K_regular, K_playoff, decay_carry), runs the full
-backtest for each grid point, scores the validation-period predictions with
-the §6 metrics, and returns the ranked results. The caller picks the winner
-by the §6 primary metric (log-loss) and freezes those parameters.
+Sweeps a small grid over (K_regular, K_playoff, decay_carry, home_bump), runs
+the full backtest for each grid point, scores the validation-period predictions
+with the §6 metrics, and returns the ranked results. The caller picks the
+winner by the §6 primary metric (log-loss) and freezes those parameters.
 
-Scope: this tuner does NOT tune the OT/SO outcome weights. They remain at
-the §5 starting values for v1. A future weight-tuning pass would expand the
-grid in a follow-up amendment. This is a deliberate scope choice documented
-in the freeze artifact, not an oversight.
+`home_bump` is the v2.0 (§12) addition. The v1 grid was 3D with home_bump
+implicitly 0.0; the v2 grid is 4D and the v1 grid is reachable as the slice
+where home_bump = 0.
+
+Scope: this tuner does NOT tune the OT/SO outcome weights. They remain at the
+§5 starting values. A future weight-tuning pass would expand the grid in a
+follow-up amendment.
+
+Season splits differ between v1 and v2:
+  - v1:  train 1967-2020, validation 2021-22 + 2022-23, test 2023-24 + 2024-25
+  - v2:  train 1967-2020, validation 2021-22 → 2024-25, test 2025-26
+The active constants below are the v2 split per §12. v1 splits are preserved
+as `*_V1` constants for reference and for reproducing v1's freeze.
 
 §10 #1 quarantine: this module imports the test-set season ids only as
 constants (for documentation) and never reads them. The grid-search code
@@ -22,18 +31,25 @@ from dataclasses import dataclass, field
 from typing import Sequence
 
 from . import backtest, metrics
-from .ratings import DECAY_CARRY, K_PLAYOFF, K_REGULAR
+from .ratings import DECAY_CARRY, HOME_BUMP_DEFAULT, K_PLAYOFF, K_REGULAR
 
 
-# --- Season windows per §4 ----------------------------------------------------
+# --- Season windows per §4 (v1) and §12 (v2) -----------------------------------
 
 TRAINING_SEASONS: list[int] = [
     s for s in range(19671968, 20202021 + 10001, 10001)
     if s != 20042005  # cancelled lockout
 ]
-VALIDATION_SEASONS: list[int] = [20212022, 20222023]
-# Test seasons listed for documentation only — never used in this module.
-TEST_SEASONS_DO_NOT_TOUCH: list[int] = [20232024, 20242025]
+
+# v1 split — preserved for reproducing the v1 freeze artifact byte-for-byte.
+VALIDATION_SEASONS_V1: list[int] = [20212022, 20222023]
+TEST_SEASONS_V1_DO_NOT_TOUCH: list[int] = [20232024, 20242025]
+
+# v2 split per §12. The former v1 test seasons join validation because v1's
+# results on them are locked at v1 values; v2 is a separate model and may
+# re-score them as validation data. The new held-out test is 2025-26.
+VALIDATION_SEASONS: list[int] = [20212022, 20222023, 20232024, 20242025]
+TEST_SEASONS_DO_NOT_TOUCH: list[int] = [20252026]
 
 
 # --- Grid + result types ------------------------------------------------------
@@ -43,12 +59,14 @@ class GridPoint:
     k_regular: float
     k_playoff: float
     decay_carry: float
+    home_bump: float = HOME_BUMP_DEFAULT  # default 0.0 reproduces v1 cells
 
     def to_params(self) -> backtest.BacktestParams:
         return backtest.BacktestParams(
             k_regular=self.k_regular,
             k_playoff=self.k_playoff,
             decay_carry=self.decay_carry,
+            home_bump=self.home_bump,
         )
 
 
@@ -64,10 +82,21 @@ class TuneRow:
     static_baseline_ece: float
 
 
-# --- Default v1 grid ----------------------------------------------------------
+# --- Default grids ------------------------------------------------------------
 
+# v2 default: 5 × 4 × 5 × 6 = 600 cells.
 DEFAULT_GRID: list[GridPoint] = [
-    GridPoint(k_regular=kr, k_playoff=kp, decay_carry=dc)
+    GridPoint(k_regular=kr, k_playoff=kp, decay_carry=dc, home_bump=hb)
+    for kr in (4.0, 6.0, 8.0, 10.0, 12.0)
+    for kp in (6.0, 10.0, 14.0, 18.0)
+    for dc in (0.65, 0.70, 0.75, 0.80, 0.85)
+    for hb in (0.0, 20.0, 40.0, 60.0, 80.0, 100.0)
+]
+
+# v1 grid (100 cells, home_bump implicitly 0). Preserved so the v1 freeze can
+# be reproduced exactly from this codebase if needed.
+V1_GRID: list[GridPoint] = [
+    GridPoint(k_regular=kr, k_playoff=kp, decay_carry=dc, home_bump=0.0)
     for kr in (4.0, 6.0, 8.0, 10.0, 12.0)
     for kp in (6.0, 10.0, 14.0, 18.0)
     for dc in (0.65, 0.70, 0.75, 0.80, 0.85)
@@ -107,7 +136,12 @@ def evaluate_one(
 
     probs = [p.home_win_prob for p in result.predictions]
     actuals = metrics.actuals_from_predictions(result.predictions)
-    static_probs = metrics.static_rating_probs(result.predictions, frozen_ratings)
+    # The static-rating baseline gets the same home_bump the model uses, so the
+    # comparison isolates "ratings updating vs ratings frozen" rather than
+    # mixing in "with vs without home ice."
+    static_probs = metrics.static_rating_probs(
+        result.predictions, frozen_ratings, home_bump=grid_point.home_bump
+    )
 
     return TuneRow(
         grid_point=grid_point,
@@ -157,7 +191,7 @@ def grid_search(
             print(
                 f"  [{i+1:>3}/{len(grid)}] "
                 f"K={gp.k_regular:>4.1f}/{gp.k_playoff:>4.1f} "
-                f"c={gp.decay_carry:.2f}  "
+                f"c={gp.decay_carry:.2f} hb={gp.home_bump:>5.1f}  "
                 f"LL={row.log_loss:.5f}  B={row.brier:.5f}  ECE={row.ece:.4f}",
                 flush=True,
             )

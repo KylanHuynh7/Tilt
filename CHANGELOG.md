@@ -2,6 +2,20 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-05-18 — METHODOLOGY.md §13 (known limitations consolidated)
+
+New Section 13 collects every limitation surfaced during v1 development and v2.0 work into a single auditable page: scope-deferred features, design choices that bound expressivity, empirical tensions between methodology and data (notably the §5 K_playoff≥K_regular constraint cost), data-quality limitations including pre-1967 sparseness and isolated NHL API 5xx errors, franchise-lineage judgment calls (Hamilton→NY Americans, OAK/CGS/CLE merger, etc.), and methodology-process limitations (shrinking test sets, no cross-validation safety net, no external comparison anchor). Material is cross-referenced rather than duplicated; nothing already in §2/§4/§5/§8/§10/§12 was rewritten.
+
+## 2026-05-18 — METHODOLOGY.md v2.0 + V2.A (home-ice advantage)
+
+v2 begins. The v1 model is locked at commit `f7548f6`; v1 artifacts (`frozen_params_v1.json`, `test_evaluation_v1.json`) are preserved alongside the new v2 artifacts.
+
+Methodology: new §12 introduces `HOME_BUMP` as a tunable rating-point bias applied to the home team in `win_probability`. The v1 calibration result (every bucket under-predicted home wins by 3-8 points) is the direct motivation — §5 explicitly predicted this would happen when omitting home ice. v2 train/val/test split: 1967-2020 train, 2021-22 → 2024-25 validation (former v1 test seasons folded in), **2025-26 as the new held-out test** (touched exactly once at v2 final evaluation after the 2026 Cup Final).
+
+Code: `ratings.win_probability` accepts an optional `home_bump`. `backtest.BacktestParams` gains the field; `_apply_one_game` passes it through. `metrics.static_rating_probs` accepts it. `tuner.GridPoint` expands to four dimensions; `DEFAULT_GRID` grows from 100 cells to 600. `freeze_params.py` writes both `frozen_params.json` (latest) and `frozen_params_v2.json` (versioned snapshot) and preserves the v1 artifact untouched. `historical.FrozenParams` is backwards-compatible (defaults `home_bump` to 0 when missing).
+
+V2.A pre-registered expectations (in §12): optimal HOME_BUMP ∈ [30, 70] Elo points; validation log-loss improves by ≥ 0.005 vs v1 on the same window; validation ECE drops below 0.04. v2 test-set evaluation is deferred until 2025-26 is complete.
+
 ## 2026-05-18 — v1 ready for `v1 complete` commit
 
 All §9 stopping criteria met except #10 (operator-action commit). The frozen v1 model passes log-loss and Brier targets on the held-out test set, misses ECE by 0.012 (driven by 2024-25 alone; 2023-24 meets the target). Documented systematic under-prediction of home wins across all buckets — anticipated v2 fix is home-ice modeling. See [`docs/STOPPING_CRITERIA.md`](./docs/STOPPING_CRITERIA.md) for the per-criterion walkthrough.

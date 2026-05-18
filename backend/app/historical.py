@@ -41,6 +41,7 @@ class FrozenParams:
     k_regular: float
     k_playoff: float
     decay_carry: float
+    home_bump: float  # v2.0 §12; defaults to 0.0 when loading a v1 artifact
     frozen_at: str | None
     methodology_version: str | None
 
@@ -49,6 +50,7 @@ class FrozenParams:
             k_regular=self.k_regular,
             k_playoff=self.k_playoff,
             decay_carry=self.decay_carry,
+            home_bump=self.home_bump,
         )
 
 
@@ -60,10 +62,13 @@ def load_frozen_params(path: Path = ARTIFACT_PATH) -> FrozenParams:
         )
     payload = json.loads(path.read_text())
     w = payload["winner"]
+    # Backwards-compat: v1 artifacts have no home_bump field — treat as 0.0
+    # so the v1 model loads and runs identically post-v2.0 code changes.
     return FrozenParams(
         k_regular=float(w["k_regular"]),
         k_playoff=float(w["k_playoff"]),
         decay_carry=float(w["decay_carry"]),
+        home_bump=float(w.get("home_bump", 0.0)),
         frozen_at=payload.get("frozen_at"),
         methodology_version=payload.get("methodology_version"),
     )

@@ -34,9 +34,12 @@ from pathlib import Path
 
 from app import tuner
 
-METHODOLOGY_VERSION = "1.2"
+METHODOLOGY_VERSION = "2.0"
 
-DEFAULT_OUT = Path(__file__).resolve().parent.parent / "artifacts" / "frozen_params.json"
+ARTIFACTS_DIR = Path(__file__).resolve().parent.parent / "artifacts"
+DEFAULT_OUT = ARTIFACTS_DIR / "frozen_params.json"
+V2_SNAPSHOT = ARTIFACTS_DIR / "frozen_params_v2.json"
+V1_SNAPSHOT = ARTIFACTS_DIR / "frozen_params_v1.json"
 
 
 def _row_to_dict(row: tuner.TuneRow) -> dict:
@@ -46,6 +49,7 @@ def _row_to_dict(row: tuner.TuneRow) -> dict:
     d["k_regular"] = gp["k_regular"]
     d["k_playoff"] = gp["k_playoff"]
     d["decay_carry"] = gp["decay_carry"]
+    d["home_bump"] = gp["home_bump"]
     return d
 
 
@@ -88,6 +92,7 @@ def write_artifact(
         "frozen_at": datetime.now(timezone.utc).isoformat(),
         "training_seasons": tuner.TRAINING_SEASONS,
         "validation_seasons": tuner.VALIDATION_SEASONS,
+        "test_seasons_do_not_touch": tuner.TEST_SEASONS_DO_NOT_TOUCH,
         "grid_size": report.grid_size,
         "wall_seconds": round(report.wall_seconds, 2),
         "constraint": constraint_note,
@@ -95,6 +100,7 @@ def write_artifact(
             "k_regular": winner.grid_point.k_regular,
             "k_playoff": winner.grid_point.k_playoff,
             "decay_carry": winner.grid_point.decay_carry,
+            "home_bump": winner.grid_point.home_bump,
             "validation_metrics": {
                 "n_predictions": winner.n_predictions,
                 "brier": winner.brier,
@@ -111,6 +117,7 @@ def write_artifact(
             "k_regular": report.best.grid_point.k_regular,
             "k_playoff": report.best.grid_point.k_playoff,
             "decay_carry": report.best.grid_point.decay_carry,
+            "home_bump": report.best.grid_point.home_bump,
             "log_loss": report.best.log_loss,
             "brier": report.best.brier,
             "ece": report.best.ece,
@@ -119,7 +126,8 @@ def write_artifact(
         "selection_rule": "lowest log_loss; ties broken by lower ECE then lower Brier",
         "notes": [
             "OT/SO outcome weights were not tuned in this freeze; they remain at the §5 starting values.",
-            "Test seasons (2023-24, 2024-25) were not touched during the freeze per §10 #1.",
+            f"Test seasons ({tuner.TEST_SEASONS_DO_NOT_TOUCH}) were not touched during the freeze per §10 #1.",
+            "home_bump is the v2.0 §12 home-ice tunable; 0.0 = v1-equivalent behavior.",
         ],
     }
     tmp = out_path.with_suffix(".json.tmp")
@@ -127,21 +135,47 @@ def write_artifact(
     os.replace(tmp, out_path)
 
 
+def _snapshot_v1_if_needed() -> bool:
+    """Copy the existing v1 frozen_params.json to frozen_params_v1.json if the
+    snapshot doesn't already exist. Returns True if a snapshot was made.
+
+    The current frozen_params.json on disk before any v2 freeze runs IS the
+    v1 artifact, so this preserves it as the immutable v1 record per §10 #2.
+    """
+    if V1_SNAPSHOT.exists():
+        return False
+    if not DEFAULT_OUT.exists():
+        return False
+    payload = json.loads(DEFAULT_OUT.read_text())
+    version = str(payload.get("methodology_version", ""))
+    if not version.startswith("1"):
+        # Already a v2+ artifact; not a v1 to snapshot.
+        return False
+    V1_SNAPSHOT.write_text(DEFAULT_OUT.read_text())
+    print(f"snapshotted v1 frozen artifact → {V1_SNAPSHOT}")
+    return True
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="scripts.freeze_params", description=__doc__.split("\n")[0])
     p.add_argument("--out", type=Path, default=DEFAULT_OUT,
-                   help=f"output path for the artifact (default: {DEFAULT_OUT})")
+                   help=f"output path for the active artifact (default: {DEFAULT_OUT})")
     p.add_argument("--quiet", action="store_true",
                    help="suppress per-cell progress output")
     p.add_argument("--unconstrained", action="store_true",
                    help="skip the §5 K_playoff >= K_regular constraint")
+    p.add_argument("--no-snapshot", action="store_true",
+                   help="don't write frozen_params_v2.json alongside the active artifact")
     args = p.parse_args(argv)
+
+    _snapshot_v1_if_needed()
 
     print(f"freezing parameters; grid size = {len(tuner.DEFAULT_GRID)} cells")
     print(f"training:   {len(tuner.TRAINING_SEASONS)} seasons "
           f"({tuner.TRAINING_SEASONS[0]} → {tuner.TRAINING_SEASONS[-1]})")
     print(f"validation: {len(tuner.VALIDATION_SEASONS)} seasons "
           f"({tuner.VALIDATION_SEASONS[0]} → {tuner.VALIDATION_SEASONS[-1]})")
+    print(f"test (untouched): {tuner.TEST_SEASONS_DO_NOT_TOUCH}")
     constrain = not args.unconstrained
     print(f"§5 K_playoff>=K_regular constraint: {'ON' if constrain else 'OFF'}")
     print()
@@ -155,6 +189,7 @@ def main(argv: list[str] | None = None) -> int:
         gp = row.grid_point
         flag = "  " if gp.k_playoff >= gp.k_regular else "⚠ "
         print(f"  {flag}K={gp.k_regular:>4.1f}/{gp.k_playoff:>4.1f}  c={gp.decay_carry:.2f}  "
+              f"hb={gp.home_bump:>5.1f}  "
               f"LL={row.log_loss:.5f}  B={row.brier:.5f}  ECE={row.ece:.4f}")
     print()
 
@@ -162,7 +197,7 @@ def main(argv: list[str] | None = None) -> int:
     label = "WINNER (constrained)" if constrain else "WINNER (unconstrained)"
     gp = winner.grid_point
     print(f"{label}: K_regular={gp.k_regular}, K_playoff={gp.k_playoff}, "
-          f"decay_carry={gp.decay_carry}")
+          f"decay_carry={gp.decay_carry}, home_bump={gp.home_bump}")
     print(f"   validation log-loss={winner.log_loss:.5f}  "
           f"Brier={winner.brier:.5f}  ECE={winner.ece:.4f}")
     print(f"   static-rating baseline on validation: "
@@ -172,11 +207,15 @@ def main(argv: list[str] | None = None) -> int:
     if constrain and winner is not report.best:
         gp0 = report.best.grid_point
         print()
-        print(f"(unconstrained winner K={gp0.k_regular}/{gp0.k_playoff} c={gp0.decay_carry} "
+        print(f"(unconstrained winner K={gp0.k_regular}/{gp0.k_playoff} "
+              f"c={gp0.decay_carry} hb={gp0.home_bump} "
               f"LL={report.best.log_loss:.5f} — recorded in artifact for transparency)")
 
     write_artifact(report, args.out, constrain_playoff_k=constrain)
-    print(f"\nartifact written: {args.out}")
+    print(f"\nactive artifact written: {args.out}")
+    if not args.no_snapshot and args.out == DEFAULT_OUT:
+        write_artifact(report, V2_SNAPSHOT, constrain_playoff_k=constrain)
+        print(f"versioned snapshot written: {V2_SNAPSHOT}")
     return 0
 
 

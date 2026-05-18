@@ -1,12 +1,13 @@
 # NHL Rating System — Methodology Document
-## Version 1.2
+## Version 2.0
 **Author:** Kylan Huynh
-**Status:** Pre-development — frozen before model evaluation
+**Status:** v1 shipped and locked (commit `f7548f6`). v2 in flight; the v1 model and v1 evaluation are immutable per §10 #2.
 **Last updated:** May 2026
 
 **Amendment log:**
 - *v1.1 (2026-05-17):* Six pre-code clarifications folded into the relevant sections before any implementation work. No model behavior is introduced that was not implied by v1.0; all changes resolve ambiguities flagged during a methodology review. Specifically: (1) expansion-team rating + decay interaction (Section 4), (2) franchise identity persistence across relocations (Section 4), (3) tie outcome weight for pre-2005-06 seasons (Section 5), (4) explicit uniform playoff K-factor across all rounds (Section 5), (5) `/games/today` frozen-parameter invariant (Sections 5 and 11), (6) Brier score upper bound tightened from 0.250 to 0.245 (Sections 2 and 6). See CHANGELOG.md for the corresponding commit.
 - *v1.2 (2026-05-17):* Resolves an ambiguity introduced in v1.1 §4 regarding the California Seals / Cleveland Barons → Minnesota North Stars merger. The v1.1 language "pre-merger games count toward the surviving franchise's rating" left open whether the absorbed franchise's pre-merger rating was discarded, averaged, or transferred at the 1978 merger. v1.2 specifies the **simple average** rule: at the start of 1978-79, the surviving franchise's rating is set to the arithmetic mean of its own and the absorbed franchise's final 1977-78 ratings, after which the standard between-season decay applies. This rule is the most defensible reading of the v1.1 intent and is the only merger ever applied in modern NHL history; if a future merger occurs the same rule will apply by default. Resolved before any backtest evaluation was run; no parameter tuning or test-set exposure has occurred. See CHANGELOG.md.
+- *v2.0 (2026-05-18):* Begins the v2 methodology with the first of four pre-registered v2 features (the appendix lists Monte Carlo Cup probabilities, live in-game probability updates, hero-chart live updates, and home-ice advantage). v2.0 introduces **home-ice advantage** as a new tunable rating parameter and defines the v2 train / validation / test split. Crucially, v2 is a new model with its own freeze cycle; the v1 model parameters and v1 test-set results are immutable per §10 #2 and remain the canonical v1 record. See the new Section 12 below and CHANGELOG.md.
 
 ---
 
@@ -372,3 +373,113 @@ When v1 is complete and shipped, this methodology document will be extended with
 ---
 
 *This document was completed before any code was written. It is the source of truth for all v1 decisions. Disagreements between this document and the codebase are resolved in favor of this document unless a formal amendment is made and committed to the repository.*
+
+---
+
+## Section 12 — v2.0 amendment: home-ice advantage
+
+**Motivation.** The v1 calibration plot (`results/test_evaluation.json`) shows the model systematically under-predicting the home team's win rate in every probability bucket by roughly 3 to 8 percentage points. §5 of the v1 methodology anticipated this exact pattern as the expected signature of omitting home ice ("All win probabilities are computed as if games were played on neutral ice. … home/away splits in the calibration plot may reveal systematic miscalibration as a direct result. Home ice adjustment is a candidate for v2."). v2.0 is that adjustment.
+
+**Model change.** A new tunable parameter `HOME_BUMP`, measured in Elo rating points, is added to the win-probability formula. When computing the probability that the home team beats the away team:
+
+```
+P(home wins) = 1 / (1 + 10 ^ ((R_away - R_home - HOME_BUMP) / 400))
+```
+
+`HOME_BUMP = 0` exactly reproduces the v1 model. A positive value tilts predicted probabilities toward the home team. The standard NHL historical home-advantage is approximately a 3-percent absolute win-rate increase, which corresponds to roughly 40–60 Elo points. The grid search over the validation period will find the value that minimizes log-loss while honoring the §6 pass criteria.
+
+**Constraint.** `HOME_BUMP ≥ 0`. A negative bump would imply away teams are favored by venue, which has no theoretical basis. The constraint is enforced in the grid construction so the unconstrained winner is the same as the constrained winner.
+
+**Symmetry.** The bump is applied to the home rating only, not subtracted from the away rating. The Elo win-probability function is symmetric in this construction: `P(home wins) + P(away wins) = 1` is preserved.
+
+**Rating-update rule.** The K-factor update mechanism is unchanged from v1. Only the *predicted* probability shifts by the bump; the actual home/away outcome is scored against the bumped prediction. This means home teams that overperform the bumped prediction still earn rating points, and vice versa.
+
+**v2 train / validation / test split.**
+
+- *v2 train:* 1967-68 through 2020-21. Identical to v1.
+- *v2 validation:* 2021-22, 2022-23, 2023-24, 2024-25. The former v1 test seasons are folded into validation. This is permissible because v2 is a separate model with its own evaluation; v1's results on 2023-24 and 2024-25 are locked at their v1 values regardless of v2's evaluation on the same data.
+- *v2 test:* 2025-26. Held out, touched exactly once at v2 final evaluation. The 2025-26 regular season completed in April 2026; the playoffs are concluding in June 2026. v2 final evaluation runs after the Stanley Cup Final.
+
+**v2 grid search dimensions.**
+
+```
+K_regular   ∈ {4, 6, 8, 10, 12}
+K_playoff   ∈ {6, 10, 14, 18}     constraint: K_playoff ≥ K_regular  (§5)
+decay_carry ∈ {0.65, 0.70, 0.75, 0.80, 0.85}
+HOME_BUMP   ∈ {0, 20, 40, 60, 80, 100}   constraint: HOME_BUMP ≥ 0
+```
+
+100 v1 grid cells × 6 HOME_BUMP values = 600 v2 grid cells. Selection by lowest log-loss with deterministic tiebreaks (ECE then Brier).
+
+**v1 artifacts preserved.** The v1 frozen-params artifact is preserved as `backend/artifacts/frozen_params_v1.json`. The v1 test-evaluation result is preserved as `backend/results/test_evaluation_v1.json`. These represent the v1 model's locked record and must not be modified. The active artifact (`frozen_params.json`) tracks the current production model.
+
+**v2.0 pre-registered expectations.**
+
+- The optimal `HOME_BUMP` will be in the range of 30 to 70 Elo points. A value below 20 or above 100 would suggest a model wiring bug.
+- The validation log-loss should improve by at least 0.005 versus v1 on the same validation seasons (2021-22 + 2022-23). Less improvement would indicate home ice is doing less than expected and other model issues dominate.
+- The validation ECE should drop below 0.04 on the v1 validation window, since the v1 ECE miss (0.0422) was hypothesized to be home-ice driven.
+- On the new v2 test set (2025-26), the expected Brier band remains 0.235–0.245 as in v1.2. The expected ECE target is < 0.04 (v1's primary miss should be resolved).
+
+**v2.0 stopping criteria** are inherited from §9 with one additional condition: the v1 artifacts (`frozen_params_v1.json` and `test_evaluation_v1.json`) must exist at commit time and must be byte-identical to their v1 values. A diff against v1 is run as part of the v2 release checklist.
+
+**What v2.0 explicitly does not include.** The other three pre-registered v2 features (Monte Carlo Cup probabilities, live in-game probability updates, hero-chart live updates) are scope for subsequent v2.x amendments. v2.0 is intentionally narrow so the home-ice fix can be evaluated in isolation.
+
+---
+
+## Section 13 — Known limitations and ongoing uncertainties
+
+This section consolidates limitations that have surfaced during v1 development and v2.0 work. Material that appears elsewhere in this document is cross-referenced rather than repeated. The intent is a single page that an honest reader can use to bound what this model does and does not claim, without hunting through other sections.
+
+### A. Features the model does not include (scope-deferred)
+
+These are documented omissions, not oversights. Their absence is a limitation of this version of the model, not a flaw in the methodology.
+
+- **Player-level ratings, goalie separation, roster-shock from trades or free agency.** Deferred to v3 per §5 and the appendix.
+- **Monte Carlo Cup probabilities, live in-game probability updates, hero-chart live updates.** Pre-registered v2 scope; not in v2.0 (§12).
+- **Series-context adjustment for playoff games.** Game 7 of the Cup Final is weighted identically to Round 1 Game 1 (uniform K_playoff per §5 v1.1). Deferred to v3.
+- **Schedule context.** Back-to-back games, dense road trips, jet lag, and 4-in-6-night stretches are not represented. §2 pre-registers that "games following long road trips and back-to-back schedules are expected to show systematic bias." No corrective term exists in v2.0.
+- **Score-state and within-game state.** v1 and v2.0 produce pre-game probabilities only. Live in-game WP is a deferred v2 feature.
+- **Team-specific home advantage.** The v2.0 `HOME_BUMP` is a single league-wide constant. Some venues (Edmonton, Winnipeg, Nashville) historically confer larger home advantages than others. Modeling team-specific or venue-specific bumps is a candidate amendment after v2.0 baseline performance is evaluated.
+- **Coach changes, system changes, and other roster turnover that is not transactional.** The model has no representation of who is playing or for whom.
+
+### B. Design choices that bound the model's expressivity
+
+These are choices the methodology made on purpose; they could be relaxed in a future amendment but doing so would change the model's character.
+
+- **K-factor uniformity across playoff rounds.** §5 v1.1 fixes a single K_playoff for every playoff game. The grid search has no mechanism to vary K by round or series state.
+- **Between-season decay as a single carry factor.** All franchises decay toward 1500 at the same rate. A team that lost its top scorer to free agency is decayed identically to a team that returns its core intact.
+- **Uniform tie weight (0.50) for the pre-shootout era.** Fixed by §5 v1.1; not tunable. A regulation tie between a strong team and a weak team is weighted identically to a tie between two equal teams.
+- **Symmetric outcome weights.** OUTCOME_WEIGHTS[REG_WIN] + OUTCOME_WEIGHTS[REG_LOSS] = 1, etc. The v1 grid did not explore asymmetric reward structures.
+- **OT/SO outcome weights were not tuned.** v1 and v2.0 use the §5 starting values. Tuning them would expand the grid and is a pre-registered "future weight-tuning pass" rather than a v2.0 task.
+- **`HOME_BUMP` is non-negative by construction.** Constrained to ≥ 0 in §12; a negative value is not considered defensible and is not represented in the grid.
+
+### C. Empirical tensions between methodology and data
+
+These are places where the data, when given freedom, prefers a configuration the methodology explicitly disallows or de-prioritizes. They are reported here rather than reconciled silently.
+
+- **§5 K_playoff ≥ K_regular constraint vs empirical preference.** Both v1's 100-cell grid and v2.0's 600-cell grid consistently find their unconstrained log-loss minimum at K_playoff < K_regular (most often K_playoff = 6, K_regular ∈ {10, 12}). §5 pre-registers the opposite intuition ("playoff games receive a higher K because they are higher-information signals — teams are at full effort and the opponent pool is non-random"). Validation cost of enforcing the §5 constraint: ~0.0005 log-loss in v1, ~0.0002 in v2.0 — essentially within sampling noise. The methodology continues to enforce §5; the unconstrained winner is preserved in the frozen-params artifact for transparency. Possible explanations include (a) playoff games being noisier than §5 anticipates due to goalie hot streaks and small samples, (b) the validation window happening to contain unusually upset-heavy playoffs, or (c) a real signal that the §5 prior is wrong. We do not resolve this here.
+- **Brier on test set lands inside the pre-registered band, but on the loose side.** v1's pre-registered Brier band was 0.235–0.245 (tightened from 0.250 in v1.1). v1 test Brier = 0.23921 — clearly inside, but closer to the floor than the ceiling. This is reported as a "model fits slightly better than expected" rather than a failure.
+
+### D. Data-quality limitations
+
+- **Pre-1967 NHL data is sparse, inconsistent, and incomplete.** The public `/v1/score` endpoint returns 0 games on many pre-expansion dates that historically had games scheduled. Pre-1942 in particular has limited coverage. §2, §3, and §4 explicitly exclude pre-1967 seasons from training, validation, and evaluation. No calibration claims are made for those seasons; their trajectories are exposed in the dashboard for historical exploration only.
+- **PCHA / WHA / international / exhibition games appear under non-NHL team codes in the historical data.** The franchise lineage table (`franchises.py`) returns `None` for these codes; the engine drops the games. The count of dropped games is logged but not investigated case by case.
+- **NHL API server errors on isolated old dates.** Some preseason dates in the 1980s return persistent HTTP 500. The pipeline treats post-retry 5xx as "empty day" rather than failing the whole season — a defensible choice for an open-ended ingest, but it means we can't distinguish "no games" from "data unavailable" in the source data.
+- **One game in 2024-25 had a `gameState` of `FUT` with no period type at the time of ingest.** Excluded from rating updates. The pipeline is not idempotent against later state changes — re-ingesting overwrites cleanly, but a stale parquet would silently miss the update until the operator re-runs.
+
+### E. Franchise-identity choices that involved judgment
+
+These are §4 lineage decisions where the historical record is ambiguous and the codebase commits to one interpretation. They are listed so a future reviewer can audit them.
+
+- **Hamilton Tigers (HAM, 1920-25) → New York Americans (NYA).** Treated here as the same franchise (sale/relocation). Some hockey historians argue the players were sold but the franchise was effectively dissolved and the Americans were a new franchise. Either reading is defensible; this codebase commits to the relocation interpretation.
+- **California Golden Seals → Cleveland Barons → 1978 merger into Minnesota North Stars.** v1.2 specifies the simple-average merger rule — the absorbed franchise's pre-merger rating is averaged with the surviving franchise's at the season boundary. Three alternatives were considered (discard absorbed rating, transfer absorbed rating to surviving franchise, simple average) and the simple average was chosen as the most defensible reading of the v1.1 wording. None of the alternatives is mathematically wrong; the choice affects ~30 points of Dallas Stars rating across the immediate post-merger years.
+- **Pittsburgh Pirates (PIR, 1925-30) → Philadelphia Quakers (QUA, 1930-31) → defunct.** Treated as a single franchise that relocated and then folded. Pre-1942 defunct franchises do not feed into any current-32 lineage.
+- **Atlanta Flames (AFM) vs Atlanta Thrashers (ATL).** Two distinct franchises that happened to share a city and a name family at different times. The lineage table maps them to different franchise_ids (`calgary_flames` and `winnipeg_jets` respectively). This is the unambiguously correct treatment.
+- **Toronto Arenas (TAN, 1917-19) → Toronto St. Patricks (TSP, 1919-27) → Toronto Maple Leafs (TOR, 1927+).** Single franchise, three names. No controversy; documented for completeness.
+- **Detroit Cougars (DCG, 1926-30) → Detroit Falcons (DFL, 1930-32) → Detroit Red Wings (DET, 1932+).** Single franchise, three names. No controversy.
+
+### F. Methodology process limitations
+
+- **Test sets shrink with each version.** v1's test was 2 seasons (2023-24 + 2024-25). v2's test is 1 season (2025-26). v3's test, if it follows the same pattern, will be ≤ 1 season. The shrinkage trades statistical power for the freshness of unseen data. A future amendment may need to address this — possibly by accepting wider confidence intervals on §6 metrics as test windows narrow.
+- **One-shot test evaluation per §10 #1 means we cannot detect overfitting to the validation window.** If v2's validation choices happen to capture noise specific to 2021-22 → 2024-25, the test result will tell us, but only once and only via the held-out 2025-26 season. There is no cross-validation safety net.
+- **No external comparison set.** §6 lists Vegas closing lines as "noted as context but not used as a success threshold." This is a deliberate choice — Vegas is a market, not a prediction model — but it means we have no independent calibrated reference to anchor our calibration plot against beyond the two naive baselines.
