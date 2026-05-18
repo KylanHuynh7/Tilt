@@ -27,6 +27,8 @@ pnpm-lock.yaml
 # Frontend build
 frontend/dist/
 frontend/.vite/
+frontend/tsconfig.tsbuildinfo
+frontend/**/*.tsbuildinfo
 
 # Env + secrets
 .env

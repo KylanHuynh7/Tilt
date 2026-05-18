@@ -1,11 +1,12 @@
 # NHL Rating System — Methodology Document
-## Version 1.1
+## Version 1.2
 **Author:** Kylan Huynh
-**Status:** Pre-development — frozen before any code is written
+**Status:** Pre-development — frozen before model evaluation
 **Last updated:** May 2026
 
 **Amendment log:**
 - *v1.1 (2026-05-17):* Six pre-code clarifications folded into the relevant sections before any implementation work. No model behavior is introduced that was not implied by v1.0; all changes resolve ambiguities flagged during a methodology review. Specifically: (1) expansion-team rating + decay interaction (Section 4), (2) franchise identity persistence across relocations (Section 4), (3) tie outcome weight for pre-2005-06 seasons (Section 5), (4) explicit uniform playoff K-factor across all rounds (Section 5), (5) `/games/today` frozen-parameter invariant (Sections 5 and 11), (6) Brier score upper bound tightened from 0.250 to 0.245 (Sections 2 and 6). See CHANGELOG.md for the corresponding commit.
+- *v1.2 (2026-05-17):* Resolves an ambiguity introduced in v1.1 §4 regarding the California Seals / Cleveland Barons → Minnesota North Stars merger. The v1.1 language "pre-merger games count toward the surviving franchise's rating" left open whether the absorbed franchise's pre-merger rating was discarded, averaged, or transferred at the 1978 merger. v1.2 specifies the **simple average** rule: at the start of 1978-79, the surviving franchise's rating is set to the arithmetic mean of its own and the absorbed franchise's final 1977-78 ratings, after which the standard between-season decay applies. This rule is the most defensible reading of the v1.1 intent and is the only merger ever applied in modern NHL history; if a future merger occurs the same rule will apply by default. Resolved before any backtest evaluation was run; no parameter tuning or test-set exposure has occurred. See CHANGELOG.md.
 
 ---
 
@@ -123,8 +124,15 @@ This rule applies uniformly to all teams. Expansion teams begin at exactly 1500.
 **Expansion teams and the decay rule (v1.1 clarification):**
 An expansion team's first season starts at exactly 1500 with no decay step applied (there is no prior-season rating to decay). The decay rule applies normally at every season boundary from season 2 onward. This is the assumed behavior and is now explicit. It applies identically to historical expansions (e.g., the 1967-68 expansion six) and modern expansion teams (Vegas 2017-18, Seattle 2021-22).
 
-**Franchise identity across relocations (v1.1 clarification):**
-Franchise rating persists across relocations. When a franchise relocates, the new-city team inherits the prior-city team's most recent rating without any reset, and that rating continues to evolve under the same decay and update rules. Examples in the training and validation windows: Atlanta Flames → Calgary Flames (1980), Colorado Rockies → New Jersey Devils (1982), Minnesota North Stars → Dallas Stars (1993), Quebec Nordiques → Colorado Avalanche (1995), Hartford Whalers → Carolina Hurricanes (1997), Atlanta Thrashers → Winnipeg Jets (2011). The 1967 California Seals → Cleveland Barons → 1978 merger into the Minnesota North Stars is handled as relocation through the merger date and is then folded into the surviving franchise; pre-merger games count toward the surviving franchise's rating. This decision is for modeling simplicity and the absence of any defensible alternative that does not introduce arbitrary post-hoc choices; it is not a claim that relocated teams retain their old fans' team identity.
+**Franchise identity across relocations (v1.1 clarification, updated v1.2):**
+Franchise rating persists across relocations. When a franchise relocates, the new-city team inherits the prior-city team's most recent rating without any reset, and that rating continues to evolve under the same decay and update rules. Examples in the training and validation windows: Atlanta Flames → Calgary Flames (1980), Colorado Rockies → New Jersey Devils (1982), Minnesota North Stars → Dallas Stars (1993), Quebec Nordiques → Colorado Avalanche (1995), Hartford Whalers → Carolina Hurricanes (1997), Atlanta Thrashers → Winnipeg Jets (2011).
+
+**Franchise mergers (v1.2 resolution):**
+A merger is treated differently from a relocation because two pre-merger ratings exist on the day of the merger and one must yield to the other. The rule: at the start of the season following the merger, the surviving franchise's rating is set to the **arithmetic mean** of the surviving franchise's and the absorbed franchise's final pre-merger ratings. The standard between-season decay (carry = 0.75) is then applied to that averaged rating. The absorbed franchise stops existing in the rating state from that boundary onward.
+
+The only merger this rule applies to in NHL history is the 1978 California Golden Seals / Cleveland Barons (OAK → CGS → CLE lineage) merging into the Minnesota North Stars (later Dallas Stars). At the 1978-79 boundary, the North Stars' new rating is `mean(R_MNS_1977-78, R_CLE_1977-78)`. The same rule will be applied by default to any future merger; a future amendment can override it before that merger occurs.
+
+This decision is for modeling simplicity and best matches the v1.1 wording "pre-merger games count toward the surviving franchise's rating" — both lineages contribute equally to the post-merger state. It is not a claim that relocated or merged teams retain their old fans' team identity.
 
 ---
 

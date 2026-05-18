@@ -1,0 +1,184 @@
+"""FastAPI app — Phase D wired to the frozen historical engine.
+
+Endpoints:
+  GET  /healthz                      liveness + cache status
+  GET  /seasons                      list of all available seasons (sorted)
+  GET  /ratings/current              current ratings for the 32 active franchises
+  GET  /ratings/history/{season}     trajectory for one season (any of 108)
+  GET  /games/today                  today's matchups with pre-game probabilities
+  GET  /calibration/current          §6 test-set metrics + calibration buckets
+  POST /admin/refresh                re-ingest current season + rebuild cache
+"""
+
+from __future__ import annotations
+
+import json
+import sys
+from contextlib import asynccontextmanager
+from datetime import date
+from pathlib import Path
+
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+
+from . import engine, historical
+from .franchises import current_code
+from .seasons import parse as parse_season
+from .teams import TEAMS
+
+RESULTS_PATH = Path(__file__).resolve().parent.parent / "results" / "test_evaluation.json"
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Build the cache at startup. Cheap (~1-2s) and avoids per-request hits.
+    try:
+        historical.initialize()
+    except FileNotFoundError as exc:
+        # No frozen artifact yet — surface a clear error in the logs but let
+        # the app start so error responses can guide the operator.
+        print(f"[startup] {exc}", file=sys.stderr)
+    yield
+
+
+app = FastAPI(
+    title="Tilt — NHL Rating System",
+    version="1.0.0",
+    lifespan=lifespan,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_credentials=False,
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+)
+
+
+# ---- Helpers -------------------------------------------------------------------
+
+def _cache_or_503():
+    try:
+        return historical.get_cache()
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+
+
+# ---- Endpoints -----------------------------------------------------------------
+
+@app.get("/healthz")
+async def healthz():
+    try:
+        cache = historical.get_cache()
+        return {
+            "ok": True,
+            "seasons_in_cache": len(cache.seasons_replayed),
+            "last_built_at": cache.last_built_at.isoformat() if cache.last_built_at else None,
+            "frozen_params": {
+                "k_regular": cache.params.k_regular,
+                "k_playoff": cache.params.k_playoff,
+                "decay_carry": cache.params.decay_carry,
+                "frozen_at": cache.params.frozen_at,
+                "methodology_version": cache.params.methodology_version,
+            },
+        }
+    except FileNotFoundError as exc:
+        return {"ok": False, "error": str(exc)}
+
+
+@app.get("/seasons")
+async def list_seasons():
+    cache = _cache_or_503()
+    ids = sorted(cache.trajectories.keys(), reverse=True)
+    return {
+        "count": len(ids),
+        "seasons": [
+            {
+                "season_id": sid,
+                "label": parse_season(sid).label,
+                "pre_1967": historical.is_pre_1967(sid),
+            }
+            for sid in ids
+        ],
+    }
+
+
+@app.get("/ratings/current")
+async def ratings_current():
+    cache = _cache_or_503()
+    rows = []
+    for code, fid, rating in historical.current_active_ratings_with_codes():
+        rows.append({
+            "team": code,
+            "franchise_id": fid,
+            "name": TEAMS.get(code, fid),
+            "rating": round(rating, 2),
+        })
+    return {
+        "as_of": cache.last_built_at.isoformat() if cache.last_built_at else None,
+        "teams": rows,
+    }
+
+
+@app.get("/ratings/history/{season}")
+async def ratings_history(season: int):
+    cache = _cache_or_503()
+    if season not in cache.trajectories:
+        raise HTTPException(
+            status_code=404,
+            detail=f"season {season} not in cache; available seasons via GET /seasons",
+        )
+    parsed = parse_season(season)
+    bucket = cache.trajectories[season]
+
+    teams = []
+    for fid, points in bucket.items():
+        code = current_code(fid)
+        teams.append({
+            "franchise_id": fid,
+            "team": code,  # None for defunct franchises
+            "name": TEAMS.get(code, fid) if code else fid.replace("_", " ").title(),
+            "is_defunct": code is None,
+            "points": [
+                {"game_id": p.game_id, "date": p.date, "rating": round(p.rating, 2)}
+                for p in points
+            ],
+        })
+    return {
+        "season": season,
+        "label": parsed.label,
+        "pre_1967": parsed.is_pre_1967,
+        "n_franchises": len(teams),
+        "teams": teams,
+    }
+
+
+@app.get("/games/today")
+async def games_today():
+    _cache_or_503()  # ensure cache exists; fail clearly if not
+    matchups = await engine.todays_matchups()
+    return {
+        "date": date.today().isoformat(),
+        "frozen_params": True,  # v1 milestone-2 complete; frozen artifact in use
+        "matchups": matchups,
+    }
+
+
+@app.get("/calibration/current")
+async def calibration_current():
+    if not RESULTS_PATH.exists():
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "no test-evaluation results yet; "
+                "run `uv run python -m scripts.evaluate --confirm`"
+            ),
+        )
+    return json.loads(RESULTS_PATH.read_text())
+
+
+@app.post("/admin/refresh")
+async def admin_refresh():
+    status = await engine.refresh_current_season()
+    return {"ok": True, **status}
