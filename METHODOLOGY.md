@@ -1,5 +1,5 @@
 # NHL Rating System — Methodology Document
-## Version 2.2
+## Version 2.3
 **Author:** Kylan Huynh
 **Status:** v1 shipped and locked (commit `f7548f6`). v2 in flight; the v1 model and v1 evaluation are immutable per §10 #2.
 **Last updated:** May 2026
@@ -10,6 +10,7 @@
 - *v2.0 (2026-05-18):* Begins the v2 methodology with the first of four pre-registered v2 features (the appendix lists Monte Carlo Cup probabilities, live in-game probability updates, hero-chart live updates, and home-ice advantage). v2.0 introduces **home-ice advantage** as a new tunable rating parameter and defines the v2 train / validation / test split. Crucially, v2 is a new model with its own freeze cycle; the v1 model parameters and v1 test-set results are immutable per §10 #2 and remain the canonical v1 record. See the new Section 12 below and CHANGELOG.md.
 - *v2.1 (2026-05-18):* Adds **Monte Carlo Cup probabilities** — the second of the four pre-registered v2 features. No change to the rating model itself; Cup probabilities are a forward projection from current ratings, not an evaluation of model accuracy against future outcomes. Defines the sim algorithm (per-game rating updates within a single run, 10,000 sims per call), the data inputs (parquet for current state, derived bracket), and how this surface relates to the §10 #1 test-set quarantine (it does not). See the new Section 14 below.
 - *v2.2 (2026-05-18):* Adds **live in-game win probability** — the third of the four pre-registered v2 features — as **Interpretation B**: a separate empirical model layer that estimates `P(home wins | period, time remaining, score differential)` from historical play-by-play data. The Elo rating model is unchanged; nothing in `ratings.py` is touched. v2.2 introduces a new artifact (`live_wp_v2.json`) trained on the 2010-11 → 2024-25 seasons and exposes a stateless endpoint that callers query with a game state. Live polling of in-progress games is deferred to v2.3. See the new Section 15 below.
+- *v2.3 (2026-05-18):* Wires the v2.2 model into the dashboard's live flow. For each in-progress game in `/games/today`, the backend fetches the current play-by-play, extracts `(period, time remaining, score differential)`, and includes the live WP in the payload. The frontend polls `/games/today` every 60 seconds when any matchup is in progress. No new model logic; this is the integration layer that makes v2.2 visible. The "hero chart live updates" pre-registered v2 feature is also covered here — the trajectory chart will refresh on the same polling interval when the current season's parquet has new games. See the new Section 16 below.
 
 ---
 
@@ -490,7 +491,19 @@ These are specific to the Monte Carlo Cup sim layer (§14). They do not affect t
 - **Outcome distribution baseline is one season.** The 79 / 16 / 5 percent REG / OT / SO split uses 2024-25 only. Using a multi-season average would be a small refinement; the current choice was made to keep the dataset transparent.
 - **No special handling for goalie injuries, suspensions, or back-to-back fatigue inside playoffs.** Series simulation treats each game as fresh — the sim has no concept of a starting goalie being unavailable for Game 6. This is consistent with the v1 / v2.0 rating model's scope (which also doesn't model these); flagged here because the playoff format makes the omission more visible.
 
-### G. Methodology process limitations
+### G. v2.3 live-polling limitations
+
+These are specific to the live integration layer added in §16. The underlying rating model and WP lookup are unaffected; these bound how *fresh* the live surfaces feel and what failure modes the polling layer can mask.
+
+- **60-second polling interval.** Between polls, the displayed live WP and live score are stale by up to a minute. A goal that just happened won't appear until the next poll fires. Shorter intervals trade visible freshness against NHL API load and battery on the client; 60 s was chosen as a reasonable default for a low-stakes dashboard. A user-facing "refresh now" button is not currently provided.
+- **No Server-Sent Events or WebSocket push.** The polling architecture means the backend is reactive, not proactive. If a future amendment needs sub-second update latency (e.g., a "puck just dropped" indicator), the polling design would need replacement, not patching.
+- **Per-request fan-out to the NHL API.** Each `/games/today` request that includes in-progress games triggers one PBP fetch per live game from the backend, in parallel. On a 10-game evening with every game live, a single request fans out to 10 NHL API calls. Scales fine for solo use; with broader deployment (many concurrent users) it would warrant per-game caching with a short TTL.
+- **`live_state` extraction trusts the "latest play" as current state.** During intermissions or extended TV timeouts, the latest play's `timeRemaining` may show 0:00 of the previous period rather than the next period's 20:00. The frontend renders whatever the backend reports; the dashboard does not currently distinguish intermission from start-of-next-period.
+- **Polling stops when no games are in progress.** If a user has the page open at 6:55 PM Eastern and the first game starts at 7:00, the polling won't re-engage until the next `/games/today` fetch reflects the LIVE state. A user who never refreshes the page after pre-game won't see the live overlay until they switch tabs or reload.
+- **`game_state` transitions are not push-notified.** A game flipping from PRE to LIVE, or from LIVE to FINAL, is detected only on the next poll. There is no "the game just ended" event.
+- **Hero-chart live updates poll the same endpoint on the same cadence.** The trajectory chart re-fetches every 60 s while viewing the in-progress 2025-26 season. Newly-completed games show up only after the backend's pipeline has re-ingested the day's parquet, which is a separate `/admin/refresh` operation. Without that, the historical cache won't include the new game and the chart won't move.
+
+### H. Methodology process limitations
 
 - **Test sets shrink with each version.** v1's test was 2 seasons (2023-24 + 2024-25). v2's test is 1 season (2025-26). v3's test, if it follows the same pattern, will be ≤ 1 season. The shrinkage trades statistical power for the freshness of unseen data. A future amendment may need to address this — possibly by accepting wider confidence intervals on §6 metrics as test windows narrow.
 - **One-shot test evaluation per §10 #1 means we cannot detect overfitting to the validation window.** If v2's validation choices happen to capture noise specific to 2021-22 → 2024-25, the test result will tell us, but only once and only via the held-out 2025-26 season. There is no cross-validation safety net.
@@ -600,3 +613,35 @@ v2.2 picks B. Reasoning: A would couple the rating system to play-by-play data (
 - No team-specific adjustments. The model treats every team identically; the rating gap is not an input. A future amendment could blend the empirical WP with the rating-derived pre-game WP via a learned weight.
 - No 4-on-4 / 5-on-3 / pulled-goalie awareness. The lookup only knows period, time, and score; situational state is out of scope.
 - No calibration evaluation yet. A future v2.x amendment will run the WP model against 2025-26 once that season is complete and publish ECE/log-loss numbers analogous to the §6 metrics for the rating model.
+
+---
+
+## Section 16 — v2.3 amendment: live polling integration
+
+**What v2.3 adds.** The remaining two pre-registered v2 features ship together as a single integration layer:
+
+1. **Live in-game probability surfaced in the dashboard.** For every game in `/games/today` whose `gameState` is `LIVE` or `CRIT`, the backend additionally fetches `/v1/gamecenter/{gameId}/play-by-play`, extracts `(period, time remaining, home score, away score)`, queries the v2.2 lookup, and returns the live WP alongside the pre-game WP.
+2. **Hero-chart live updates.** The frontend re-fetches the current season's trajectory on the same polling interval so newly-completed games appear in the chart without a manual refresh.
+
+**No new model.** The rating engine (v2.0), Cup simulator (v2.1), and WP lookup (v2.2) are all unchanged. v2.3 is plumbing.
+
+**Polling cadence.** 60-second interval on the frontend, conditional on at least one in-progress matchup being present in the current `/games/today` payload. When no game is in progress, no polling happens — the page stays static.
+
+**Backend side-effects per request.** When a `/games/today` request lands and any matchup is in progress, the backend issues one additional NHL API call per in-progress game to fetch its play-by-play. A typical game day has 4-12 evening games; even with all of them in progress simultaneously the backend's per-request fan-out stays under 15 NHL API calls. No rate-limit concerns at that volume; the NHL public web API has handled the v2.2 ingest (~250-300 calls per training season) without complaint.
+
+**Failure modes (handled).** If the play-by-play fetch fails or returns malformed data for any game, the matchup falls back to its pre-game WP only — the `live_wp` field is omitted from that matchup's response. The endpoint never errors due to a single game's PBP being unavailable. The `live_state` field signals to the frontend whether to render the live overlay.
+
+**Live state extraction rules.**
+
+- `period`: the `periodDescriptor.number` from the last completed play, bucketed to {1, 2, 3, 4} where 4 collapses any OT or SO period number.
+- `time_remaining_s`: the `timeRemaining` string from the last completed play, parsed as `mm:ss → seconds`. During an intermission, time_remaining is taken to be 0 of the period just completed.
+- `home_score` / `away_score`: the maximum `details.homeScore` / `details.awayScore` observed across all goal plays in the period through the latest play. Equivalent to the live game scoreboard.
+- `game_state`: passed through verbatim from the top-level `gameState` field so the frontend can distinguish PRE / LIVE / CRIT / FINAL / OFF.
+
+**What v2.3 does NOT do.** No score predictions are computed live — the live WP is conditional on the current state, not a forecast of future scoring. No data is written to disk on a live request; the playback data is ephemeral. Server-Sent Events / WebSockets are out of scope; if the polling cost ever becomes an issue, that's a future amendment.
+
+**Pre-registered expectations.**
+
+- For a game at period 1 with 20:00 remaining and 0-0 score, the live WP should match the (P1, mins_remaining=19, score_diff=0) lookup (≈0.54 across the 15-season training corpus).
+- For a game that just ended (state FINAL/OFF), no live WP is returned; the pre-game WP and final score suffice.
+- For a game with the state FUT or PRE, no live WP is returned; the pre-game WP is the only published number.

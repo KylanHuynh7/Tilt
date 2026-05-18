@@ -2,6 +2,21 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-05-18 — METHODOLOGY.md v2.3 + V2.D (live polling integration)
+
+v2 continues. v2.3 wires the v2.2 stateless WP model into the dashboard's live flow. No new model logic; this is pure integration. New §16 documents the polling cadence (60 s, conditional on in-progress games), the live-state extraction rules, and the failure-containment story (a single bad PBP fetch never breaks `/games/today`). New §13.G consolidates the seven live-polling limitations (between-poll staleness, no SSE, per-request fan-out, intermission ambiguity, lazy re-engagement, no push notifications for state transitions, hero-chart depends on /admin/refresh).
+
+Code:
+  - `app/live_state.py`: NHL `/v1/gamecenter/{gid}/play-by-play` fetcher + parser, with score-max aggregation across goal events and time-remaining extraction from the latest play. Returns None on any failure so the caller can fall back.
+  - `app/live_wp.py`: `get_model()` + `clear_cache()` for the runtime path.
+  - `app/engine.py`: `todays_matchups` extended to fan out PBP fetches for LIVE/CRIT games and enrich each matchup with `live_state` and `live_wp` fields. Pre-game payload shape unchanged.
+  - `frontend/src/api.ts`: new `LiveStateBlock` / `LiveWPBlock` types on Matchup.
+  - `frontend/src/components/TodaysGames.tsx`: `GameCard` component now renders live period/clock, live score, and a second probability bar for the live WP when present. Pre-game bar dimmed; live bar full-opacity with a smoothing tag if the lookup hit a sparse bin.
+  - `frontend/src/App.tsx`: 60 s polling for `/games/today` while any matchup is in progress; matching 60 s polling for `/ratings/history/20252026` while the Trajectories tab is viewing the current season.
+  - 9 new tests in `test_live_state.py`.
+
+Tests: 154 passing (was 145 at end of V2.C; 9 added).
+
 ## 2026-05-18 — METHODOLOGY.md v2.2 + V2.C (live in-game win probability)
 
 v2 continues. v2.2 adds the third pre-registered v2 feature: live in-game win probability, implemented as **Interpretation B** — a separate empirical lookup model independent of the Elo rating engine. New §15 documents the bin structure (period × mins_remaining × clamped_score_diff), Bayesian smoothing for sparse bins (α=50, threshold=100), training window 2010-11 → 2024-25, and the relationship to §10 #1 (2025-26 is held out from the WP training corpus).

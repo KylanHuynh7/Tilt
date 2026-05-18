@@ -19,6 +19,18 @@ export type RatingsHistoryResponse = {
   teams: TeamHistory[];
 };
 
+export type LiveStateBlock = {
+  game_state: string;
+  period: number;
+  time_remaining_s: number;
+  home_score: number;
+  away_score: number;
+};
+export type LiveWPBlock = {
+  home_win_prob: number;
+  n_samples: number;
+  smoothed: boolean;
+};
 export type Matchup = {
   game_id: number;
   game_date: string;
@@ -31,6 +43,9 @@ export type Matchup = {
   away_win_prob: number;
   home_score: number | null;
   away_score: number | null;
+  // v2.3 §16 — present when the game is LIVE/CRIT and the PBP fetch succeeded.
+  live_state?: LiveStateBlock;
+  live_wp?: LiveWPBlock;
 };
 export type TodayResponse = {
   date: string;

@@ -297,6 +297,27 @@ def write_artifact(model: WPModel, path: Path = DEFAULT_ARTIFACT) -> None:
     os.replace(tmp, path)
 
 
+_cached_model: WPModel | None = None
+
+
+def get_model(path: Path = DEFAULT_ARTIFACT) -> WPModel:
+    """Lazily load and cache the WP model at module level.
+
+    Use this from request paths that want the model without re-reading the
+    artifact every call. Raises FileNotFoundError if the artifact is missing.
+    """
+    global _cached_model
+    if _cached_model is None:
+        _cached_model = load_artifact(path)
+    return _cached_model
+
+
+def clear_cache() -> None:
+    """Reset the cached model (after a re-build, for example)."""
+    global _cached_model
+    _cached_model = None
+
+
 def load_artifact(path: Path = DEFAULT_ARTIFACT) -> WPModel:
     payload = json.loads(path.read_text())
     model = WPModel(training_seasons=payload.get("training_seasons", []))

@@ -55,12 +55,46 @@ export default function App() {
       .catch((e: Error) => setHistoryErr(e.message));
   }, [season]);
 
-  // Load today's games once on mount.
+  // Load today's games once on mount, and poll every 60s while any matchup
+  // is in progress (v2.3 §16 live polling).
   useEffect(() => {
-    fetchToday()
-      .then(setToday)
-      .catch((e: Error) => setTodayErr(e.message));
+    let cancelled = false;
+    const tick = () => {
+      fetchToday()
+        .then((res) => {
+          if (cancelled) return;
+          setToday(res);
+        })
+        .catch((e: Error) => {
+          if (cancelled) return;
+          setTodayErr(e.message);
+        });
+    };
+    tick();
+    const interval = setInterval(() => {
+      // Only poll while there's something live to refresh.
+      if (today?.matchups.some((m) => !!m.live_state)) tick();
+    }, 60_000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+    // intentionally don't depend on `today` to avoid restarting the interval
+    // every time the payload updates; the interval reads `today` from closure
+    // via setToday-driven re-renders.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // v2.3 §16 hero-chart live refresh: when viewing the in-progress 2025-26
+  // season, poll the trajectory every 60s so newly-completed games appear
+  // without a manual refresh.
+  useEffect(() => {
+    if (season !== 20252026) return;
+    const interval = setInterval(() => {
+      fetchHistory(20252026).then(setHistory).catch(() => {});
+    }, 60_000);
+    return () => clearInterval(interval);
+  }, [season]);
 
   // Lazy-load calibration only when the tab is opened.
   useEffect(() => {
