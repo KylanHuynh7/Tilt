@@ -155,7 +155,7 @@ body {
   align-items: center;
   gap: 12px;
 }
-.team.right { justify-content: flex-end; flex-direction: row-reverse; }
+.team.right { justify-content: flex-start; flex-direction: row-reverse; }
 .team .abbr { font-weight: 700; font-size: 18px; letter-spacing: 0.04em; }
 .team .name { font-size: 12px; color: var(--text-dim); }
 .team .rating { font-variant-numeric: tabular-nums; font-size: 13px; color: var(--text-dim); }
