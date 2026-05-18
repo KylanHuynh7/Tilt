@@ -1,4 +1,5 @@
 import type { Matchup, TodayResponse } from "../api";
+import { colorFor } from "../teamColors";
 
 type Props = { data: TodayResponse };
 
@@ -17,6 +18,14 @@ function clockLabel(seconds: number): string {
   return `${mm}:${ss}`;
 }
 
+function TeamBadge({ team }: { team: string }) {
+  return (
+    <div className="team-badge" style={{ backgroundColor: colorFor(team) }}>
+      {team}
+    </div>
+  );
+}
+
 function GameCard({ m }: { m: Matchup }) {
   const awayPct = m.away_win_prob * 100;
   const homePct = m.home_win_prob * 100;
@@ -24,6 +33,7 @@ function GameCard({ m }: { m: Matchup }) {
   return (
     <div className={`game ${isLive ? "live" : ""}`}>
       <div className="team">
+        <TeamBadge team={m.away} />
         <span className="abbr">{m.away}</span>
         <span className="rating">{m.away_rating.toFixed(0)}</span>
       </div>
@@ -36,6 +46,7 @@ function GameCard({ m }: { m: Matchup }) {
         {!isLive && <span>@</span>}
       </div>
       <div className="team right">
+        <TeamBadge team={m.home} />
         <span className="abbr">{m.home}</span>
         <span className="rating">{m.home_rating.toFixed(0)}</span>
       </div>

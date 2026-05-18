@@ -503,7 +503,13 @@ These are specific to the live integration layer added in §16. The underlying r
 - **`game_state` transitions are not push-notified.** A game flipping from PRE to LIVE, or from LIVE to FINAL, is detected only on the next poll. There is no "the game just ended" event.
 - **Hero-chart live updates poll the same endpoint on the same cadence.** The trajectory chart re-fetches every 60 s while viewing the in-progress 2025-26 season. Newly-completed games show up only after the backend's pipeline has re-ingested the day's parquet, which is a separate `/admin/refresh` operation. Without that, the historical cache won't include the new game and the chart won't move.
 
-### H. Methodology process limitations
+### H. Frontend design choices with project-external reasoning
+
+These are conscious UI decisions made for non-technical reasons (trademark, license risk, etc.) rather than to bound any modeling claim. Documented so a future contributor doesn't "fix" them.
+
+- **No NHL team logos in the dashboard.** Team identity is shown using a colored badge (a filled circle in the franchise's primary brand color from `frontend/src/teamColors.ts`) plus the three-letter team abbreviation. NHL team logos are registered trademarks and embedding them — even on a student project — carries takedown / IP-claim risk. The colored-badge substitute gives users a recognizable visual without copying any mark. If a future amendment wants real logos, the only safe path is per-team license clearance or a fair-use legal review.
+
+### I. Methodology process limitations
 
 - **Test sets shrink with each version.** v1's test was 2 seasons (2023-24 + 2024-25). v2's test is 1 season (2025-26). v3's test, if it follows the same pattern, will be ≤ 1 season. The shrinkage trades statistical power for the freshness of unseen data. A future amendment may need to address this — possibly by accepting wider confidence intervals on §6 metrics as test windows narrow.
 - **One-shot test evaluation per §10 #1 means we cannot detect overfitting to the validation window.** If v2's validation choices happen to capture noise specific to 2021-22 → 2024-25, the test result will tell us, but only once and only via the held-out 2025-26 season. There is no cross-validation safety net.

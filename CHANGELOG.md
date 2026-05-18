@@ -2,6 +2,12 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-05-18 — UI polish: center Today's Games card, colored team badges
+
+Frontend tweaks to make the Today's Games tab feel less cramped and add team-color identity without trademark risk. Layout change: `.games-grid` switched from a 2-column grid to `flex-wrap: wrap` with `justify-content: center` so a single matchup centers cleanly and multiple matchups flow naturally as a row. Cards bumped to padding 22/28, max-width 640px, abbrev font 18px. New `TeamBadge` component renders a 44px circle filled with the team's primary color (already in `teamColors.ts`) with the three-letter abbreviation in white.
+
+§13.H added documenting why we don't embed NHL team logos: registered trademarks, takedown risk on a student project. The colored-badge approach is the safe substitute. Previous §13.H "Methodology process limitations" renumbered to §13.I; content unchanged.
+
 ## 2026-05-18 — METHODOLOGY.md v2.3 + V2.D (live polling integration)
 
 v2 continues. v2.3 wires the v2.2 stateless WP model into the dashboard's live flow. No new model logic; this is pure integration. New §16 documents the polling cadence (60 s, conditional on in-progress games), the live-state extraction rules, and the failure-containment story (a single bad PBP fetch never breaks `/games/today`). New §13.G consolidates the seven live-polling limitations (between-poll staleness, no SSE, per-request fan-out, intermission ambiguity, lazy re-engagement, no push notifications for state transitions, hero-chart depends on /admin/refresh).
