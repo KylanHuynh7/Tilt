@@ -21,10 +21,18 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from . import engine, historical
+from dataclasses import asdict
+
+from . import cup_simulator, engine, historical, standings
 from .franchises import current_code
 from .seasons import parse as parse_season
 from .teams import TEAMS
+
+CURRENT_SEASON_ID = 20252026  # the in-progress season the Cup sim operates on
+DEFAULT_CUP_SIMS = 10_000
+
+# Cached Cup-sim result; rebuilt on /admin/refresh and at first request.
+_cup_result: cup_simulator.CupSimResult | None = None
 
 RESULTS_PATH = Path(__file__).resolve().parent.parent / "results" / "test_evaluation.json"
 
@@ -178,7 +186,69 @@ async def calibration_current():
     return json.loads(RESULTS_PATH.read_text())
 
 
+@app.get("/simulation/cup")
+async def simulation_cup(n: int | None = None, refresh: bool = False):
+    """Monte Carlo Cup-win probabilities per §14.
+
+    Cached across requests. Pass `?refresh=true` to force a fresh run, or
+    `?n=N` to override the default 10,000 simulations.
+    """
+    global _cup_result
+    cache = _cache_or_503()
+    n_sims = int(n) if n else DEFAULT_CUP_SIMS
+    needs_fresh = (
+        refresh
+        or _cup_result is None
+        or _cup_result.n_simulations != n_sims
+    )
+    if needs_fresh:
+        state = standings.derive_playoff_state(CURRENT_SEASON_ID)
+        stand = standings.compute_standings(CURRENT_SEASON_ID)
+        ratings_by_code = cup_simulator.ratings_by_team_code(
+            historical.current_active_ratings_with_codes()
+        )
+        _cup_result = cup_simulator.simulate_cup(
+            state, stand, ratings_by_code,
+            k_playoff=cache.params.k_playoff,
+            home_bump=cache.params.home_bump,
+            n_simulations=n_sims,
+        )
+
+    # Pretty-format the response: include rating and franchise name per team.
+    by_code_rating = cup_simulator.ratings_by_team_code(
+        historical.current_active_ratings_with_codes()
+    )
+    teams_payload = []
+    for code, prob in sorted(
+        _cup_result.cup_probabilities.items(),
+        key=lambda kv: -kv[1],
+    ):
+        teams_payload.append({
+            "team": code,
+            "name": TEAMS.get(code, code),
+            "rating": round(by_code_rating.get(code, 1500.0), 2),
+            "cup_probability": prob,
+            "alive": code in _cup_result.alive,
+        })
+    return {
+        "season": CURRENT_SEASON_ID,
+        "simulated_at": _cup_result.simulated_at,
+        "n_simulations": _cup_result.n_simulations,
+        "wall_seconds": _cup_result.wall_seconds,
+        "current_round": _cup_result.state_round,
+        "in_progress_series": _cup_result.in_progress_series,
+        "teams": teams_payload,
+        "frozen_params": {
+            "k_playoff": cache.params.k_playoff,
+            "home_bump": cache.params.home_bump,
+            "methodology_version": cache.params.methodology_version,
+        },
+    }
+
+
 @app.post("/admin/refresh")
 async def admin_refresh():
+    global _cup_result
     status = await engine.refresh_current_season()
+    _cup_result = None  # force the Cup sim to rebuild next request
     return {"ok": True, **status}

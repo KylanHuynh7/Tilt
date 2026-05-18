@@ -1,5 +1,5 @@
 # NHL Rating System — Methodology Document
-## Version 2.0
+## Version 2.1
 **Author:** Kylan Huynh
 **Status:** v1 shipped and locked (commit `f7548f6`). v2 in flight; the v1 model and v1 evaluation are immutable per §10 #2.
 **Last updated:** May 2026
@@ -8,6 +8,7 @@
 - *v1.1 (2026-05-17):* Six pre-code clarifications folded into the relevant sections before any implementation work. No model behavior is introduced that was not implied by v1.0; all changes resolve ambiguities flagged during a methodology review. Specifically: (1) expansion-team rating + decay interaction (Section 4), (2) franchise identity persistence across relocations (Section 4), (3) tie outcome weight for pre-2005-06 seasons (Section 5), (4) explicit uniform playoff K-factor across all rounds (Section 5), (5) `/games/today` frozen-parameter invariant (Sections 5 and 11), (6) Brier score upper bound tightened from 0.250 to 0.245 (Sections 2 and 6). See CHANGELOG.md for the corresponding commit.
 - *v1.2 (2026-05-17):* Resolves an ambiguity introduced in v1.1 §4 regarding the California Seals / Cleveland Barons → Minnesota North Stars merger. The v1.1 language "pre-merger games count toward the surviving franchise's rating" left open whether the absorbed franchise's pre-merger rating was discarded, averaged, or transferred at the 1978 merger. v1.2 specifies the **simple average** rule: at the start of 1978-79, the surviving franchise's rating is set to the arithmetic mean of its own and the absorbed franchise's final 1977-78 ratings, after which the standard between-season decay applies. This rule is the most defensible reading of the v1.1 intent and is the only merger ever applied in modern NHL history; if a future merger occurs the same rule will apply by default. Resolved before any backtest evaluation was run; no parameter tuning or test-set exposure has occurred. See CHANGELOG.md.
 - *v2.0 (2026-05-18):* Begins the v2 methodology with the first of four pre-registered v2 features (the appendix lists Monte Carlo Cup probabilities, live in-game probability updates, hero-chart live updates, and home-ice advantage). v2.0 introduces **home-ice advantage** as a new tunable rating parameter and defines the v2 train / validation / test split. Crucially, v2 is a new model with its own freeze cycle; the v1 model parameters and v1 test-set results are immutable per §10 #2 and remain the canonical v1 record. See the new Section 12 below and CHANGELOG.md.
+- *v2.1 (2026-05-18):* Adds **Monte Carlo Cup probabilities** — the second of the four pre-registered v2 features. No change to the rating model itself; Cup probabilities are a forward projection from current ratings, not an evaluation of model accuracy against future outcomes. Defines the sim algorithm (per-game rating updates within a single run, 10,000 sims per call), the data inputs (parquet for current state, derived bracket), and how this surface relates to the §10 #1 test-set quarantine (it does not). See the new Section 14 below.
 
 ---
 
@@ -478,8 +479,57 @@ These are §4 lineage decisions where the historical record is ambiguous and the
 - **Toronto Arenas (TAN, 1917-19) → Toronto St. Patricks (TSP, 1919-27) → Toronto Maple Leafs (TOR, 1927+).** Single franchise, three names. No controversy; documented for completeness.
 - **Detroit Cougars (DCG, 1926-30) → Detroit Falcons (DFL, 1930-32) → Detroit Red Wings (DET, 1932+).** Single franchise, three names. No controversy.
 
-### F. Methodology process limitations
+### F. v2.1 Cup-simulation approximations
+
+These are specific to the Monte Carlo Cup sim layer (§14). They do not affect the rating model itself; they bound how faithfully the sim represents the playoff process built on top of the model.
+
+- **Outcome-type sampling is rating-independent.** The sim draws REG / OT / SO outcomes from the 2024-25 league-wide distribution regardless of the rating gap between the two teams. In reality, evenly-matched games go to overtime more often than blowouts do; modeling overtime probability as a function of rating gap would be a more accurate approximation. The current approach is documented in §14 as the v2.1 starting point; refining it is v3 scope.
+- **Conference membership is hardcoded.** `cup_simulator.EAST_TEAMS` and `cup_simulator.WEST_TEAMS` enumerate the current 32 franchises by conference. If the NHL realigns divisions, expands, or contracts, the literal sets in code must be updated. There is no test that detects future realignment automatically.
+- **Higher-seed inference uses regular-season points only.** For not-yet-started series (e.g., the Conference Final before the Conference Semifinal winners are known), the Cup sim picks the higher seed by regular-season point total. NHL tiebreakers (regulation wins, head-to-head record, etc.) are not modeled. With current point spreads this rarely matters, but it's a known approximation.
+- **Outcome distribution baseline is one season.** The 79 / 16 / 5 percent REG / OT / SO split uses 2024-25 only. Using a multi-season average would be a small refinement; the current choice was made to keep the dataset transparent.
+- **No special handling for goalie injuries, suspensions, or back-to-back fatigue inside playoffs.** Series simulation treats each game as fresh — the sim has no concept of a starting goalie being unavailable for Game 6. This is consistent with the v1 / v2.0 rating model's scope (which also doesn't model these); flagged here because the playoff format makes the omission more visible.
+
+### G. Methodology process limitations
 
 - **Test sets shrink with each version.** v1's test was 2 seasons (2023-24 + 2024-25). v2's test is 1 season (2025-26). v3's test, if it follows the same pattern, will be ≤ 1 season. The shrinkage trades statistical power for the freshness of unseen data. A future amendment may need to address this — possibly by accepting wider confidence intervals on §6 metrics as test windows narrow.
 - **One-shot test evaluation per §10 #1 means we cannot detect overfitting to the validation window.** If v2's validation choices happen to capture noise specific to 2021-22 → 2024-25, the test result will tell us, but only once and only via the held-out 2025-26 season. There is no cross-validation safety net.
 - **No external comparison set.** §6 lists Vegas closing lines as "noted as context but not used as a success threshold." This is a deliberate choice — Vegas is a market, not a prediction model — but it means we have no independent calibrated reference to anchor our calibration plot against beyond the two naive baselines.
+
+---
+
+## Section 14 — v2.1 amendment: Monte Carlo Cup probabilities
+
+**What v2.1 adds.** A new published quantity — for each team currently in the playoff field, the probability (per the model) that they win the 2026 Stanley Cup. Exposed via a new `/simulation/cup` endpoint. This is the second of four pre-registered v2 features; v2.0 added home-ice advantage, v2.2/v2.3 will add live in-game probabilities and hero-chart live updates.
+
+**What v2.1 does NOT change.** The rating model is identical to v2.0. There are no new tunable parameters. The frozen v2.0 artifact (`frozen_params.json`) is the model used to drive the sim. Cup probabilities are a *forward projection* from current ratings, not a new model.
+
+**Relation to §10 #1 (test-set quarantine).** The Cup sim uses the rating state as of "today," which is produced by replaying every season including 2025-26 to date. Replaying 2025-26 to produce ratings is not "examining test set results" — it's a state computation, the same one that powers `/games/today` and `/ratings/current`. The Cup sim never scores predicted probabilities against the actual outcomes of future 2025-26 games (because those outcomes do not yet exist), and never scores past 2025-26 games (which is what the v2 test evaluation will do, exactly once, after the Cup Final). The two surfaces — `/simulation/cup` (forward projection, free) and `/calibration/current` (held-out test evaluation, run once) — operate on different planes and do not interfere.
+
+**Simulation algorithm.**
+
+For each of `N_SIMS = 10,000` simulations:
+1. **Start from current ratings.** A fresh copy of the rating state at "now" (after replaying everything in the parquet through 2025-26 to date).
+2. **Continue any in-progress playoff series.** For each best-of-7 series where neither team has reached 4 wins, simulate one game at a time. The home team for each game follows the standard 2-2-1-1-1 home-away schedule based on the higher seed (derived from regular-season points). For each sampled game: compute `P(home wins) = win_probability(R_home, R_away, home_bump=HB)`, draw a uniform random number to decide the winner, then sample the outcome type (REG vs OT vs SO) from the historical 2024-25 distribution, then update both teams' ratings using the v2.0 rule. Continue until one team reaches 4 wins; the loser is eliminated.
+3. **Propagate winners to the next round.** Build the next-round bracket by matching winners according to the actual NHL bracket structure (determined from the empirical Round 1 matchups, no need to re-derive seeding).
+4. **Repeat steps 2-3 across all remaining rounds.** Conference Finals (best of 7), then Stanley Cup Final (best of 7).
+5. **Record the Cup champion** for this simulation.
+
+After all `N_SIMS` runs, `P(team wins Cup) = cup_count[team] / N_SIMS`. Confidence intervals at N=10,000 are roughly ±1% for the favorites.
+
+**Sub-decisions and their rationale.**
+- **Ratings update within a single sim run** (per user decision). Captures hot-streak dynamics. Alternative was static ratings; the v2.1 choice is closer to how playoffs actually unfold.
+- **Outcome-type sampling from historical distribution.** Regular season + playoffs combined for 2024-25 produce roughly 79% regulation, 16% OT, 5% SO finishes. The sampled distribution does not change with team strength — a known approximation. (Refining this would require modeling overtime probability as a function of rating gap, which is v3 scope.)
+- **No tiebreaker logic in standings.** The Cup field is already determined for 2025-26 (regular season is over). Tiebreakers would only matter for an in-progress regular season; that surface is deferred.
+- **Coin-flip tiebreakers within a series are not needed** because best-of-7 cannot tie.
+- **The simulation respects in-progress series.** If a series is currently 3-2, the sim only plays games 6 and 7 (if needed). It does not re-simulate games 1-5.
+
+**Pre-registered expectations.**
+- Cup probabilities should sum to exactly 1.0 across all teams currently in the playoff field (any team already eliminated has probability 0).
+- The team with the highest current rating among playoff participants should have the highest Cup probability, but the gap to second place will be smaller than the rating gap suggests because four best-of-7 series introduce substantial variance.
+- Repeated calls with the same input should produce slightly different numbers due to RNG, but the differences should be within the ±1% confidence interval at N=10,000.
+
+**What is published, and what is honest about it.**
+- Per-team Cup probability, rounded to 3 decimal places.
+- The endpoint reports `n_simulations` and a `simulated_at` timestamp so the caller can judge freshness.
+- The endpoint reports the current playoff state used as the starting point (eliminated teams, completed series, in-progress series, current round) — this is the audit trail.
+- No comparison is made to published Cup probabilities elsewhere; like Vegas, those are markets, not predictions.

@@ -2,6 +2,14 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-05-18 — METHODOLOGY.md §13.F (Cup-sim approximations documented)
+
+New subsection F under §13 (Known limitations) lists the five approximations the Cup simulator makes: rating-independent outcome-type sampling, hardcoded conference membership, regular-season-points-only higher-seed inference for not-yet-started series, single-season outcome distribution baseline, no special goalie/fatigue handling in playoff series. The original "F. Methodology process limitations" is renamed to G to preserve its content while making room.
+
+## 2026-05-18 — METHODOLOGY.md v2.1 + V2.B (Monte Carlo Cup probabilities)
+
+v2 continues. v2.1 adds the second pre-registered v2 feature: Monte Carlo Cup probabilities. New §14 documents the simulation algorithm (per-game rating updates within a single sim run, 10,000 sims per call, in-progress series resumed from current state), the §10 #1 quarantine reasoning (forward projection ≠ test evaluation), and pre-registered expectations (probabilities sum to 1.0, ±1% CI at N=10k). No change to the rating model itself — the frozen v2.0 artifact drives the sim.
+
 ## 2026-05-18 — METHODOLOGY.md §13 (known limitations consolidated)
 
 New Section 13 collects every limitation surfaced during v1 development and v2.0 work into a single auditable page: scope-deferred features, design choices that bound expressivity, empirical tensions between methodology and data (notably the §5 K_playoff≥K_regular constraint cost), data-quality limitations including pre-1967 sparseness and isolated NHL API 5xx errors, franchise-lineage judgment calls (Hamilton→NY Americans, OAK/CGS/CLE merger, etc.), and methodology-process limitations (shrinking test sets, no cross-validation safety net, no external comparison anchor). Material is cross-referenced rather than duplicated; nothing already in §2/§4/§5/§8/§10/§12 was rewritten.
