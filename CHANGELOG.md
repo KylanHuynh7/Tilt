@@ -2,6 +2,16 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-05-18 — README refreshed for v2
+
+Project README updated to reflect the v2 feature set. Added a Status block making the v1-locked / v2-evaluation-pending split unambiguous. v1 metrics table relabeled as the canonical v1 record per §10 #2; new v2 status block reports the validation numbers (LL 0.66219, Brier 0.23495, ECE 0.01528 across n=5,594) and explicitly notes that the v2 test evaluation is gated on the 2026 Stanley Cup Final.
+
+Backend module table extended with `pbp_pipeline`, `standings`, `cup_simulator`, `live_wp`, `live_state`, marked by version of introduction. Scripts section lists `build_live_wp.py`. Endpoint table adds `/simulation/cup`, `/wp`, plus the new `cup_winner` fields on `/ratings/history`. Frontend section rewritten as a per-tab description with the new behaviors (cup-winner 👑 + crown, all-32 Cup odds bar chart on Trajectories; live WP overlay + period/clock on Today's games; team-colored badges for trademark-safe identity).
+
+One-time-setup section now includes `pbp_pipeline ingest --all` (~15 min) and `build_live_wp` (~5 s) steps. Test count refreshed: 106 → 154. Disclaimer split into a v1 paragraph (numbers locked) and v2 paragraph (validation-only, test pending).
+
+No methodology change; this is documentation refresh. No new §13 limitations introduced.
+
 ## 2026-05-18 — Cup probability panel below the trajectory chart
 
 User-visible: when viewing the 2025-26 season on the Trajectories tab, a 32-team vertical bar chart now sits under the trajectory plot showing each team's Stanley Cup win probability from the v2.1 Monte Carlo sim. Bars sorted desc; teams not in the playoff field render at 0% with low opacity. Bars colored by each team's primary brand color (same palette as the trajectory lines and the Today's Games badges).
