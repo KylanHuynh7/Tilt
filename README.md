@@ -146,6 +146,10 @@ cd frontend && npm install && npm run dev
 
 Open <http://localhost:5173>.
 
+## Deploying
+
+The repo is set up for one-click deploy to Vercel (frontend) + Railway/Render/Fly (backend) via the included `backend/Dockerfile`. The parquet cache (~2 MB) and all artifacts ship in the repo so the backend boots in ~1.5 s with no build-time data ingest. See **[`DEPLOY.md`](./DEPLOY.md)** for the step-by-step walkthrough including env vars (`CORS_ALLOWED_ORIGINS`, `VITE_API_BASE`) and the `/admin/refresh` ephemerality caveat for free-tier hosts.
+
 ### One-time setup for a fresh clone
 
 ```bash

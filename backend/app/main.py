@@ -13,6 +13,7 @@ Endpoints:
 from __future__ import annotations
 
 import json
+import os
 import sys
 from contextlib import asynccontextmanager
 from datetime import date
@@ -75,9 +76,16 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# CORS allow-list is env-driven so deployed frontends (Vercel, etc.) can be
+# allowlisted via CORS_ALLOWED_ORIGINS without code changes. Defaults to the
+# local-dev URLs so `npm run dev` works out of the box.
+_DEFAULT_CORS = "http://localhost:5173,http://127.0.0.1:5173"
+_cors_raw = os.environ.get("CORS_ALLOWED_ORIGINS", _DEFAULT_CORS)
+_cors_origins = [o.strip() for o in _cors_raw.split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=_cors_origins,
     allow_credentials=False,
     allow_methods=["GET", "POST"],
     allow_headers=["*"],

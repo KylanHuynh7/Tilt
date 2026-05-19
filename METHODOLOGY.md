@@ -492,7 +492,16 @@ These are specific to the Monte Carlo Cup sim layer (§14). They do not affect t
 - **Outcome distribution baseline is one season.** The 79 / 16 / 5 percent REG / OT / SO split uses 2024-25 only. Using a multi-season average would be a small refinement; the current choice was made to keep the dataset transparent.
 - **No special handling for goalie injuries, suspensions, or back-to-back fatigue inside playoffs.** Series simulation treats each game as fresh — the sim has no concept of a starting goalie being unavailable for Game 6. This is consistent with the v1 / v2.0 rating model's scope (which also doesn't model these); flagged here because the playoff format makes the omission more visible.
 
-### G. v2.3 live-polling limitations
+### G. Deployment / operational limitations
+
+These are constraints introduced by the deployed-app setup (Dockerfile + Vercel/Railway/Render). They don't affect any modeling claim — only what state survives across container restarts and how stale the live data is in practice.
+
+- **The backend container's storage is ephemeral on default free tiers.** Both Railway and Render reset the container's filesystem on redeploy and on idle-sleep wake. The parquet cache is shipped with the image so the backend always has *historical* data, but any `/admin/refresh`-triggered ingest of the current-season parquet is lost on restart. Persistence between restarts requires mounting a volume at `/app/data_cache/raw` (Railway: Volumes; Fly: Volumes; Render: persistent disk on paid tier only). Documented in `DEPLOY.md`.
+- **Idle sleep on free-tier hosts.** Backends idle-sleep after ~15 minutes of no traffic; first request after sleep is ~5-10 s slow. This shows up in the dashboard as a one-time "Loading…" delay when the page first loads after a quiet period. Acceptable for a portfolio project; would warrant an always-on tier for production traffic.
+- **The deployed parquet snapshot is only as fresh as the last `git push`.** If you don't push updated parquets, the dashboard's "current ratings" stay frozen at the snapshot date. Calling `/admin/refresh` updates the running container but doesn't write back to git. Operational refresh is therefore a manual step: `pipeline ingest --season 20252026 && git add data_cache/ && git commit && git push` whenever you want the public dashboard to advance.
+- **CORS allow-list must be set per deployed frontend URL.** `CORS_ALLOWED_ORIGINS` is a comma-separated env var on the backend. Misconfiguration shows up as "Couldn't load …" errors in the browser; no model behavior is affected. Vercel preview URLs change per pull request — if you want previews to work against the deployed backend, add them to the allow-list explicitly.
+
+### H. v2.3 live-polling limitations
 
 These are specific to the live integration layer added in §16. The underlying rating model and WP lookup are unaffected; these bound how *fresh* the live surfaces feel and what failure modes the polling layer can mask.
 
@@ -504,13 +513,13 @@ These are specific to the live integration layer added in §16. The underlying r
 - **`game_state` transitions are not push-notified.** A game flipping from PRE to LIVE, or from LIVE to FINAL, is detected only on the next poll. There is no "the game just ended" event.
 - **Hero-chart live updates poll the same endpoint on the same cadence.** The trajectory chart re-fetches every 60 s while viewing the in-progress 2025-26 season. Newly-completed games show up only after the backend's pipeline has re-ingested the day's parquet, which is a separate `/admin/refresh` operation. Without that, the historical cache won't include the new game and the chart won't move.
 
-### H. Frontend design choices with project-external reasoning
+### I. Frontend design choices with project-external reasoning
 
 These are conscious UI decisions made for non-technical reasons (trademark, license risk, etc.) rather than to bound any modeling claim. Documented so a future contributor doesn't "fix" them.
 
 - **No NHL team logos in the dashboard.** Team identity is shown using a colored badge (a filled circle in the franchise's primary brand color from `frontend/src/teamColors.ts`) plus the three-letter team abbreviation. NHL team logos are registered trademarks and embedding them — even on a student project — carries takedown / IP-claim risk. The colored-badge substitute gives users a recognizable visual without copying any mark. If a future amendment wants real logos, the only safe path is per-team license clearance or a fair-use legal review.
 
-### I. Methodology process limitations
+### J. Methodology process limitations
 
 - **Test sets shrink with each version.** v1's test was 2 seasons (2023-24 + 2024-25). v2's test is 1 season (2025-26). v3's test, if it follows the same pattern, will be ≤ 1 season. The shrinkage trades statistical power for the freshness of unseen data. A future amendment may need to address this — possibly by accepting wider confidence intervals on §6 metrics as test windows narrow.
 - **One-shot test evaluation per §10 #1 means we cannot detect overfitting to the validation window.** If v2's validation choices happen to capture noise specific to 2021-22 → 2024-25, the test result will tell us, but only once and only via the held-out 2025-26 season. There is no cross-validation safety net.

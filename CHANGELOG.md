@@ -2,6 +2,30 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-05-18 — Deploy-ready: Dockerfile + vercel.json + DEPLOY.md
+
+The project now deploys cleanly to Vercel (frontend) + Railway/Render/Fly (backend) without per-deploy data ingest. The Parquet cache (~2 MB across 108 score seasons + 15 PBP seasons) is small enough to commit, so it's now tracked in git and ships in the container image. Backend cold start stays at ~1.5 s.
+
+Backend:
+  - `backend/Dockerfile`: python:3.12-slim, uv installed from the published image, layer-cached dep install before app code is copied. Listens on `$PORT` (Railway/Render/Fly inject it; defaults to 8000 locally).
+  - `backend/.dockerignore`: excludes .venv, tests, scripts, caches.
+  - `main.py`: CORS `allow_origins` is now read from the `CORS_ALLOWED_ORIGINS` env var (comma-separated), defaulting to the local-dev URLs. Existing tests still pass.
+
+Frontend:
+  - `frontend/vercel.json`: Vite preset, build/install commands, SPA rewrites.
+  - No code changes; existing `VITE_API_BASE` handling already works against any backend URL.
+
+Repo:
+  - `.gitignore`: un-ignored `backend/data_cache/` with a note explaining why (deploy-ready snapshot).
+  - All 123 parquet files now tracked (~2 MB total).
+
+Docs:
+  - `DEPLOY.md`: full walkthrough for Railway / Render / Fly + Vercel including env-var reference, post-deploy refresh procedure, free-tier ephemerality caveats, and a troubleshooting table.
+  - `README.md`: added a "Deploying" section linking to DEPLOY.md.
+  - `METHODOLOGY.md` §13: new subsection G "Deployment / operational limitations" documenting ephemeral container storage, idle-sleep cold start, and CORS-allowlist requirements. Subsequent subsections renumbered (G→H, H→I, I→J).
+
+No methodology change; pure infra/operational addition. Tests: 154 still passing.
+
 ## 2026-05-18 — README refreshed for v2
 
 Project README updated to reflect the v2 feature set. Added a Status block making the v1-locked / v2-evaluation-pending split unambiguous. v1 metrics table relabeled as the canonical v1 record per §10 #2; new v2 status block reports the validation numbers (LL 0.66219, Brier 0.23495, ECE 0.01528 across n=5,594) and explicitly notes that the v2 test evaluation is gated on the 2026 Stanley Cup Final.

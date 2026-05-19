@@ -1,0 +1,13 @@
+# Don't ship dev cruft into the container.
+.venv
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+.ruff_cache
+.mypy_cache
+tests
+scripts
+*.tmp
+*.bak
+README.md

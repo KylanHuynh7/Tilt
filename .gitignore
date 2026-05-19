@@ -44,5 +44,6 @@ Thumbs.db
 .vscode/
 *.swp
 
-# Cached NHL data (will be replaced by proper storage in a later milestone)
-backend/data_cache/
+# NHL data cache — committed at v2 release so the backend is deploy-ready
+# without running the pipeline. The parquets total only ~2 MB (zstd-compressed)
+# so they're cheap to track. Use `/admin/refresh` to update post-deploy.
