@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import {
   CartesianGrid,
+  LabelList,
   Line,
   LineChart,
   ReferenceLine,
@@ -13,6 +14,31 @@ import type { RatingsHistoryResponse } from "../api";
 import { colorFor } from "../teamColors";
 
 type Props = { data: RatingsHistoryResponse };
+
+// Renders a 👑 emoji at the last data point of the cup-winner's line.
+// Recharts' LabelList iterates every (index, value); we return null for
+// every point except the final one, using a closure over `lastIndex`.
+function makeCrownContent(lastIndex: number) {
+  // Recharts' LabelList content callback uses a permissive prop type;
+  // we pull only what we need and coerce.
+  return (props: any) => {
+    if (props?.index !== lastIndex) return null;
+    if (props?.value == null) return null;
+    const x = Number(props.x);
+    const y = Number(props.y);
+    if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+    return (
+      <text
+        x={x + 6}
+        y={y - 6}
+        fontSize={22}
+        style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.35))" }}
+      >
+        👑
+      </text>
+    );
+  };
+}
 
 export function TrajectoryChart({ data }: Props) {
   const { rows, teams, yDomain } = useMemo(() => {
@@ -79,19 +105,29 @@ export function TrajectoryChart({ data }: Props) {
             labelStyle={{ color: "var(--text-dim)" }}
             itemSorter={(item) => -(item.value as number)}
           />
-          {teams.map((team) => (
-            <Line
-              key={team.id}
-              type="monotone"
-              dataKey={team.id}
-              name={team.code ?? team.id}
-              stroke={team.code ? colorFor(team.code) : "#888"}
-              strokeOpacity={0.75}
-              strokeWidth={1.5}
-              dot={false}
-              isAnimationActive={false}
-            />
-          ))}
+          {teams.map((team) => {
+            const isChampion = data.cup_winner_franchise === team.id;
+            return (
+              <Line
+                key={team.id}
+                type="monotone"
+                dataKey={team.id}
+                name={team.code ?? team.id}
+                stroke={team.code ? colorFor(team.code) : "#888"}
+                strokeOpacity={isChampion ? 1.0 : 0.75}
+                strokeWidth={isChampion ? 2.25 : 1.5}
+                dot={false}
+                isAnimationActive={false}
+              >
+                {isChampion && (
+                  <LabelList
+                    dataKey={team.id}
+                    content={makeCrownContent(rows.length - 1)}
+                  />
+                )}
+              </Line>
+            );
+          })}
         </LineChart>
       </ResponsiveContainer>
     </div>

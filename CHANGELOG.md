@@ -2,6 +2,21 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-05-18 — Cup winner 👑 marker on the trajectory chart
+
+User-visible: when viewing a completed season's ratings trajectory, the Stanley Cup winner now gets a 👑 emoji at the end of their line, plus a thicker / higher-opacity line for visual prominence. In-progress seasons show no crown.
+
+Backend:
+  - `standings.cup_winner(season_id)`: returns the team-code champion for a season, derived from the SCF winner in the playoff bracket. Falls back to a hand-curated `CUP_WINNER_OVERRIDES` for the COVID-era bracket weirdness (2019-20, 2020-21 — both TBL, the published 8/4/2/1 chronological bucket can't disambiguate the non-standard formats).
+  - `derive_playoff_state` rewritten from subset-membership (which mis-bucketed CF/SCF as R2 once all rounds completed — R1 winners are technically in every later round) to chronological bucketing (first 8 series = R1, next 4 = R2, etc.). All seasons since 2013 verified correct except the two COVID years handled via overrides.
+  - `/ratings/history/{season}` adds `cup_winner` (team code) and `cup_winner_franchise` (stable franchise_id for chart join).
+
+Frontend:
+  - `TrajectoryChart`: when `cup_winner_franchise` matches a team, that line gets thicker (2.25 vs 1.5 stroke), full opacity, and a 👑 emoji rendered via `LabelList` at the line's last data point only.
+  - `api.ts`: new `cup_winner` + `cup_winner_franchise` fields on `RatingsHistoryResponse`.
+
+METHODOLOGY.md §13.D: added a bullet documenting the cup_winner derivation rule, the 8/4/2/1 bracket assumption, the COVID-era overrides, and the pre-1942 challenge-series caveat. Notes that the limitation affects only the dashboard's visual marker, not the rating model.
+
 ## 2026-05-18 — UI polish: center Today's Games card, colored team badges
 
 Frontend tweaks to make the Today's Games tab feel less cramped and add team-color identity without trademark risk. Layout change: `.games-grid` switched from a 2-column grid to `flex-wrap: wrap` with `justify-content: center` so a single matchup centers cleanly and multiple matchups flow naturally as a row. Cards bumped to padding 22/28, max-width 640px, abbrev font 18px. New `TeamBadge` component renders a 44px circle filled with the team's primary color (already in `teamColors.ts`) with the three-letter abbreviation in white.

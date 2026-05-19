@@ -173,11 +173,28 @@ async def ratings_history(season: int):
                 for p in points
             ],
         })
+
+    # Best-effort Cup winner; None for in-progress seasons or pre-NHL-cup eras
+    # where the parquet has no completed SCF. Wrapped in try/except so a data
+    # quirk in any single season never breaks the endpoint. Converted from the
+    # team code to the franchise_id so the frontend chart can join on the
+    # same key it uses for the trajectory lines.
+    try:
+        winner_code = standings.cup_winner(season)
+    except Exception:  # noqa: BLE001
+        winner_code = None
+    from .franchises import franchise_for
+    winner_franchise_id = (
+        franchise_for(winner_code, season) if winner_code else None
+    )
+
     return {
         "season": season,
         "label": parsed.label,
         "pre_1967": parsed.is_pre_1967,
         "n_franchises": len(teams),
+        "cup_winner": winner_code,             # 3-letter team code, or None
+        "cup_winner_franchise": winner_franchise_id,  # stable id for chart join
         "teams": teams,
     }
 

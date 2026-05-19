@@ -16,6 +16,8 @@ export type RatingsHistoryResponse = {
   label: string;
   pre_1967: boolean;
   n_franchises: number;
+  cup_winner: string | null;             // 3-letter team code, or null
+  cup_winner_franchise: string | null;   // stable franchise_id, or null
   teams: TeamHistory[];
 };
 

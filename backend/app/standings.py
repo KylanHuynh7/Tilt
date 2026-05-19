@@ -229,16 +229,19 @@ def _opponents_in_round(
 def derive_playoff_state(season_id: int) -> PlayoffState:
     """Reconstruct the bracket from the parquet's playoff games.
 
-    Algorithm:
+    Algorithm (chronology-based, replaces an earlier subset-based version
+    that mis-bucketed CF/SCF series as R2 once all rounds had played out
+    — R1 winners are technically in every later round too, so subset
+    membership alone can't distinguish rounds):
+
       1. Group games into series by team-pair.
-      2. Identify Round 1 series as those whose teams played the EARLIEST
-         playoff game involving them.
-      3. Walk forward: Round 2 series have both participants in the set of
-         Round 1 winners; Conference Finals likewise from R2 winners; SCF
-         from CF winners.
+      2. Sort series by first-game date (earliest first).
+      3. The first 8 = R1, next 4 = R2, next 2 = CF, last 1 = SCF.
+         Modern NHL bracket has exactly 15 series; partial-season states
+         bucket whatever is present.
       4. A series can be "in progress" — recorded but with winner=None.
-         The earliest in-progress series belongs to the earliest round
-         whose participants are otherwise valid.
+      5. For pre-modern eras with different bracket formats, the buckets
+         may not cleanly fit; documented in §13.J as a known limitation.
     """
     t = _load_season(season_id)
     po = t.filter(pc.equal(t.column("game_type"), PLAYOFF))
@@ -247,70 +250,32 @@ def derive_playoff_state(season_id: int) -> PlayoffState:
     if not grouped:
         return PlayoffState(season_id=season_id)
 
-    # Build every series object first; assign rounds below.
-    all_series: list[Series] = []
-    for _, games in grouped.items():
-        all_series.append(_build_series(games))
+    # Build series with their first-game date so we can sort chronologically.
+    series_with_start: list[tuple[date, Series]] = []
+    for teams, games in grouped.items():
+        s = _build_series(games)
+        series_with_start.append((games[0]["game_date"], s))
+    series_with_start.sort(key=lambda x: x[0])
+    ordered_series = [s for _, s in series_with_start]
 
-    # Each team's first playoff game date — used to peg "this team was in R1".
-    # If we miss a team in R1, it shouldn't be in the playoff field at all.
-    first_game_date: dict[str, date] = {}
-    for s in all_series:
-        # Take the dates of this series' games to set first-seen per participant.
-        # We need them ordered; re-derive from grouped.
-        teams = frozenset({s.team_a, s.team_b})
-        games = grouped[teams]
-        d = games[0]["game_date"]
-        for team in (s.team_a, s.team_b):
-            prev = first_game_date.get(team)
-            if prev is None or d < prev:
-                first_game_date[team] = d
+    # Bucket by round per the modern bracket layout (8 / 4 / 2 / 1).
+    round1 = ordered_series[:8]
+    round2 = ordered_series[8:12]
+    cf = ordered_series[12:14]
+    scf = ordered_series[14:15]
 
-    if not first_game_date:
-        return PlayoffState(season_id=season_id)
-
-    # The playoff field is everyone who played at least one playoff game.
-    field_set = set(first_game_date.keys())
-
-    # Round 1: series where both teams' first playoff games are on this series.
-    # In practice: a team's first playoff game IS in their Round 1 series.
-    # The series containing each team's earliest game is its Round 1 series.
-    r1_team_first_series: dict[str, Series] = {}
-    for s in all_series:
-        teams = frozenset({s.team_a, s.team_b})
-        games = grouped[teams]
-        d = games[0]["game_date"]
-        for team in (s.team_a, s.team_b):
-            if d == first_game_date[team]:
-                r1_team_first_series[team] = s
-    round1 = list({id(s): s for s in r1_team_first_series.values()}.values())
-
-    r1_winners: set[str] = {s.winner for s in round1 if s.winner is not None}
-
-    round2 = _opponents_in_round(
-        [s for s in all_series if s not in round1],
-        r1_winners,
-    )
-    r2_winners: set[str] = {s.winner for s in round2 if s.winner is not None}
-
-    cf = _opponents_in_round(
-        [s for s in all_series if s not in round1 and s not in round2],
-        r2_winners,
-    )
-    cf_winners: set[str] = {s.winner for s in cf if s.winner is not None}
-
-    scf = _opponents_in_round(
-        [s for s in all_series
-         if s not in round1 and s not in round2 and s not in cf],
-        cf_winners,
-    )
+    # Playoff field = anyone who played at least one playoff game.
+    field_set: set[str] = set()
+    for s in ordered_series:
+        field_set.add(s.team_a)
+        field_set.add(s.team_b)
 
     cup_champion: str | None = None
     if scf and scf[0].winner is not None:
         cup_champion = scf[0].winner
 
     eliminated_set: set[str] = set()
-    for s in all_series:
+    for s in ordered_series:
         if s.winner is not None:
             eliminated_set.add(s.opponent_of(s.winner))
     alive_set = field_set - eliminated_set
@@ -329,6 +294,36 @@ def derive_playoff_state(season_id: int) -> PlayoffState:
 
 
 # ---- Higher-level convenience -------------------------------------------------
+
+
+# Hand-curated overrides for seasons where the chronological "8/4/2/1" bracket
+# bucketing breaks down. The COVID bubble (2019-20) used a 24-team play-in
+# round before the standard bracket; the 2020-21 season used realigned all-
+# divisional brackets with different series counts. For these, the algorithm
+# can't reliably derive the SCF winner from chronology alone — overrides
+# below carry the ground truth.
+CUP_WINNER_OVERRIDES: dict[int, str] = {
+    20192020: "TBL",  # Tampa Bay Lightning, COVID bubble in Edmonton
+    20202021: "TBL",  # Tampa Bay Lightning, realigned-division playoffs
+}
+
+
+def cup_winner(season_id: int) -> str | None:
+    """The Stanley Cup champion team code for a season, or None if the SCF
+    hasn't completed (in-progress season) or the season has no playoff data.
+
+    Looks up `CUP_WINNER_OVERRIDES` first for known non-standard bracket years;
+    otherwise derives from `derive_playoff_state(...).cup_champion`.
+
+    For very early seasons (pre-1942) when the Cup was sometimes decided via
+    inter-league challenge series, this function only knows about NHL playoff
+    games (gameType=3) and may report the NHL playoff winner rather than the
+    actual Stanley Cup holder. Documented in §13.J.
+    """
+    if season_id in CUP_WINNER_OVERRIDES:
+        return CUP_WINNER_OVERRIDES[season_id]
+    state = derive_playoff_state(season_id)
+    return state.cup_champion
 
 
 def remaining_regular_season_games(season_id: int) -> list[dict]:
