@@ -2,6 +2,21 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-05-18 — Cup probability panel below the trajectory chart
+
+User-visible: when viewing the 2025-26 season on the Trajectories tab, a 32-team vertical bar chart now sits under the trajectory plot showing each team's Stanley Cup win probability from the v2.1 Monte Carlo sim. Bars sorted desc; teams not in the playoff field render at 0% with low opacity. Bars colored by each team's primary brand color (same palette as the trajectory lines and the Today's Games badges).
+
+Backend (main.py):
+  - `/simulation/cup` response extended to include all 32 active franchises rather than just the playoff field. Each row gets a `status` field with one of `alive`, `eliminated`, or `not_in_playoffs`. Teams not in the playoff field have `cup_probability: 0.0`. The change is additive; existing callers that read the `teams` array still work.
+
+Frontend:
+  - New `CupOdds` component (recharts BarChart, 260px tall, X-axis = team abbreviations rotated -45° for readability, Y-axis = Cup %).
+  - `App.tsx` fetches `/simulation/cup` when entering the Trajectories tab and re-polls every 5 minutes (the sim is cheap but not free — 60s polling matches games/today's "I need to see this change fast" cadence, while Cup probabilities only move on completed games, so 5min is enough).
+  - Panel hidden when viewing any season other than 2025-26 (no live Cup race for completed seasons; the 👑 marker on the trajectory chart is the historical analogue).
+  - `api.ts`: new `CupTeam` + `CupResponse` types and `fetchCup()` helper.
+
+No methodology change — the underlying Cup sim and rating model are unchanged. The panel is a new view on existing data, scoped to the in-progress season.
+
 ## 2026-05-18 — Cup winner 👑 marker on the trajectory chart
 
 User-visible: when viewing a completed season's ratings trajectory, the Stanley Cup winner now gets a 👑 emoji at the end of their line, plus a thicker / higher-opacity line for visual prominence. In-progress seasons show no crown.

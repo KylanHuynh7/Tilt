@@ -251,22 +251,29 @@ async def simulation_cup(n: int | None = None, refresh: bool = False):
             n_simulations=n_sims,
         )
 
-    # Pretty-format the response: include rating and franchise name per team.
-    by_code_rating = cup_simulator.ratings_by_team_code(
-        historical.current_active_ratings_with_codes()
-    )
+    # Pretty-format the response: include EVERY active franchise (32 teams),
+    # with 0.0 probability for teams that aren't in the playoff field so the
+    # frontend can render all 32 bars without extra plumbing.
+    active = historical.current_active_ratings_with_codes()
+    by_code_rating = cup_simulator.ratings_by_team_code(active)
+    in_field = set(_cup_result.playoff_field)
+    eliminated_set = set(_cup_result.eliminated)
     teams_payload = []
-    for code, prob in sorted(
-        _cup_result.cup_probabilities.items(),
-        key=lambda kv: -kv[1],
-    ):
+    for code, _fid, rating in active:
+        prob = _cup_result.cup_probabilities.get(code, 0.0)
+        if code in in_field:
+            status = "eliminated" if code in eliminated_set else "alive"
+        else:
+            status = "not_in_playoffs"
         teams_payload.append({
             "team": code,
             "name": TEAMS.get(code, code),
-            "rating": round(by_code_rating.get(code, 1500.0), 2),
+            "rating": round(rating, 2),
             "cup_probability": prob,
-            "alive": code in _cup_result.alive,
+            "alive": status == "alive",
+            "status": status,
         })
+    teams_payload.sort(key=lambda t: -t["cup_probability"])
     return {
         "season": CURRENT_SEASON_ID,
         "simulated_at": _cup_result.simulated_at,

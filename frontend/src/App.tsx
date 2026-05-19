@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   fetchCalibration,
+  fetchCup,
   fetchHistory,
   fetchSeasons,
   fetchToday,
   type CalibrationResponse,
+  type CupResponse,
   type RatingsHistoryResponse,
   type SeasonRow,
   type TodayResponse,
@@ -12,6 +14,7 @@ import {
 import { TrajectoryChart } from "./components/TrajectoryChart";
 import { TodaysGames } from "./components/TodaysGames";
 import { CalibrationPanel } from "./components/CalibrationPanel";
+import { CupOdds } from "./components/CupOdds";
 
 type Tab = "trajectories" | "today" | "calibration";
 
@@ -30,6 +33,9 @@ export default function App() {
 
   const [cal, setCal] = useState<CalibrationResponse | null>(null);
   const [calErr, setCalErr] = useState<string | null>(null);
+
+  const [cup, setCup] = useState<CupResponse | null>(null);
+  const [cupErr, setCupErr] = useState<string | null>(null);
 
   // Load season list once. The default selection is the most-recent season
   // (the API returns sorted desc), which is the current 2025-26.
@@ -95,6 +101,21 @@ export default function App() {
     }, 60_000);
     return () => clearInterval(interval);
   }, [season]);
+
+  // Cup odds: load once when first entering the Trajectories tab, then poll
+  // every 5 minutes so probabilities track new games without spamming the sim.
+  useEffect(() => {
+    if (tab !== "trajectories") return;
+    if (cup || cupErr) {
+      // already loaded once; just keep the periodic refresh going
+    } else {
+      fetchCup().then(setCup).catch((e: Error) => setCupErr(e.message));
+    }
+    const interval = setInterval(() => {
+      fetchCup().then(setCup).catch(() => {});
+    }, 5 * 60_000);
+    return () => clearInterval(interval);
+  }, [tab, cup, cupErr]);
 
   // Lazy-load calibration only when the tab is opened.
   useEffect(() => {
@@ -181,6 +202,15 @@ export default function App() {
           {historyErr && <div className="error">Couldn't load trajectories: {historyErr}</div>}
           {!history && !historyErr && season != null && <div className="loading">Loading…</div>}
           {history && <TrajectoryChart data={history} />}
+
+          {/* Cup odds panel — only show when viewing the in-progress season */}
+          {season === 20252026 && (
+            <>
+              {cupErr && <div className="error">Couldn't load Cup odds: {cupErr}</div>}
+              {!cup && !cupErr && <div className="loading">Loading Cup odds…</div>}
+              {cup && <CupOdds data={cup} />}
+            </>
+          )}
         </section>
       )}
 

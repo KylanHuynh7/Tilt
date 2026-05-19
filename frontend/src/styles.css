@@ -121,6 +121,28 @@ body {
 }
 .chart-tooltip-crown { font-size: 13px; }
 
+.cup-odds {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--panel-edge);
+}
+.cup-odds-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.cup-odds-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.cup-odds-meta { font-size: 11px; color: var(--text-dim); }
+.cup-odds-chart { width: 100%; height: 260px; }
+.cup-odds-foot { font-size: 11px; color: var(--text-dim); margin-top: 8px; }
+
 .games-grid {
   display: flex;
   flex-wrap: wrap;
