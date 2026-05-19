@@ -15,12 +15,10 @@ import { colorFor } from "../teamColors";
 
 type Props = { data: RatingsHistoryResponse };
 
-// Renders a 👑 emoji at the last data point of the cup-winner's line.
+// Renders "{TEAM} 👑" at the last data point of the cup-winner's line.
 // Recharts' LabelList iterates every (index, value); we return null for
 // every point except the final one, using a closure over `lastIndex`.
-function makeCrownContent(lastIndex: number) {
-  // Recharts' LabelList content callback uses a permissive prop type;
-  // we pull only what we need and coerce.
+function makeCrownContent(lastIndex: number, teamCode: string, teamColor: string) {
   return (props: any) => {
     if (props?.index !== lastIndex) return null;
     if (props?.value == null) return null;
@@ -28,14 +26,47 @@ function makeCrownContent(lastIndex: number) {
     const y = Number(props.y);
     if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
     return (
-      <text
-        x={x + 6}
-        y={y - 6}
-        fontSize={22}
-        style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.35))" }}
-      >
-        👑
-      </text>
+      <g style={{ pointerEvents: "none" }}>
+        <text
+          x={x + 8}
+          y={y + 4}
+          fontSize={12}
+          fontWeight={700}
+          fill={teamColor}
+          style={{ filter: "drop-shadow(0 1px 1px rgba(255,255,255,0.6))" }}
+        >
+          {teamCode}{" "}
+          <tspan fontSize={14}>👑</tspan>
+        </text>
+      </g>
+    );
+  };
+}
+
+// Custom tooltip renderer that flags the cup winner with a 👑 next to their
+// abbreviation. Falls back to default styling otherwise.
+function makeTooltipContent(cupWinnerFranchise: string | null) {
+  return ({ active, payload, label }: any) => {
+    if (!active || !payload?.length) return null;
+    const sorted = [...payload].sort(
+      (a: any, b: any) => (b.value ?? 0) - (a.value ?? 0),
+    );
+    return (
+      <div className="chart-tooltip">
+        <div className="chart-tooltip-label">{label}</div>
+        {sorted.map((row: any) => {
+          const isChamp = row.dataKey === cupWinnerFranchise;
+          return (
+            <div key={row.dataKey} className="chart-tooltip-row">
+              <span className="chart-tooltip-name" style={{ color: row.color }}>
+                {row.name}
+                {isChamp && <span className="chart-tooltip-crown"> 👑</span>}
+              </span>
+              <span className="chart-tooltip-value">{row.value?.toFixed?.(2)}</span>
+            </div>
+          );
+        })}
+      </div>
     );
   };
 }
@@ -96,14 +127,8 @@ export function TrajectoryChart({ data }: Props) {
           />
           <ReferenceLine y={1500} stroke="var(--text-dim)" strokeDasharray="2 4" />
           <Tooltip
-            contentStyle={{
-              background: "var(--panel)",
-              border: "1px solid var(--panel-edge)",
-              borderRadius: 6,
-              fontSize: 12,
-            }}
-            labelStyle={{ color: "var(--text-dim)" }}
-            itemSorter={(item) => -(item.value as number)}
+            content={makeTooltipContent(data.cup_winner_franchise)}
+            wrapperStyle={{ outline: "none" }}
           />
           {teams.map((team) => {
             const isChampion = data.cup_winner_franchise === team.id;
@@ -122,7 +147,11 @@ export function TrajectoryChart({ data }: Props) {
                 {isChampion && (
                   <LabelList
                     dataKey={team.id}
-                    content={makeCrownContent(rows.length - 1)}
+                    content={makeCrownContent(
+                      rows.length - 1,
+                      team.code ?? "?",
+                      team.code ? colorFor(team.code) : "#333",
+                    )}
                   />
                 )}
               </Line>
