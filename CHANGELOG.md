@@ -2,6 +2,18 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-05-19 — DEPLOY.md flipped to Render-first (free tier, no CC)
+
+User constraint: no paid platforms for the backend. Render's free Web Service tier is still available and supports Dockerfile deploys directly, so it's now the primary walkthrough in `DEPLOY.md` (replacing Railway, which removed its free tier in 2023). Alternatives reordered:
+
+- **Primary:** Render (free, no credit card, sleeps after 15 min idle with ~30-60 s cold start).
+- **Alternative — always-on free:** Hugging Face Spaces with the Docker SDK. Free, no CC, code is public on the free tier.
+- **Paid:** Fly.io (free monthly credit but requires CC) and Railway ($5/min) kept as honorable mentions.
+
+No code changes. The `Dockerfile` was already host-agnostic (listens on `$PORT`), the CORS allow-list is already env-driven, and the parquet cache is already in the image. README's "Deploying" sentence updated to name Render as the recommended backend target.
+
+No methodology amendment. §13.G "Deployment / operational limitations" already covers ephemeral container storage and idle-sleep cold start, which apply to Render the same way they applied to Railway.
+
 ## 2026-05-18 — Deploy-ready: Dockerfile + vercel.json + DEPLOY.md
 
 The project now deploys cleanly to Vercel (frontend) + Railway/Render/Fly (backend) without per-deploy data ingest. The Parquet cache (~2 MB across 108 score seasons + 15 PBP seasons) is small enough to commit, so it's now tracked in git and ships in the container image. Backend cold start stays at ~1.5 s.

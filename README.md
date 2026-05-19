@@ -148,7 +148,7 @@ Open <http://localhost:5173>.
 
 ## Deploying
 
-The repo is set up for one-click deploy to Vercel (frontend) + Railway/Render/Fly (backend) via the included `backend/Dockerfile`. The parquet cache (~2 MB) and all artifacts ship in the repo so the backend boots in ~1.5 s with no build-time data ingest. See **[`DEPLOY.md`](./DEPLOY.md)** for the step-by-step walkthrough including env vars (`CORS_ALLOWED_ORIGINS`, `VITE_API_BASE`) and the `/admin/refresh` ephemerality caveat for free-tier hosts.
+The repo is set up for free-tier deploy to **Vercel** (frontend) + **Render** (backend) via the included `backend/Dockerfile` — no credit card required for either. The parquet cache (~2 MB) and all artifacts ship in the repo so the backend boots in ~1.5 s once awake. See **[`DEPLOY.md`](./DEPLOY.md)** for the step-by-step walkthrough, alternative hosts (Hugging Face Spaces, Fly.io, Railway), env-var reference, and the `/admin/refresh` ephemerality caveat for free-tier hosts.
 
 ### One-time setup for a fresh clone
 
