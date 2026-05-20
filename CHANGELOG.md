@@ -2,6 +2,20 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-11 — NHL v3 draft merged + resolutions; player-projection methodology draft (pre-code)
+
+- **NHL v3 draft merged to `main`.** METHODOLOGY.md §17–§19 come from the `v3-draft` branch (2026-05-19), unchanged. The header and amendment log were reconciled with the v2 evaluation record.
+- **New §20 (proposed):** answers v3's open questions with facts checked today.
+  - No NHL transactions feed exists, but box-score lineups go back to 1967-68, so moves are inferred from lineups.
+  - Seven decisions: data source, ≥ 10-game move threshold, restart-not-stack windows, `BOOST_AMOUNT = 0` in the grid, a test guard refusing any 2026-27 game, v3 live once frozen, nested v3.1 freeze.
+  - The v3 test (2026-27) can only run after the 2027 Cup Final.
+- **New `methodology/NHL_PLAYERS.md` (v0.1-draft):** per-game P(≥1 point) and P(≥1 goal) for NHL skaters.
+  - Model: shrunk, decayed per-60 rates × expected TOI × opponent and home factors.
+  - Data: official box scores; 540-cell grid per event.
+  - Split: warm-up 1998-99 → 2009-10, validation → 2022-23, one-shot test 2023-24 → 2025-26.
+  - Four pass criteria per event, including beating the "last 82 games" heuristic. Seven decisions pending.
+- No code written.
+
 ## 2026-10-11 — College football v1.1: live win probability (4 of 5 targets PASS)
 
 - **Download:** ESPN college play-by-play (FBS vs FBS), 3.9 MB of samples. 2004 had no usable games; training 2005–2013 has 5,751 games. A resume bug double-counted 2010's drops; fixed and corrected.
