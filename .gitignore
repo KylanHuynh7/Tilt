@@ -39,6 +39,12 @@ frontend/**/*.tsbuildinfo
 .DS_Store
 Thumbs.db
 
+# Tool / verification artifacts (Playwright snapshots, ad-hoc screenshots)
+.playwright-mcp/
+*.png
+!frontend/public/**/*.png
+!docs/**/*.png
+
 # Editor
 .idea/
 .vscode/
