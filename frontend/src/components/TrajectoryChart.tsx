@@ -125,7 +125,7 @@ export function TrajectoryChart({ data }: Props) {
             fontSize={11}
             width={48}
           />
-          <ReferenceLine y={1500} stroke="var(--text-dim)" strokeDasharray="2 4" />
+          <ReferenceLine y={1500} stroke="var(--text-faint)" strokeDasharray="2 4" />
           <Tooltip
             content={makeTooltipContent(data.cup_winner_franchise)}
             wrapperStyle={{ outline: "none" }}

@@ -2,6 +2,19 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-05-19 — UI: NHL "broadcast graphics" dark theme
+
+Theme refresh per user request after seeing the deployed dashboard looked flat. Adopts an NHL-branded dark aesthetic: charcoal background, silver-white text, NHL red (`#c8102e`) as the accent. Header gains a small red signal dot before the title, a 56px accent underline, and an uppercase wordmark feel. Tabs uppercase + spaced for a broadcast vibe; active tab gets red underline and a subtle background highlight. Probability bars get a slight inset shadow and bigger height for depth. Live games get a red glow + box-shadow ring. Team badges get a soft ring + drop shadow for premium feel.
+
+Team color palette retuned for the dark theme (`frontend/src/teamColors.ts`):
+- **BOS / PIT / LAK** flip back to their published gold/silver secondaries (their primary blacks vanish on dark).
+- **COL / DAL / FLA / WPG / STL / TBL / TOR / VAN / MIN** get slightly lightened variants of their dark navy / green / burgundy primaries so the lines read against the dark bg.
+- 23 other teams keep their original published primaries — they already read fine on dark.
+
+METHODOLOGY.md §13.I: added a bullet documenting the theme + team-color coupling so a future contributor restoring the light theme also knows to restore the published primaries.
+
+No methodology amendment. No backend code touched.
+
 ## 2026-05-19 — DEPLOY.md flipped to Render-first (free tier, no CC)
 
 User constraint: no paid platforms for the backend. Render's free Web Service tier is still available and supports Dockerfile deploys directly, so it's now the primary walkthrough in `DEPLOY.md` (replacing Railway, which removed its free tier in 2023). Alternatives reordered:
