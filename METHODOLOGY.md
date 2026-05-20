@@ -1,7 +1,7 @@
 # NHL Rating System — Methodology Document
-## Version 2.3
+## Version 3.0-draft
 **Author:** Kylan Huynh
-**Status:** v1 shipped and locked (commit `f7548f6`). v2 in flight; the v1 model and v1 evaluation are immutable per §10 #2.
+**Status:** v1 shipped and locked (commit `f7548f6`). v2 shipped, evaluation pending (gated on 2026 Stanley Cup Final). v3 in PRE-CODE DRAFT — methodology only, no implementation. Drafted on the `v3-draft` branch for review after v2 test evaluation is locked.
 **Last updated:** May 2026
 
 **Amendment log:**
@@ -11,6 +11,8 @@
 - *v2.1 (2026-05-18):* Adds **Monte Carlo Cup probabilities** — the second of the four pre-registered v2 features. No change to the rating model itself; Cup probabilities are a forward projection from current ratings, not an evaluation of model accuracy against future outcomes. Defines the sim algorithm (per-game rating updates within a single run, 10,000 sims per call), the data inputs (parquet for current state, derived bracket), and how this surface relates to the §10 #1 test-set quarantine (it does not). See the new Section 14 below.
 - *v2.2 (2026-05-18):* Adds **live in-game win probability** — the third of the four pre-registered v2 features — as **Interpretation B**: a separate empirical model layer that estimates `P(home wins | period, time remaining, score differential)` from historical play-by-play data. The Elo rating model is unchanged; nothing in `ratings.py` is touched. v2.2 introduces a new artifact (`live_wp_v2.json`) trained on the 2010-11 → 2024-25 seasons and exposes a stateless endpoint that callers query with a game state. Live polling of in-progress games is deferred to v2.3. See the new Section 15 below.
 - *v2.3 (2026-05-18):* Wires the v2.2 model into the dashboard's live flow. For each in-progress game in `/games/today`, the backend fetches the current play-by-play, extracts `(period, time remaining, score differential)`, and includes the live WP in the payload. The frontend polls `/games/today` every 60 seconds when any matchup is in progress. No new model logic; this is the integration layer that makes v2.2 visible. The "hero chart live updates" pre-registered v2 feature is also covered here — the trajectory chart will refresh on the same polling interval when the current season's parquet has new games. See the new Section 16 below.
+- *v3.0-draft (2026-05-19):* **PRE-CODE DRAFT.** Begins the v3 methodology with the first of the two pre-registered v3 features from the appendix: **roster-shock modeling**. Transactions (trades, free-agent signings, waiver claims) become first-class inputs to the rating engine via a transaction-driven dynamic K-factor boost — when a roster event lands, the affected teams' K is temporarily elevated for the next N games so the rating can converge faster to the new on-ice reality. This is a heuristic, low-data-dependency approach that deliberately avoids building a full player-rating model (deferred to v4). v3 is a new model with its own freeze cycle and a NEW held-out test set (2026-27 — see §17). v1 and v2 parameters / results remain immutable per §10 #2. Draft only; no code written.
+- *v3.1-draft (2026-05-19):* **PRE-CODE DRAFT.** Adds the second pre-registered v3 feature: **series-context K adjustment**. The uniform `K_playoff` from v1.1 §5 is replaced by a function `K(round, series_state)` so that later rounds and elimination games carry more weight than R1 Game 1. Resolves the v1/v2 tension where the unconstrained validation grid consistently wanted `K_playoff < K_regular`; the v3 hypothesis is that the unconstrained preference was masking a genuine signal about *which* playoff games matter, not whether playoff games matter overall. Draft only; no code written.
 
 ---
 
@@ -662,3 +664,194 @@ v2.2 picks B. Reasoning: A would couple the rating system to play-by-play data (
 - For a game at period 1 with 20:00 remaining and 0-0 score, the live WP should match the (P1, mins_remaining=19, score_diff=0) lookup (≈0.54 across the 15-season training corpus).
 - For a game that just ended (state FINAL/OFF), no live WP is returned; the pre-game WP and final score suffice.
 - For a game with the state FUT or PRE, no live WP is returned; the pre-game WP is the only published number.
+
+---
+
+## Section 17 — v3.0-draft amendment: roster-shock modeling
+
+**STATUS: DRAFT. No code has been written for this section. Review and amend on the `v3-draft` branch before any v3.0 implementation work begins.**
+
+### Motivation
+
+v1 and v2 ratings update only from game results. A team that trades its top scorer at the deadline loses roughly 1-2 wins' worth of expected goals immediately, but the rating mechanism takes ~30 games at K=10 to converge to the new on-ice reality. By the time the model catches up, the regular season is half-over. The same lag applies in reverse for trade acquisitions and free-agent signings.
+
+§2 explicitly pre-registered this as a known weakness: *"Hot-streak upsets are a known lag problem … upsets driven by recent form will be systematically underpredicted."* Roster shocks are the related but distinct case — the team's *talent* changes mid-season, not just its form.
+
+### Design choice — heuristic K-boost, not player-rating
+
+Two interpretations of "roster-shock modeling" exist:
+
+- **Interpretation P (player-level):** maintain a per-player rating contribution to team strength. At each transaction, apply a team rating delta of `(player_value × team_share) × Elo_scaling`. Requires a separate player-rating system (likely WAR-based or built from goal-share data).
+- **Interpretation T (transaction-level):** treat the transaction itself as the signal. When a transaction occurs, temporarily elevate the affected teams' K-factor for the next N games. The team's rating then converges *faster* to whatever the new on-ice reality is, without committing to a player-level model.
+
+v3.0 picks **T**. Reasoning:
+
+1. Interpretation P is essentially a separate research project (player ratings) that lives inside the team-rating project. Scope creep risk is high; building a credible WAR system is a year of work in its own right.
+2. Interpretation T captures the qualitative effect (faster convergence after roster change) with minimal new data: transaction date + teams involved. No per-player evaluations.
+3. T is *less* opinionated. It says "after a trade, trust new evidence faster" — which is true regardless of whether the trade was good or bad. P forces us to pre-judge every transaction.
+4. Interpretation P remains the natural v4 amendment if v3 proves the foundation valuable.
+
+### Model change
+
+A new tunable parameter `BOOST_WINDOW` (in games) and `BOOST_AMOUNT` (multiplier on K). For each team and each game:
+
+```
+games_since_last_event = (games_this_team_played_since_last_transaction)
+if games_since_last_event < BOOST_WINDOW:
+    effective_K = K * (1 + BOOST_AMOUNT * (1 - games_since_last_event / BOOST_WINDOW))
+else:
+    effective_K = K
+```
+
+The boost decays linearly across the window. A team that just made a trade gets `K * (1 + BOOST_AMOUNT)` on its very next game; halfway through the window it gets `K * (1 + 0.5 × BOOST_AMOUNT)`; after `BOOST_WINDOW` games it's back to baseline.
+
+Pre-registered starting values:
+- `BOOST_WINDOW = 10` games
+- `BOOST_AMOUNT = 0.5` (i.e., 50 % K boost on the first post-trade game)
+
+Both tunable on v3 validation.
+
+### Data dependency
+
+NHL transaction feed. Two candidate sources:
+
+- **NHL public web API** — `https://api-web.nhle.com/v1/club-roster-season/{TEAM}/{SEASON}` returns per-season rosters, from which trade dates can be inferred by diff. Reliable but daily-granularity at best.
+- **NHL transactions endpoint** — if/when discovered. The publicly-documented API doesn't expose a clean transactions stream.
+
+If the API path isn't viable, a manually-curated CSV of transaction dates for the v3 evaluation window (2026-27) is acceptable as a v3.0 starting point. The infrastructure is the same.
+
+### v3 train / validation / test split
+
+- *v3 train:* 1967-68 → 2020-21 (unchanged from v1/v2).
+- *v3 validation:* 2021-22 → 2025-26 (folds v2's test season into v3 validation, same pattern as v2 folding in v1's test seasons).
+- *v3 test:* **2026-27** (held out, touched exactly once at v3 final evaluation after the 2027 Stanley Cup Final).
+
+The shifting test window keeps each model's test set genuinely unseen at evaluation time and avoids cross-model contamination of the same test data. The cost is that v3 evaluation isn't possible until the 2026-27 season concludes — a calendar wait of roughly one full season after v2 lock.
+
+### v3.0 grid search
+
+The v2.0 4-D grid expands to 6-D for the v3.0 freeze:
+
+```
+K_regular   ∈ {4, 6, 8, 10, 12}
+K_playoff   ∈ {6, 10, 14, 18}     constraint: K_playoff ≥ K_regular  (§5)
+decay_carry ∈ {0.65, 0.70, 0.75, 0.80, 0.85}
+home_bump   ∈ {0, 20, 40, 60, 80, 100}   constraint: home_bump ≥ 0
+BOOST_WINDOW ∈ {5, 10, 15, 20}
+BOOST_AMOUNT ∈ {0.25, 0.50, 0.75, 1.00}
+```
+
+5 × 4 × 5 × 6 × 4 × 4 = 9,600 cells. At ~2 s per cell (per v2.0 benchmarks), the full sweep wall time is roughly 5-6 hours. Acceptable for a one-time freeze run; needs background execution.
+
+Selection rule unchanged from v2.0: lowest log-loss with deterministic tiebreaks (ECE then Brier). §5 K_playoff ≥ K_regular and §17 BOOST_AMOUNT ≥ 0 constraints both applied.
+
+### Pre-registered v3.0 expectations
+
+- The optimal `BOOST_WINDOW` lands in the range [5, 15] games. Below 5, the boost barely matters before fading; above 15, the boost effectively redefines K rather than capturing a transient event.
+- The optimal `BOOST_AMOUNT` lands in [0.25, 0.75]. A value at the upper or lower edge suggests the model is using BOOST_AMOUNT to compensate for something else.
+- Validation log-loss improves by at least 0.002 versus v2 on the same validation seasons. Less improvement would suggest roster shocks don't carry enough signal at this resolution and Interpretation P is needed.
+- Test-set Brier on 2026-27 lands inside the same v2.1 band of 0.235–0.245.
+
+### What v3.0 explicitly does NOT do
+
+- **No player-level ratings.** Deferred to v4 per the design discussion above.
+- **No transaction-quality judgment.** The model doesn't try to say "Team A got a good player." It just trusts new evidence faster after any transaction.
+- **No retrospective rating reattribution.** Pre-transaction games' contributions stay as they were; the boost only affects future games.
+- **No coach-change shocks.** Coaching turnover is a different signal; out of scope for v3.0.
+
+### Open questions to resolve before v3.0 code begins
+
+1. **Transaction data source.** Confirm the NHL API exposes transactions at sufficient granularity, or accept curated CSV as the v3.0 starting point.
+2. **Definition of "transaction."** Trade for sure. Free-agent signing on Day 1 of free agency, yes. Waiver claim, yes. Recall from AHL, probably not (too noisy). To be specified before coding.
+3. **Multi-trade days.** If a team makes three trades on deadline day, do we apply one boost or three? Proposal: one boost regardless — the "uncertainty signal" is the day, not the count.
+
+---
+
+## Section 18 — v3.1-draft amendment: series-context K adjustment
+
+**STATUS: DRAFT. No code has been written for this section. Review and amend on the `v3-draft` branch before any v3.1 implementation work begins.**
+
+### Motivation
+
+§5 v1.1 made `K_playoff` uniform across every playoff game. v3.1 acknowledges that not all playoff games carry equal information weight:
+
+- A Round 1 Game 1 between two teams that finished 110 and 102 points apart is a relatively low-information event (the rating gap going in is already meaningful).
+- A Conference Final between two teams that survived two rounds each is a higher-information event (the opponent pool has narrowed and survivorship-selected for quality).
+- A Game 7 of any round, especially an elimination game, is higher-information still — the prior series state already told us something about both teams.
+
+The v1 and v2 grid searches both consistently found that the **unconstrained** log-loss minimum places `K_playoff < K_regular`. We enforced `K_playoff ≥ K_regular` via the §5 constraint because the pre-registered intuition said playoff games carry more information. v3.1's hypothesis is that **the unconstrained preference was masking a real signal about *which* playoff games matter, not whether playoff games matter overall**. A flat `K_playoff = 6` is preferred over `K_playoff = 10` because *most* playoff games (early rounds, non-elimination) are noisy; the few high-information games are dragged down by averaging with the rest. v3.1 lets the model treat the noisy ones differently from the decisive ones.
+
+### Model change
+
+`K_playoff` becomes a function:
+
+```
+K(round, series_state) = K_playoff_base * (1 + round_factor[round] + elimination_factor[series_state])
+
+where:
+    round_factor[round] = ROUND_WEIGHTS[round - 1]
+    elimination_factor[series_state] = ELIMINATION_BUMP if facing_elimination else 0.0
+```
+
+Round indexing: 1 = R1, 2 = R2, 3 = Conference Final, 4 = Stanley Cup Final.
+
+A game is "facing elimination" if at least one of the two teams enters the game with 3 series wins. Both teams facing elimination (3-3) qualifies as well.
+
+Pre-registered starting values:
+
+- `K_playoff_base = 10` (matches v2.0)
+- `ROUND_WEIGHTS = [0.0, 0.10, 0.20, 0.30]` (R1 at baseline, escalating linearly through SCF)
+- `ELIMINATION_BUMP = 0.20`
+
+So a Game 7 of the Cup Final with one team facing elimination would get `K = 10 × (1 + 0.30 + 0.20) = 15`. A non-elimination Round 1 Game 2 gets `K = 10 × (1 + 0.0) = 10`. The original v2 behavior is recoverable by setting all multipliers to zero.
+
+All multipliers tunable on v3 validation.
+
+### Implementation notes
+
+- The `standings` module already derives playoff state (series → round, wins-so-far per series) for the Cup simulator. The same logic feeds v3.1's K classifier — no new data dependency.
+- `backtest._apply_one_game` is the only place where K gets resolved; the change is localized.
+- The §5 constraint K_playoff ≥ K_regular still applies — but now interpreted as `K_playoff_base ≥ K_regular`. The multipliers can take effective `K(R1, no-elim)` below `K_regular`, which is fine because the constraint was about base values.
+
+### v3.1 grid additions
+
+On top of v3.0's 6-D grid, v3.1 adds three more dimensions:
+
+```
+ROUND_WEIGHTS_SCALE ∈ {0.0, 0.05, 0.10, 0.15, 0.20, 0.30}   (multiplier scaling all round factors)
+ELIMINATION_BUMP    ∈ {0.0, 0.10, 0.20, 0.30}
+```
+
+That's 6 × 4 = 24 additional cells per v3.0 grid point. Combined with v3.0's 9,600 cells: **9,600 × 24 = 230,400 cells**. At 2 s each: ~130 hours wall time on a single core. Infeasible.
+
+**Practical strategy for v3.1's grid:**
+
+Run v3.0's freeze first to lock the 6-D parameters. Then run v3.1's 2-D sub-grid (ROUND_WEIGHTS_SCALE × ELIMINATION_BUMP = 24 cells, ~1 minute wall time) on top of v3.0's locked params. This is sequential nested freezing — v3.0 first, v3.1 layered on top. The two features are nearly orthogonal so the sequential approach should sacrifice very little vs joint optimization.
+
+If joint optimization is needed for honest evaluation, parallelize the grid across multiple cores (a 230k-cell sweep at 8 cores ≈ 16 hours). Decision deferred until v3.0 is locked.
+
+### Pre-registered v3.1 expectations
+
+- `ROUND_WEIGHTS_SCALE` lands in [0.05, 0.15]. Above 0.30 the model is treating the Cup Final as more valuable than the regular season, which is overstating what we know.
+- `ELIMINATION_BUMP` lands in [0.10, 0.30]. Above 0.30 elimination games dominate the rating signal in a way that feels post-hoc.
+- v3.1 validation log-loss improves by at least 0.0005 versus v3.0 on the same validation seasons. A smaller improvement suggests series context doesn't carry enough signal at this resolution.
+- The §5 constraint K_playoff_base ≥ K_regular continues to hold under tuning; if v3.1's tuner wants K_playoff_base = K_regular = 10 with all round multipliers ≈ 0, that's evidence v3.1 isn't pulling its weight.
+
+### What v3.1 explicitly does NOT do
+
+- **No re-weighting of regular-season games by month or by importance.** Regular-season K stays flat.
+- **No "best-vs-best" detection for series matchups.** The model doesn't know that an 8-seed vs 1-seed series is informationally different from a 4-seed vs 5-seed series; both get the same round_factor.
+- **No score-state-aware K within a game.** A 7-0 blowout and a 1-0 squeaker contribute the same to the rating update. v2.2's live WP model already captures within-game state for the published probability, but not for the rating itself.
+
+---
+
+## Section 19 — v3.x candidate features (not pre-registered)
+
+Documenting four ideas that surfaced during v3 scoping. Each is plausibly worth doing, but none are committed to v3 until amended into a numbered v3.x section.
+
+1. **Team-specific home advantage.** Replace the single `home_bump` from v2.0 with 32 per-team variants tuned on validation. Pairs naturally with v3.0 if a player-rating signal exists; without one, the per-team variants risk overfitting on the limited home-game sample per team per season.
+2. **Schedule context.** Back-to-back games, dense road trips, days-of-rest, miles-traveled as small predicted-WP adjustments. §2 already named this as a pre-registered weakness. Small data dependency (NHL schedule, already in the parquet).
+3. **Goalie-aware predictions.** Detect the starting goalie before the game and adjust the predicted WP by the goalie's recent rating delta. Real research project; needs goalie ratings as a separate model layer.
+4. **UI: head-to-head explorer.** Pick two teams, see model accuracy on their historical matchups, current rating gap, expected goal-differential per game. Frontend-only; no methodology amendment needed.
+
+If any of these are promoted to v3 scope, they get their own numbered section (§20, §21, …) at the time of promotion. Until then this section is the parking lot.

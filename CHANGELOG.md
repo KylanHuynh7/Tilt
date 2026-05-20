@@ -2,6 +2,20 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-05-19 — METHODOLOGY.md v3.0-draft + v3.1-draft (PRE-CODE DRAFT, branch `v3-draft`)
+
+**Branch:** `v3-draft`. Not merged to `main`. Drafted for review after v2's test evaluation locks (gated on the 2026 Stanley Cup Final).
+
+Pre-code methodology draft for both pre-registered v3 features from the appendix:
+
+- **§17 — v3.0-draft: roster-shock modeling.** Adds a transaction-driven dynamic K-factor boost. When a roster event (trade, FA signing, waiver claim) lands, the affected teams' K is temporarily elevated for the next `BOOST_WINDOW` games (default 10) by `BOOST_AMOUNT` (default 0.5), decaying linearly. Heuristic, low-data-dependency approach that deliberately avoids building a player-rating system (deferred to v4 as "Interpretation P"). New v3 train/val/test split: train 1967-2020 (unchanged), validation 2021-22 → 2025-26 (folds v2's test into v3 validation), test **2026-27** (held out, one full season wait after v2 lock). 6-D freeze grid (~9.6 k cells, ~5-6 h wall time). Open questions: NHL transactions data source, definition of "transaction," multi-trade days. None of these block the methodology; they block the code.
+
+- **§18 — v3.1-draft: series-context K adjustment.** `K_playoff` becomes a function `K(round, series_state) = K_base * (1 + round_factor + elimination_factor)`. Resolves the v1/v2 tension where the unconstrained grid wanted `K_playoff < K_regular` — v3.1 hypothesis is that the unconstrained preference was masking *which* playoff games matter, not whether they matter overall. Sequential nested freeze: v3.0 first, then v3.1's 2-D sub-grid (24 cells, ~1 min) layered on top — the two features are nearly orthogonal, joint optimization deferred unless v3.0 lock shows it's needed.
+
+- **§19 — v3.x candidate parking lot.** Four non-pre-registered ideas that surfaced during scoping: team-specific home advantage, schedule context, goalie-aware predictions, head-to-head UI explorer. Each gets its own numbered section if and when promoted to v3 scope.
+
+No code written. No tests added. v1 and v2 artifacts untouched on `main`.
+
 ## 2026-05-19 — UI: NHL "broadcast graphics" dark theme
 
 Theme refresh per user request after seeing the deployed dashboard looked flat. Adopts an NHL-branded dark aesthetic: charcoal background, silver-white text, NHL red (`#c8102e`) as the accent. Header gains a small red signal dot before the title, a 56px accent underline, and an uppercase wordmark feel. Tabs uppercase + spaced for a broadcast vibe; active tab gets red underline and a subtle background highlight. Probability bars get a slight inset shadow and bigger height for depth. Live games get a red glow + box-shadow ring. Team badges get a soft ring + drop shadow for premium feel.
