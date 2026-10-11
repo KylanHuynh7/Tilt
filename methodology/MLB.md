@@ -1,7 +1,7 @@
 # MLB Rating System — Methodology Document
 ## Version 1.1
 **Author:** Kylan Huynh
-**Status:** APPROVED 2026-10-11 — all six **[DECISION]** items resolved as recommended. Later changes to §§3–6 or §12 are version-tagged amendments.
+**Status:** v1 frozen and evaluated 2026-10-11 — **all four §6 criteria PASS** on 2022–2025 (postseason flagged: worse than a coin flip). APPROVED 2026-10-11 — all six **[DECISION]** items resolved as recommended. Later changes to §§3–6 or §12 are version-tagged amendments.
 **Last updated:** 2026-10-11
 
 **Amendment log:**
@@ -187,6 +187,13 @@ RE  = run expectancy for the current base-out state, a 24-cell table computed fr
   - *K_playoff = 2 is the grid floor and below K_regular,* the same direction as every other sport. The best cell honoring K_playoff ≥ K_regular is +0.00003 LL, i.e. noise.
   - *Home rate by validation season:* 54.1 / 53.0 / 54.3 / 52.8 / 53.0 / **55.8 (2020)** / 54.0%. No trend; §8 drift flag not fired.
 - **Freeze run exited with code 134 (abort) after writing the artifact.** The 1.6 MB JSON is complete (all sections, 5,120 grid rows, winner = grid[0]), and recomputing the winner's validation metrics from scratch reproduced LL / Brier / ECE exactly. The abort hit during the final console summary; the cause was not diagnosed. Freezes are verified by recomputation, not by exit code.
+- **Test evaluation (N4, run once 2026-10-11, `results/mlb/test_evaluation.json`):** 2022–2025, n = 9,890. Model **LL 0.67805 (PASS < 0.685), Brier 0.24258 (PASS 0.235–0.248), ECE 0.01112 (PASS < 0.03)**, and it beats the home-rate baseline (0.69152). **All four §6 criteria pass.** Team-only (c = 0) at the frozen K / carry / H: LL 0.67880, ECE 0.00860. Naive 0.69315; static 0.70252. Locked per §10 #2.
+  - ***Postseason flag fired, and the postseason is worse than a coin flip:*** n = 171, LL **0.71140** (naive 0.69315), ECE **0.1032**. The regular-season model does not transfer to October: short series, aces on full rest, and bullpen-heavy usage the starter term can't see. Reported prominently; no fix inside this cycle.
+  - *Pitcher term on test:* −0.00075 LL vs team-only (a small but consistent sign with validation), while ECE is worse (0.0111 vs 0.0086). It improves ranking slightly at a small cost in calibration.
+  - *First starts vs established:* games where a starter has no prior rating (n = 377) have ECE 0.052 vs 0.010 established. Unrated pitchers are the weak spot of the term (A = 0 for them).
+  - *Per season:* 2022 0.0059, **2023 0.0299** (at the edge of the target; the pitch-clock / shift-ban year), 2024 0.0175, 2025 0.0202.
+  - *Late-season flag not fired:* late/mid ratio 1.14.
+  - *Neutral sites:* n = 20, noise.
 - **No logos:** inherits NHL §13.I.
 
 ---

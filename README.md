@@ -7,7 +7,7 @@ Interpretable rating systems that produce calibrated, game-by-game win probabili
 | **NHL** | Live — v2 (evaluated, see below) | [`METHODOLOGY.md`](./METHODOLOGY.md) |
 | **NBA** | Live — v1.1: pre-game model (all §6 targets PASS on test) + live in-game win probability | [`methodology/NBA.md`](./methodology/NBA.md) |
 | **NFL** | Live — v1.1: pre-game model (all §6 targets PASS; playoff ECE flagged) + live win probability (4 of 5 live targets PASS) | [`methodology/NFL.md`](./methodology/NFL.md) |
-| **MLB** | Methodology draft under review | [`methodology/MLB.md`](./methodology/MLB.md) |
+| **MLB** | Model frozen + evaluated — all §6 targets PASS (postseason flagged); dashboard in progress | [`methodology/MLB.md`](./methodology/MLB.md) |
 | College football | Planned (after MLB) | — |
 
 Everything below this table describes the NHL model unless stated otherwise. Each sport gets its own methodology document, written and approved before that sport's model code, with its own train/validation/test split and §13-style limitations.
@@ -44,6 +44,20 @@ Key methodology commitments (unchanged from v1):
 - **No silent exclusion** of seasons or game subsets to improve numbers (§10 #4).
 
 `METHODOLOGY.md` §13 consolidates every known limitation across the model, data, lineage choices, Cup-sim approximations, and live-polling layer.
+
+## MLB v1 results — held-out test set (2022–2025)
+
+Frozen on validation 2015–2021 (`K_regular 4, K_playoff 2, carry 0.60, home bump 25, margin-of-victory on, starting-pitcher scale c 3.0, α 0.1`), evaluated once on 2026-10-11.
+
+| | log-loss | Brier | ECE | n | §6 verdict |
+|---|---:|---:|---:|---:|:---:|
+| **MLB model** | **0.67805** | **0.24258** | **0.01112** | 9,890 | log-loss **PASS**, Brier **PASS**, ECE **PASS** |
+| Team-only Elo (no pitcher term) | 0.67880 | 0.24294 | 0.00860 | 9,890 | — |
+| Home-rate baseline | 0.69152 | 0.24919 | 0.00730 | 9,890 | beaten (**PASS**) |
+| Naive 50% | 0.69315 | 0.25000 | 0.02910 | 9,890 | beaten |
+| §6 target | < 0.685 | 0.235–0.248 | < 0.03 | — | — |
+
+> **⚠ Postseason:** on 171 playoff games the model's log-loss is **0.711, worse than a coin flip** (ECE 0.103). Treat October probabilities with caution. The starting-pitcher term helps only slightly overall (−0.0008 LL) and costs a little calibration.
 
 ## NFL v1 results — held-out test set (2022–2025)
 

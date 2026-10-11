@@ -2,6 +2,14 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-11 — MLB N4: one-shot test evaluation (PASS ×4, postseason worse than coin flip)
+
+Ran once on 2022–2025 (n = 9,890): **LL 0.67805, Brier 0.24258, ECE 0.01112, beats home-rate baseline 0.69152: all PASS.**
+- Team-only baseline LL 0.67880, so the pitcher term buys 0.00075 LL at a small calibration cost.
+- **Postseason (n = 171): LL 0.71140, worse than the coin flip, and ECE 0.1032.** Flag fired; shown prominently in the README.
+- First-start games ECE 0.052 vs 0.010 established. 2023 ECE 0.0299.
+- Documented in MLB §13 and the README.
+
 ## 2026-10-11 — MLB N3: validation grid + freeze
 
 5,120-cell grid on 2015–2021, about 32 min.
