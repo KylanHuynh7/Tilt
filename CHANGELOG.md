@@ -2,6 +2,15 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-10 — NBA N3: validation grid + freeze
+
+- `app/nba/tuner.py`: §5 grid (5 × 5 × 4 × 6 × 2 = 1,200 cells), validation 2018-19 → 2023-24, selection by LL then ECE then Brier. Static-rating and home-rate baselines. Test seasons named but never loaded (`load_rows` asserts it).
+- `scripts/nba_freeze.py`: runs the grid (~2 min), prints the §8 pre-freeze checks, writes `artifacts/nba/frozen_params.json` (winner + full grid + checks). Refuses to overwrite an existing freeze without `--force`.
+
+**Frozen:** K_regular 15, K_playoff 10, carry 0.65, H 40, MOV on. Validation LL 0.63072 / Brier 0.22038 / ECE 0.01274 (n = 7,588) vs home-rate baseline LL 0.68573.
+
+Pre-registration outcomes logged in methodology/NBA.md §13: H = 40 misses the 50–110 expectation but is not a bug (clean U-curve); K_playoff < K_regular again; MOV helps by 0.0028 LL; home rate swings 54.7–59.0% by season with no trend. +5 tests (191).
+
 ## 2026-10-10 — NBA N2: rating engine + walk-forward backtest
 
 - `app/nba/ratings.py`: §5 rule. Elo via `core.elo.expected` with home bump (0 at neutral sites), binary W/L, fixed-constant MOV multiplier `(|MOV|+3)^0.8 / (7.5 + 0.006·D)` when `mov` is on, zero-sum update, regression to 1500.
