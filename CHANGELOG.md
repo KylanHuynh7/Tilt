@@ -2,6 +2,15 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-11 — MLB N1 + N2: ingest, lineage, rating engine with starting-pitcher term
+
+`methodology/MLB.md` v1.0 approved (all six decisions as recommended); v1.1 adds the validity rule (final + both scores; doubleheaders kept) and five pitcher-term details, all fixed before any rating code ran.
+- `app/mlb/teams.py`: 30 franchises on stable MLB team ids (120 = Expos→Nationals, …), dark-theme colors.
+- `app/mlb/pipeline.py`: per-season schedule (R/F/D/L/W, probables) + starter lines from boxscores; suspended-game dedupe by gamePk; neutral rule; coverage; `recheck`. Data 2000–2026: all seasons PASS; 1.7 MB.
+- `app/mlb/ratings.py` + `backtest.py`: Elo + FiveThirtyEight game score, rolling pitcher/team rGS, probable pitchers from 2010, month segments, team-only mode (c = 0).
+- `app/mlb/tuner.py`, `scripts/mlb_freeze.py`, `scripts/mlb_evaluate.py`: grid and one-shot evaluator (not yet run).
+- +16 tests (289).
+
 ## 2026-10-11 — Mobile formatting pass
 
 User request: make sure the site fits on phones. Audited with an automated overflow check plus screenshots at **360 px and 390 px** across every page state: NHL / NBA / NFL trajectories, today/this-week, calibration, a game-detail page, a player card, and the MLB placeholder. No page scrolls sideways at either width.

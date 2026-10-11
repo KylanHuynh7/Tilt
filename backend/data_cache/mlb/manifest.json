@@ -1,0 +1,353 @@
+{
+  "2000": {
+    "coverage": {
+      "dropped_scoreless_finals": 35,
+      "passes": true,
+      "ratio": 0.9996,
+      "regular_final": 2429,
+      "scheduled": 2430
+    },
+    "neutral_games": 2,
+    "pulled_at": "2026-10-11T15:41:59.817668+00:00",
+    "rows": 2501,
+    "starter_lines": 4920
+  },
+  "2001": {
+    "coverage": {
+      "dropped_scoreless_finals": 0,
+      "passes": true,
+      "ratio": 0.9996,
+      "regular_final": 2429,
+      "scheduled": 2430
+    },
+    "neutral_games": 1,
+    "pulled_at": "2026-10-11T15:43:01.499173+00:00",
+    "rows": 2584,
+    "starter_lines": 4928
+  },
+  "2002": {
+    "coverage": {
+      "dropped_scoreless_finals": 0,
+      "passes": true,
+      "ratio": 0.9984,
+      "regular_final": 2426,
+      "scheduled": 2430
+    },
+    "neutral_games": 0,
+    "pulled_at": "2026-10-11T15:44:02.086337+00:00",
+    "rows": 2464,
+    "starter_lines": 4920
+  },
+  "2003": {
+    "coverage": {
+      "dropped_scoreless_finals": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_final": 2430,
+      "scheduled": 2430
+    },
+    "neutral_games": 0,
+    "pulled_at": "2026-10-11T15:45:04.535306+00:00",
+    "rows": 2469,
+    "starter_lines": 4936
+  },
+  "2004": {
+    "coverage": {
+      "dropped_scoreless_finals": 0,
+      "passes": true,
+      "ratio": 0.9992,
+      "regular_final": 2428,
+      "scheduled": 2430
+    },
+    "neutral_games": 4,
+    "pulled_at": "2026-10-11T15:46:04.346665+00:00",
+    "rows": 2464,
+    "starter_lines": 4924
+  },
+  "2005": {
+    "coverage": {
+      "dropped_scoreless_finals": 0,
+      "passes": true,
+      "ratio": 1.0004,
+      "regular_final": 2431,
+      "scheduled": 2430
+    },
+    "neutral_games": 0,
+    "pulled_at": "2026-10-11T15:46:50.997237+00:00",
+    "rows": 2461,
+    "starter_lines": 4922
+  },
+  "2006": {
+    "coverage": {
+      "dropped_scoreless_finals": 0,
+      "passes": true,
+      "ratio": 0.9996,
+      "regular_final": 2429,
+      "scheduled": 2430
+    },
+    "neutral_games": 0,
+    "pulled_at": "2026-10-11T15:47:45.257342+00:00",
+    "rows": 2460,
+    "starter_lines": 4918
+  },
+  "2007": {
+    "coverage": {
+      "dropped_scoreless_finals": 0,
+      "passes": true,
+      "ratio": 1.0004,
+      "regular_final": 2431,
+      "scheduled": 2430
+    },
+    "neutral_games": 7,
+    "pulled_at": "2026-10-11T15:48:41.113460+00:00",
+    "rows": 2459,
+    "starter_lines": 4918
+  },
+  "2008": {
+    "coverage": {
+      "dropped_scoreless_finals": 0,
+      "passes": true,
+      "ratio": 0.9992,
+      "regular_final": 2428,
+      "scheduled": 2430
+    },
+    "neutral_games": 7,
+    "pulled_at": "2026-10-11T15:49:22.351062+00:00",
+    "rows": 2463,
+    "starter_lines": 4920
+  },
+  "2009": {
+    "coverage": {
+      "dropped_scoreless_finals": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_final": 2430,
+      "scheduled": 2430
+    },
+    "neutral_games": 0,
+    "pulled_at": "2026-10-11T15:50:04.722548+00:00",
+    "rows": 2461,
+    "starter_lines": 4920
+  },
+  "2010": {
+    "coverage": {
+      "dropped_scoreless_finals": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_final": 2430,
+      "scheduled": 2430
+    },
+    "neutral_games": 6,
+    "pulled_at": "2026-10-11T15:50:52.601931+00:00",
+    "rows": 2462,
+    "starter_lines": 4924
+  },
+  "2011": {
+    "coverage": {
+      "dropped_scoreless_finals": 0,
+      "passes": true,
+      "ratio": 0.9996,
+      "regular_final": 2429,
+      "scheduled": 2430
+    },
+    "neutral_games": 3,
+    "pulled_at": "2026-10-11T15:51:38.050258+00:00",
+    "rows": 2468,
+    "starter_lines": 4934
+  },
+  "2012": {
+    "coverage": {
+      "dropped_scoreless_finals": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_final": 2430,
+      "scheduled": 2430
+    },
+    "neutral_games": 2,
+    "pulled_at": "2026-10-11T15:52:24.223064+00:00",
+    "rows": 2467,
+    "starter_lines": 4934
+  },
+  "2013": {
+    "coverage": {
+      "dropped_scoreless_finals": 0,
+      "passes": true,
+      "ratio": 1.0004,
+      "regular_final": 2431,
+      "scheduled": 2430
+    },
+    "neutral_games": 1,
+    "pulled_at": "2026-10-11T15:53:07.442393+00:00",
+    "rows": 2469,
+    "starter_lines": 4938
+  },
+  "2014": {
+    "coverage": {
+      "dropped_scoreless_finals": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_final": 2430,
+      "scheduled": 2430
+    },
+    "neutral_games": 2,
+    "pulled_at": "2026-10-11T15:53:51.125824+00:00",
+    "rows": 2462,
+    "starter_lines": 4924
+  },
+  "2015": {
+    "coverage": {
+      "dropped_scoreless_finals": 0,
+      "passes": true,
+      "ratio": 0.9996,
+      "regular_final": 2429,
+      "scheduled": 2430
+    },
+    "neutral_games": 3,
+    "pulled_at": "2026-10-11T15:54:35.273763+00:00",
+    "rows": 2466,
+    "starter_lines": 4930
+  },
+  "2016": {
+    "coverage": {
+      "dropped_scoreless_finals": 0,
+      "passes": true,
+      "ratio": 0.9992,
+      "regular_final": 2428,
+      "scheduled": 2430
+    },
+    "neutral_games": 1,
+    "pulled_at": "2026-10-11T15:55:19.092631+00:00",
+    "rows": 2465,
+    "starter_lines": 4926
+  },
+  "2017": {
+    "coverage": {
+      "dropped_scoreless_finals": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_final": 2430,
+      "scheduled": 2430
+    },
+    "neutral_games": 10,
+    "pulled_at": "2026-10-11T15:56:15.163296+00:00",
+    "rows": 2468,
+    "starter_lines": 4936
+  },
+  "2018": {
+    "coverage": {
+      "dropped_scoreless_finals": 0,
+      "passes": true,
+      "ratio": 1.0004,
+      "regular_final": 2431,
+      "scheduled": 2430
+    },
+    "neutral_games": 6,
+    "pulled_at": "2026-10-11T15:57:12.051963+00:00",
+    "rows": 2465,
+    "starter_lines": 4928
+  },
+  "2019": {
+    "coverage": {
+      "dropped_scoreless_finals": 0,
+      "passes": true,
+      "ratio": 0.9996,
+      "regular_final": 2429,
+      "scheduled": 2430
+    },
+    "neutral_games": 10,
+    "pulled_at": "2026-10-11T15:58:07.454008+00:00",
+    "rows": 2467,
+    "starter_lines": 4932
+  },
+  "2020": {
+    "coverage": {
+      "dropped_scoreless_finals": 0,
+      "passes": true,
+      "ratio": 0.9978,
+      "regular_final": 898,
+      "scheduled": 900
+    },
+    "neutral_games": 47,
+    "pulled_at": "2026-10-11T15:58:25.688456+00:00",
+    "rows": 953,
+    "starter_lines": 1902
+  },
+  "2021": {
+    "coverage": {
+      "dropped_scoreless_finals": 0,
+      "passes": true,
+      "ratio": 0.9996,
+      "regular_final": 2429,
+      "scheduled": 2430
+    },
+    "neutral_games": 3,
+    "pulled_at": "2026-10-11T15:59:07.576420+00:00",
+    "rows": 2467,
+    "starter_lines": 4932
+  },
+  "2022": {
+    "coverage": {
+      "dropped_scoreless_finals": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_final": 2430,
+      "scheduled": 2430
+    },
+    "neutral_games": 3,
+    "pulled_at": "2026-10-11T15:59:56.812052+00:00",
+    "rows": 2470,
+    "starter_lines": 4940
+  },
+  "2023": {
+    "coverage": {
+      "dropped_scoreless_finals": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_final": 2430,
+      "scheduled": 2430
+    },
+    "neutral_games": 5,
+    "pulled_at": "2026-10-11T16:00:36.524108+00:00",
+    "rows": 2471,
+    "starter_lines": 4942
+  },
+  "2024": {
+    "coverage": {
+      "dropped_scoreless_finals": 0,
+      "passes": true,
+      "ratio": 0.9996,
+      "regular_final": 2429,
+      "scheduled": 2430
+    },
+    "neutral_games": 8,
+    "pulled_at": "2026-10-11T16:00:37.394530+00:00",
+    "rows": 2473,
+    "starter_lines": 4944
+  },
+  "2025": {
+    "coverage": {
+      "dropped_scoreless_finals": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_final": 2430,
+      "scheduled": 2430
+    },
+    "neutral_games": 4,
+    "pulled_at": "2026-10-11T16:01:23.739797+00:00",
+    "rows": 2477,
+    "starter_lines": 4954
+  },
+  "2026": {
+    "coverage": {
+      "dropped_scoreless_finals": 0,
+      "passes": true,
+      "ratio": 0.9996,
+      "regular_final": 2429,
+      "scheduled": 2430
+    },
+    "neutral_games": 12,
+    "pulled_at": "2026-10-11T16:01:50.701672+00:00",
+    "rows": 2476,
+    "starter_lines": 4908
+  }
+}

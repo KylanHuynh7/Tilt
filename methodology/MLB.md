@@ -1,5 +1,5 @@
 # MLB Rating System — Methodology Document
-## Version 1.0
+## Version 1.1
 **Author:** Kylan Huynh
 **Status:** APPROVED 2026-10-11 — all six **[DECISION]** items resolved as recommended. Later changes to §§3–6 or §12 are version-tagged amendments.
 **Last updated:** 2026-10-11
@@ -7,6 +7,7 @@
 **Amendment log:**
 - *v0.1-draft (2026-10-11):* First draft, after a data-availability probe and before any MLB ingest, rating code, or metric.
 - *v1.0 (2026-10-11):* Author approved with every [DECISION] as recommended: (1) test 2022–2025, (2) MOV on/off, (3) starting-pitcher adjustment in v1, (4) no K_playoff ≥ K_regular constraint, (5) thresholds LL < 0.685, Brier 0.235–0.248, ECE < 0.03, beat home-rate, (6) v1.1 live targets as in §12.
+- *v1.1 (2026-10-11):* Ingest-phase validity rule, made before any rating code or metric. A game counts only if it is final **and** has both scores: the API lists some games as final with no score (35 in 2000). Same-day, same-teams pairs are **not** collapsed, because in MLB they are real doubleheaders (unlike the NBA v1.1 duplicate rule). With the rule applied, 2000 has 2,429 of 2,430 regular-season games and passes coverage. Pitcher-term details, also fixed before any rating code ran: (i) a team's `rGS_t` starts at the league's running mean game score up to that game (50.0 before the first game), with no look-ahead; (ii) pitcher `rGS_p` and team `rGS_t` carry over between seasons unchanged, and only Elo regresses; (iii) after every game both the actual starter's `rGS_p` and the team's `rGS_t` update with that start's game score, using the same α; (iv) when the 2010+ probable pitcher is missing, the actual starter is used; (v) the 2000 phantom rows have boxscores fetched, but they never enter the model because they fail the validity rule.
 
 ---
 
@@ -171,6 +172,13 @@ RE  = run expectancy for the current base-out state, a 24-cell table computed fr
 - **Rule changes inside the window:** universal DH (2022), pitch clock / shift ban (2023), extra-inning runner (2020+).
 - **The 2020 60-game season** is in validation, with no special handling.
 - **Data terms:** MLB data is used under MLB Advanced Media's non-commercial terms; Tilt can't be commercialized on this data.
+- **Ingest (N1, 2026-10-11):**
+  - *Coverage:* every season 2000–2026 passes after the v1.1 validity rule; 35 scoreless "finals" were dropped in 2000.
+  - *Starters:* starter lines come from ~62k boxscores.
+  - *Probables:* both probable pitchers are present for 28,045 of 28,070 games in 2010–21; the actual starter is used for the other 25.
+  - *Neutral sites (< 5 home games at that venue):* 0–12 per season, except **47 in 2020**. COVID make-ups often listed the "home" team batting last in the opponent's park, plus the Blue Jays' displaced games. Toronto's 26 games at Buffalo's Sahlen Field remain home games.
+  - *Limitations:* the neutral rule cannot tell a true neutral site from a one-off relocated home game (e.g. hurricane moves). Both get no home bump.
+- **Engine (N2):** on warm-up + validation the league mean stays at exactly 1500, ratings span 1398–1617, 1,854 pitchers are tracked, and team rGS spans 42–59. No new limitations beyond §5 / §13.
 - **No logos:** inherits NHL §13.I.
 
 ---
