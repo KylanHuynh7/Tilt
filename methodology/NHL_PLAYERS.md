@@ -1,10 +1,15 @@
 # NHL Player Projections — Methodology Document
-## Version 0.2
+## Version 0.3
 **Author:** Kylan Huynh
 **Status:** Approved 2026-10-11, all seven decisions as recommended (P-1 NHL, P-3 test 2023-24 → 2025-26 and P-7 hide-unless-pass explicitly; P-2, P-4, P-5 and P-6 as written).
 
 **Amendment log:**
 - *v0.2 (2026-10-11, during the first trial ingest, before any model code or bulk download):* The §3 coverage threshold is lowered from 16 to **12 skaters per team**. The trial season contained a genuine 15-skater game (New Jersey on 2010-10-11, under the salary cap), so 16 would have rejected real lineups. 12 still catches truncated box scores. Games below 16 are counted in the manifest.
+- *v0.3 (2026-10-11, before any model code ran on data):* Fills four values §4 left unstated:
+  - **`m_toi` = 2 games.** The prior only matters for a player's first few games.
+  - **Debut-TOI and `r_pos` cohorts:** in the first warm-up season (1998-99), which has no previous season, both use that season's own values. This is warm-up only and never scored.
+  - **Goals allowed** = the sum of the opponent's skater goals in the box score, so shootout winners are excluded.
+  - **League mean** = the previous season's goals allowed per team-game.
 **Last updated:** 2026-10-11
 
 Same project rules as the team models:

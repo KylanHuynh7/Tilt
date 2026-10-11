@@ -100,6 +100,13 @@ class BacktestParams:
     outcome_weights: dict[Outcome, float] = field(
         default_factory=lambda: dict(OUTCOME_WEIGHTS)
     )
+    # v3.0 roster-shock boost (§17, §20). boost_amount 0 reproduces v2.
+    boost_window: float = 0.0
+    boost_amount: float = 0.0
+    # v3.1 series context (§18, §20): playoff K = K_playoff ×
+    # (1 + round_scale·(round − 1) + elim_bump·[facing elimination]). 0/0 reproduces v2.
+    round_scale: float = 0.0
+    elim_bump: float = 0.0
 
 
 @dataclass
@@ -140,6 +147,64 @@ def _weighted_outcome(out: Outcome, weights: dict[Outcome, float]) -> float:
     return weights[out]
 
 
+@dataclass
+class _V3State:
+    """Per-run state for the v3 K adjustments. Reset each season."""
+
+    events: set[tuple[int, str]] = field(default_factory=set)       # (game_id, team code)
+    since: dict[str, int] = field(default_factory=dict)              # franchise -> games since last event
+    series_wins: dict[int, dict[str, int]] = field(default_factory=dict)
+    wins_needed: dict[int, int] = field(default_factory=dict)        # series key -> wins to clinch
+
+
+def series_key(game_id: int) -> int:
+    """Playoff ids end in R S G (round, series, game); the key drops G."""
+    return game_id // 10
+
+
+def playoff_round(game_id: int) -> int:
+    return (game_id // 100) % 10
+
+
+ALL_BEST_OF_7_FROM = 19861987
+
+
+def _wins_needed(rows: list[dict]) -> dict[int, int]:
+    """Clinch target per series. Every series has been best-of-7 since
+    1986-87; earlier best-of-3 / best-of-5 rounds are read from the completed
+    series (the winner's win count). Only replayed historically, so complete.
+    """
+    wins: dict[int, dict[str, int]] = {}
+    for r in rows:
+        if r["game_type"] != PLAYOFF or r.get("state") not in FINAL_STATES or r["home_score"] is None:
+            continue
+        w = r["home"] if r["home_score"] > r["away_score"] else r["away"]
+        d = wins.setdefault(series_key(r["game_id"]), {})
+        d[w] = d.get(w, 0) + 1
+    return {k: (4 if r0 >= ALL_BEST_OF_7_FROM else max(v.values()))
+            for k, v in wins.items() for r0 in [rows[0]["season_id"]]}
+
+
+def _boost(k: float, since: int | None, params: BacktestParams) -> float:
+    if params.boost_amount <= 0 or since is None or since >= params.boost_window:
+        return k
+    return k * (1.0 + params.boost_amount * (1.0 - since / params.boost_window))
+
+
+def _playoff_k(row: dict, params: BacktestParams, v3: _V3State) -> float:
+    k = params.k_playoff
+    if params.round_scale == 0 and params.elim_bump == 0:
+        return k
+    rnd = playoff_round(row["game_id"])
+    if rnd == 0:  # 2020 qualifying round / round robin: no series structure
+        return k
+    key = series_key(row["game_id"])
+    need = v3.wins_needed.get(key, 4)
+    wins = v3.series_wins.get(key, {})
+    facing = any(w >= need - 1 for w in wins.values())
+    return k * (1.0 + params.round_scale * (rnd - 1) + (params.elim_bump if facing else 0.0))
+
+
 def _apply_one_game(
     row: dict,
     state: dict[str, float],
@@ -147,6 +212,7 @@ def _apply_one_game(
     record_predictions: bool,
     predictions_out: list[Prediction],
     snapshots_out: list[Snapshot] | None,
+    v3: _V3State | None = None,
 ) -> bool:
     """Apply one game's update to `state` in place. Returns True if applied,
     False if the game was filtered out.
@@ -202,10 +268,25 @@ def _apply_one_game(
     p_home = win_probability(r_home, r_away, home_bump=params.home_bump)
     w_home = _weighted_outcome(home_outcome, params.outcome_weights)
     w_away = _weighted_outcome(away_outcome, params.outcome_weights)
-    k = params.k_playoff if is_playoff else params.k_regular
+    if v3 is None:
+        k_home = k_away = params.k_playoff if is_playoff else params.k_regular
+    else:
+        k = _playoff_k(row, params, v3) if is_playoff else params.k_regular
+        for code, fid in ((home_code, home_fid), (away_code, away_fid)):
+            if (row["game_id"], code) in v3.events:
+                v3.since[fid] = 0
+        k_home = _boost(k, v3.since.get(home_fid), params)
+        k_away = _boost(k, v3.since.get(away_fid), params)
+        for fid in (home_fid, away_fid):
+            if fid in v3.since:
+                v3.since[fid] += 1
+        if is_playoff:
+            w = home_code if home_score > away_score else away_code
+            d = v3.series_wins.setdefault(series_key(row["game_id"]), {})
+            d[w] = d.get(w, 0) + 1
 
-    new_home = r_home + k * (w_home - p_home)
-    new_away = r_away + k * (w_away - (1.0 - p_home))
+    new_home = r_home + k_home * (w_home - p_home)
+    new_away = r_away + k_away * (w_away - (1.0 - p_home))
 
     if record_predictions:
         predictions_out.append(Prediction(
@@ -244,6 +325,7 @@ def run(
     initial_state: dict[str, float] | None = None,
     record_predictions_for: set[int] | None = None,
     record_snapshots: bool = False,
+    roster_events: set[tuple[int, str]] | None = None,
 ) -> BacktestResult:
     """Replay games season-by-season.
 
@@ -259,8 +341,14 @@ def run(
       record_snapshots: when True, record one Snapshot per (team, game) for
         the trajectory chart. Off by default to keep memory bounded for
         large training runs.
+      roster_events: v3 (game_id, team code) boost events from
+        `roster_moves`. Needed only when params.boost_amount > 0.
     """
     params = params or BacktestParams()
+    use_v3 = bool(params.boost_amount or params.round_scale or params.elim_bump)
+    if params.boost_amount > 0 and roster_events is None:
+        raise ValueError("boost_amount > 0 needs roster_events (app.roster_moves)")
+    v3 = _V3State(events=roster_events or set()) if use_v3 else None
     state: dict[str, float] = dict(initial_state or {})
     predictions: list[Prediction] = []
     snapshots: list[Snapshot] | None = [] if record_snapshots else None
@@ -297,6 +385,11 @@ def run(
                 state[fid] = apply_decay(state[fid], carry=params.decay_carry)
 
         rows = _load_season_rows(season_id)
+        if v3 is not None:
+            # Boost windows don't cross seasons; the offseason carry resets ratings.
+            v3.since = {}
+            v3.series_wins = {}
+            v3.wins_needed = _wins_needed(rows)
         record = (
             record_predictions_for is None
             or season_id in record_predictions_for
@@ -305,7 +398,7 @@ def run(
             if row["game_type"] not in (REGULAR, PLAYOFF):
                 dropped_non_nhl += 1
                 continue
-            applied = _apply_one_game(row, state, params, record, predictions, snapshots)
+            applied = _apply_one_game(row, state, params, record, predictions, snapshots, v3)
             if applied:
                 processed += 1
             else:

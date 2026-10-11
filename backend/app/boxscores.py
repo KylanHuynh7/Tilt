@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import fcntl
 import json
 import sys
 from typing import Any
@@ -91,8 +92,9 @@ def _games(season: int) -> list[dict]:
             if g["game_type"] in (2, 3) and g["state"] in ("OFF", "FINAL")]
 
 
-async def ingest_season(season: int) -> dict:
-    if season > LAST_SEASON:
+async def ingest_season(season: int, *, live: bool = False) -> dict:
+    """`live=True` is only for the dashboard's current season (§20 V3-6)."""
+    if season > LAST_SEASON and not live:
         raise ValueError(f"{season} is after {LAST_SEASON}; the v3 test season is never ingested (§20 V3-5)")
     games = _games(season)
     path = BOX_DIR / f"{season}.parquet"
@@ -123,17 +125,19 @@ async def ingest_season(season: int) -> dict:
             BOX_DIR.mkdir(parents=True, exist_ok=True)
             pq.write_table(pa.Table.from_pylist(rows, schema=SCHEMA), path, compression="zstd")
     kept = len({r["game_id"] for r in rows})
-    m = json.loads(MANIFEST.read_text()) if MANIFEST.exists() else {}
-    m[str(season)] = {"games": len(games), "kept": kept, "short_game_ids": sorted(short),
+    with open(BOX_DIR / ".manifest.lock", "w") as lock:   # parallel ingests share the manifest
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        m = json.loads(MANIFEST.read_text()) if MANIFEST.exists() else {}
+        m[str(season)] = {"games": len(games), "kept": kept, "short_game_ids": sorted(short),
                       "under_16_skater_game_ids": sorted(under_16),
-                      "rows": len(rows), "covered": kept == len(games) and not short}
-    MANIFEST.write_text(json.dumps(m, indent=2, sort_keys=True))
+                          "rows": len(rows), "covered": kept == len(games) and not short}
+        MANIFEST.write_text(json.dumps(m, indent=2, sort_keys=True))
     return {"season": season, **m[str(season)]}
 
 
 def read_season(season: int) -> list[dict]:
-    if season > LAST_SEASON:
-        raise ValueError(f"{season} is after {LAST_SEASON}")
+    # The v3 test quarantine is enforced where it matters, in the freeze
+    # (tuner_v3.check_quarantine); the live dashboard reads the current season.
     return pq.read_table(BOX_DIR / f"{season}.parquet").to_pylist()
 
 
