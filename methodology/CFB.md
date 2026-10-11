@@ -1,5 +1,5 @@
 # College Football (FBS) Rating System — Methodology Document
-## Version 1.1
+## Version 1.2
 **Author:** Kylan Huynh
 **Status:** APPROVED 2026-10-11 — all six **[DECISION]** items resolved as recommended. Later changes to §§3–6 or §12 are version-tagged amendments.
 **Last updated:** 2026-10-11
@@ -13,6 +13,7 @@
   - **(c) Bowls and playoff** are fetched by date (Dec 1 → Jan 20), keeping events ESPN marks as postseason. Week-based queries never returned pre-2024 bowls. Regular-season weeks run through week 17.
   - **(d) Coverage rule** counts regular-season games *listed* (completed, or cancelled/postponed) and requires ≥ 11, not "12 from 2006". The rule exists to detect missing data, not unplayed games: the 9/11 week (2001) and hurricanes Harvey and Irma (2017) cancelled real games, and 12-game schedules were optional from 2006. With (a)–(d) every season 2001–2025 passes; 2020 is exempt.
   - **(e)** Games with no FBS team (FCS playoff games returned by date queries) are dropped.
+- *v1.2 (2026-10-11):* Pooled-FCS details, fixed before any backtest ran. §5 calls the FCS rating's per-season regression "tuned", but the approved grid has no separate parameter for it. Resolution: the pooled FCS rating regresses toward its own starting value `fcs_init` using the **same `carry`** as FBS teams, which adds no new tuned dimension. A program that leaves FBS (e.g. Idaho after 2017) drops out of the FBS state and is represented by the pool. Teams already FBS in 2001 start at 1500. A program entering FBS starts at the pool's current value (DECISION 3).
 
 ---
 
@@ -156,6 +157,17 @@ Inherits the NFL §12 five-term form (pre-game edge fading over time, score marg
 - **Bowl games** include opt-outs and interim coaches the model can't see.
 - **The playoff format changed** (4 → 12 teams in 2024), inside the test window.
 - **Coverage starts in 2001;** earlier history isn't available from this source.
+- **Frozen parameters (N3, 2026-10-11):** `K_regular 40, K_post 40, carry 0.70, H 40, mov on, fcs_init 1300`, from the 2,304-cell grid on 2014–2021 (FBS-vs-FBS games, n = 5,911). Validation LL 0.54555, Brier 0.18492, ECE 0.02135. Baselines: naive 0.69315, home-rate 0.68105, static 0.78757.
+  - *H = 40 sits exactly on the lower edge of the pre-registered 40–100.*
+  - *MOV matters far more here than in any other sport:* best MOV-off cell LL 0.56669 (+0.021).
+  - *K_post = K_regular in the winner,* so DECISION 4 never came into play.
+  - *`fcs_init` = 1300 is the top of its grid,* but the pool falls to 1062 by 2021, below every FBS program.
+  - *Home rate by validation season* is 56.4 → 60.3% across 2014–2019, then 56.7% (2020) and 58.5% (2021). It rose rather than fell; no downward-drift flag, but noted.
+- **§8 failure modes fired at freeze, then audited, no bug found.**
+  - *Rating range:* FBS ratings at the end of validation span 908 (UMass) to 2044 (Georgia), outside the inherited [1100, 1900] band.
+  - *League mean:* the FBS mean is 1492.2, outside the inherited ±1 of 1500, because rating points move to and from the pooled FCS rating and entrants start at the pool value.
+  - *Audit, as §8 requires before proceeding:* (1) the MOV multiplier matches the approved formula exactly; (2) the extremes are the right programs (Georgia, Alabama, Cincinnati and Ohio State on top; UMass, UConn, FIU and New Mexico State at the bottom); (3) extreme predictions are calibrated (validation 0.9–1.0 bucket: predicted 0.939, won 0.959; 0.0–0.1: predicted 0.069, won 0.078).
+  - *Conclusion:* the bands, inherited from leagues with far less talent dispersion, don't fit FBS. Reported as a finding; parameters unchanged.
 - **No logos:** inherits NHL §13.I. Headshots follow the author's ESPN-headshot decision (§13.I).
 
 ---

@@ -2,6 +2,16 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-11 — College football N2 + N3: engine with pooled FCS rating, freeze
+
+- Methodology v1.2: the FCS pool regresses toward `fcs_init` with the same carry; leavers drop to the pool.
+- `app/cfb/ratings.py` reuses the NFL Elo functions (same approved form). `app/cfb/backtest.py`: FBS teams by ESPN id plus the pooled "FCS" key; entrants seeded at the pool; FBS-vs-FCS games flagged for exclusion from metrics.
+- `app/cfb/tuner.py` + `scripts/cfb_freeze.py`: 2,304 cells in about a minute.
+- **Frozen:** K 40 / 40, carry 0.70, H 40, MOV on, fcs_init 1300. Validation LL 0.54555 / Brier 0.18492 / ECE 0.02135 (n = 5,911 FBS-vs-FBS) vs home-rate 0.68105.
+- **§8 failure modes fired** (FBS ratings 908–2044 outside [1100, 1900]; mean 1492). Audited before proceeding: formula exact, extremes are the right teams, extreme buckets calibrated. Recorded as a finding.
+- The freeze script crashed printing its summary after writing a valid artifact (print bug fixed; artifact verified by exact recomputation).
+- +4 tests.
+
 ## 2026-10-11 — College football N1: ingest (methodology/CFB.md v1.0 approved, v1.1)
 
 Author approved `methodology/CFB.md` with all six decisions as recommended.
