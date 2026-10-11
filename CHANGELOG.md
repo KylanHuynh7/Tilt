@@ -2,6 +2,15 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-11 — NFL N1: ingest + lineage (methodology/NFL.md v1.0 approved)
+
+Author approved `methodology/NFL.md` with all six decisions as recommended.
+- `app/nfl/teams.py`: 32 franchises on current nflverse codes, era-code lineage (STL→LA, SD→LAC, OAK→LV), ESPN code mapping (LAR→LA, WSH→WAS), dark-theme display colors.
+- `app/nfl/pipeline.py`: nflverse `games.csv` → `data_cache/nfl/games.parquet` keeping **only** the 11 §3-permitted columns, so betting lines never enter the repo. Loud failure on schema change. Per-season coverage in the manifest.
+- Data: 1999 → 2026 schedule (92 KB). Every complete season passes coverage (2022: 271/272, the cancelled BUF–CIN game); 2026 in progress with 65 games played. Every historical code maps to a franchise.
+- +10 tests (226). No rating code; no NFL metric computed.
+- No new limitations beyond NFL §13; the column whitelist makes §10's "never read betting columns" structural rather than procedural.
+
 ## 2026-10-11 — NFL methodology v0.1-draft (pre-code)
 
 New `methodology/NFL.md`, pending author approval.

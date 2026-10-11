@@ -1,0 +1,216 @@
+{
+  "columns_kept": [
+    "game_id",
+    "season",
+    "game_type",
+    "week",
+    "gameday",
+    "home_team",
+    "away_team",
+    "home_score",
+    "away_score",
+    "location",
+    "overtime"
+  ],
+  "coverage": {
+    "1999": {
+      "complete": true,
+      "passes": true,
+      "regular_played": 248,
+      "regular_scheduled_rows": 248,
+      "scheduled": 248
+    },
+    "2000": {
+      "complete": true,
+      "passes": true,
+      "regular_played": 248,
+      "regular_scheduled_rows": 248,
+      "scheduled": 248
+    },
+    "2001": {
+      "complete": true,
+      "passes": true,
+      "regular_played": 248,
+      "regular_scheduled_rows": 248,
+      "scheduled": 248
+    },
+    "2002": {
+      "complete": true,
+      "passes": true,
+      "regular_played": 256,
+      "regular_scheduled_rows": 256,
+      "scheduled": 256
+    },
+    "2003": {
+      "complete": true,
+      "passes": true,
+      "regular_played": 256,
+      "regular_scheduled_rows": 256,
+      "scheduled": 256
+    },
+    "2004": {
+      "complete": true,
+      "passes": true,
+      "regular_played": 256,
+      "regular_scheduled_rows": 256,
+      "scheduled": 256
+    },
+    "2005": {
+      "complete": true,
+      "passes": true,
+      "regular_played": 256,
+      "regular_scheduled_rows": 256,
+      "scheduled": 256
+    },
+    "2006": {
+      "complete": true,
+      "passes": true,
+      "regular_played": 256,
+      "regular_scheduled_rows": 256,
+      "scheduled": 256
+    },
+    "2007": {
+      "complete": true,
+      "passes": true,
+      "regular_played": 256,
+      "regular_scheduled_rows": 256,
+      "scheduled": 256
+    },
+    "2008": {
+      "complete": true,
+      "passes": true,
+      "regular_played": 256,
+      "regular_scheduled_rows": 256,
+      "scheduled": 256
+    },
+    "2009": {
+      "complete": true,
+      "passes": true,
+      "regular_played": 256,
+      "regular_scheduled_rows": 256,
+      "scheduled": 256
+    },
+    "2010": {
+      "complete": true,
+      "passes": true,
+      "regular_played": 256,
+      "regular_scheduled_rows": 256,
+      "scheduled": 256
+    },
+    "2011": {
+      "complete": true,
+      "passes": true,
+      "regular_played": 256,
+      "regular_scheduled_rows": 256,
+      "scheduled": 256
+    },
+    "2012": {
+      "complete": true,
+      "passes": true,
+      "regular_played": 256,
+      "regular_scheduled_rows": 256,
+      "scheduled": 256
+    },
+    "2013": {
+      "complete": true,
+      "passes": true,
+      "regular_played": 256,
+      "regular_scheduled_rows": 256,
+      "scheduled": 256
+    },
+    "2014": {
+      "complete": true,
+      "passes": true,
+      "regular_played": 256,
+      "regular_scheduled_rows": 256,
+      "scheduled": 256
+    },
+    "2015": {
+      "complete": true,
+      "passes": true,
+      "regular_played": 256,
+      "regular_scheduled_rows": 256,
+      "scheduled": 256
+    },
+    "2016": {
+      "complete": true,
+      "passes": true,
+      "regular_played": 256,
+      "regular_scheduled_rows": 256,
+      "scheduled": 256
+    },
+    "2017": {
+      "complete": true,
+      "passes": true,
+      "regular_played": 256,
+      "regular_scheduled_rows": 256,
+      "scheduled": 256
+    },
+    "2018": {
+      "complete": true,
+      "passes": true,
+      "regular_played": 256,
+      "regular_scheduled_rows": 256,
+      "scheduled": 256
+    },
+    "2019": {
+      "complete": true,
+      "passes": true,
+      "regular_played": 256,
+      "regular_scheduled_rows": 256,
+      "scheduled": 256
+    },
+    "2020": {
+      "complete": true,
+      "passes": true,
+      "regular_played": 256,
+      "regular_scheduled_rows": 256,
+      "scheduled": 256
+    },
+    "2021": {
+      "complete": true,
+      "passes": true,
+      "regular_played": 272,
+      "regular_scheduled_rows": 272,
+      "scheduled": 272
+    },
+    "2022": {
+      "complete": true,
+      "passes": true,
+      "regular_played": 271,
+      "regular_scheduled_rows": 271,
+      "scheduled": 272
+    },
+    "2023": {
+      "complete": true,
+      "passes": true,
+      "regular_played": 272,
+      "regular_scheduled_rows": 272,
+      "scheduled": 272
+    },
+    "2024": {
+      "complete": true,
+      "passes": true,
+      "regular_played": 272,
+      "regular_scheduled_rows": 272,
+      "scheduled": 272
+    },
+    "2025": {
+      "complete": true,
+      "passes": true,
+      "regular_played": 272,
+      "regular_scheduled_rows": 272,
+      "scheduled": 272
+    },
+    "2026": {
+      "complete": false,
+      "passes": true,
+      "regular_played": 65,
+      "regular_scheduled_rows": 272,
+      "scheduled": 272
+    }
+  },
+  "pulled_at": "2026-10-11T05:18:30.623218+00:00",
+  "rows": 7548,
+  "source": "https://github.com/nflverse/nfldata/raw/master/data/games.csv"
+}

@@ -1,11 +1,12 @@
 # NFL Rating System — Methodology Document
-## Version 0.1-draft
+## Version 1.0
 **Author:** Kylan Huynh
-**Status:** DRAFT — pre-code. **No NFL model code may be written until the author approves this document** (NHL `METHODOLOGY.md` §11). Items marked **[DECISION]** need an explicit ruling; each carries a recommendation.
+**Status:** APPROVED 2026-10-11 — all six **[DECISION]** items resolved as recommended. Any later change to §§3–6 or §12 is a version-tagged amendment.
 **Last updated:** 2026-10-11
 
 **Amendment log:**
 - *v0.1-draft (2026-10-11):* First draft, written after a data-availability probe and before any NFL ingest, rating code, or metric.
+- *v1.0 (2026-10-11):* Author approved with every [DECISION] as recommended: (1) test 2022–2025, (2) MOV on/off in the grid with ties at M = 1, (3) no K_playoff ≥ K_regular constraint, (4) QB adjustment deferred to v2, (5) v1 thresholds LL < 0.660, Brier 0.200–0.235, ECE < 0.05, must beat home-rate baseline, (6) v1.1 live targets pre-registered as in §12. No other text changed.
 
 ---
 
@@ -215,7 +216,7 @@ Reading: the pre-game edge fades with time, a lead matters more as time runs out
 
 ---
 
-## Decisions needed before implementation
+## Decisions (resolved 2026-10-11 — all as recommended)
 
 | # | Decision | Recommendation |
 |---|---|---|
