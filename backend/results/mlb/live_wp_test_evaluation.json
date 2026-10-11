@@ -1,0 +1,220 @@
+{
+  "evaluated_at": "2026-10-11T16:51:42.846793+00:00",
+  "coefficients": {
+    "b0": 0.16601777699605627,
+    "b1": 0.9979140008647764,
+    "b2": 2.0389407187412627
+  },
+  "test_seasons": [
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "overall": {
+    "n": 746273,
+    "n_games": 9890,
+    "live_model": {
+      "n": 746273,
+      "log_loss": 0.46784670748154594,
+      "brier": 0.15694762727614667,
+      "ece": 0.00979718742628226
+    },
+    "pregame_held_baseline": {
+      "n": 746273,
+      "log_loss": 0.6799268662418098,
+      "brier": 0.2434842463655323,
+      "ece": 0.02001026838993066
+    },
+    "naive_baseline": {
+      "n": 746273,
+      "log_loss": 0.6931471805548655,
+      "brier": 0.25,
+      "ece": 0.015529839616333474
+    }
+  },
+  "by_third": {
+    "innings_1_3": {
+      "n": 251472,
+      "n_games": 9890,
+      "live_model": {
+        "n": 251472,
+        "log_loss": 0.6158996460694175,
+        "brier": 0.2145943146443976,
+        "ece": 0.02202610132609298
+      },
+      "pregame_held_baseline": {
+        "n": 251472,
+        "log_loss": 0.6775337011761187,
+        "brier": 0.2423205274059053,
+        "ece": 0.009888156327058509
+      },
+      "naive_baseline": {
+        "n": 251472,
+        "log_loss": 0.6931471805620767,
+        "brier": 0.25,
+        "ece": 0.029259718775847765
+      }
+    },
+    "innings_4_6": {
+      "n": 252578,
+      "n_games": 9890,
+      "live_model": {
+        "n": 252578,
+        "log_loss": 0.47557183251986146,
+        "brier": 0.15761625910079227,
+        "ece": 0.00983595673233853
+      },
+      "pregame_held_baseline": {
+        "n": 252578,
+        "log_loss": 0.678186311186936,
+        "brier": 0.24264494562237937,
+        "ece": 0.011777044556080949
+      },
+      "naive_baseline": {
+        "n": 252578,
+        "log_loss": 0.6931471805621239,
+        "brier": 0.25,
+        "ece": 0.028038863242245915
+      }
+    },
+    "innings_7_plus": {
+      "n": 242223,
+      "n_games": 9879,
+      "live_model": {
+        "n": 242223,
+        "log_loss": 0.30608516871563957,
+        "brier": 0.09640255329525242,
+        "ece": 0.011927541942614455
+      },
+      "pregame_held_baseline": {
+        "n": 242223,
+        "log_loss": 0.6842263750411539,
+        "brier": 0.2455675812978855,
+        "ece": 0.04497518798691984
+      },
+      "naive_baseline": {
+        "n": 242223,
+        "log_loss": 0.6931471805616654,
+        "brier": 0.25,
+        "ece": 0.011768081478637449
+      }
+    }
+  },
+  "by_season": {
+    "2022": {
+      "n": 185470,
+      "n_games": 2470,
+      "live_model": {
+        "n": 185470,
+        "log_loss": 0.4601842438313363,
+        "brier": 0.15382752817371687,
+        "ece": 0.01408235090438264
+      },
+      "pregame_held_baseline": {
+        "n": 185470,
+        "log_loss": 0.6747294952632445,
+        "brier": 0.24086342056167906,
+        "ece": 0.013861754707097967
+      },
+      "naive_baseline": {
+        "n": 185470,
+        "log_loss": 0.6931471805585272,
+        "brier": 0.25,
+        "ece": 0.020003235024532273
+      }
+    },
+    "2023": {
+      "n": 187599,
+      "n_games": 2471,
+      "live_model": {
+        "n": 187599,
+        "log_loss": 0.47773915964237845,
+        "brier": 0.1609934330306786,
+        "ece": 0.020396238157478087
+      },
+      "pregame_held_baseline": {
+        "n": 187599,
+        "log_loss": 0.6830177084489597,
+        "brier": 0.24500396922745146,
+        "ece": 0.0394387743692124
+      },
+      "naive_baseline": {
+        "n": 187599,
+        "log_loss": 0.6931471805585246,
+        "brier": 0.25,
+        "ece": 0.005967515818314562
+      }
+    },
+    "2024": {
+      "n": 186175,
+      "n_games": 2472,
+      "live_model": {
+        "n": 186175,
+        "log_loss": 0.4682198147590537,
+        "brier": 0.15690286672899942,
+        "ece": 0.013182190315035704
+      },
+      "pregame_held_baseline": {
+        "n": 186175,
+        "log_loss": 0.6810460190729644,
+        "brier": 0.2440170111659135,
+        "ece": 0.027478230877630197
+      },
+      "naive_baseline": {
+        "n": 186175,
+        "log_loss": 0.6931471805585263,
+        "brier": 0.25,
+        "ece": 0.007774942930038997
+      }
+    },
+    "2025": {
+      "n": 187029,
+      "n_games": 2477,
+      "live_model": {
+        "n": 187029,
+        "log_loss": 0.4651512952882127,
+        "brier": 0.15602813864950774,
+        "ece": 0.008149727778727805
+      },
+      "pregame_held_baseline": {
+        "n": 187029,
+        "log_loss": 0.6808666093278296,
+        "brier": 0.24402853942145677,
+        "ece": 0.026799798161661198
+      },
+      "naive_baseline": {
+        "n": 187029,
+        "log_loss": 0.6931471805585253,
+        "brier": 0.25,
+        "ece": 0.02840468590432499
+      }
+    }
+  },
+  "beats_pregame_by_third": {
+    "innings_1_3": true,
+    "innings_4_6": true,
+    "innings_7_plus": true
+  },
+  "checks_on_test_range": {
+    "pre_game_p_range": [
+      0.2432,
+      0.8081
+    ],
+    "first_pitch_max_abs_gap": 0.013798236430708655,
+    "first_pitch_within_0_02": true,
+    "monotone_in_score_diff": true,
+    "leader_by_5_bottom_9_two_outs_min_wp": 0.9993518787941927,
+    "leader_by_5_bottom_9_two_outs_ge_0_97": true
+  },
+  "verdict": {
+    "beats_pregame_held_every_third": "PASS",
+    "overall_ece_below_0_03": "PASS",
+    "first_pitch_within_0_02": "PASS",
+    "monotone_in_score_diff": "PASS",
+    "leader_by_5_bottom_9_ge_0_97": "PASS"
+  },
+  "notes": [
+    "Per \u00a710 #1 this script reads the test seasons exactly once."
+  ]
+}

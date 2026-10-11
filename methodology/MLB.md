@@ -202,13 +202,24 @@ RE  = run expectancy for the current base-out state, a 24-cell table computed fr
   - *Per season:* 2022 0.0059, **2023 0.0299** (at the edge of the target; the pitch-clock / shift-ban year), 2024 0.0175, 2025 0.0202.
   - *Late-season flag not fired:* late/mid ratio 1.14.
   - *Neutral sites:* n = 20, noise.
+- **v1.1 live win probability (fitted + evaluated once, 2026-10-11):**
+  - *Data.* `playByPlay` for every valid game, 22,000+ in total. Training 2010–2014: 12,327 games, 939,332 plate appearances. Test 2022–2025: 9,890 games, 746,273 PAs. **Zero score mismatches, zero missing games.**
+  - *RE table (training):* 0.473 runs (0 out, empty), 2.236 (0 out, loaded), 0.096 (2 out, empty). These match published MLB run-expectancy values, which independently confirms the base-out reconstruction.
+  - *Fit:* β0 +0.166, β1 +0.998, β2 +2.039 (`artifacts/mlb/live_wp_v1.json`). β1 ≈ 1 means the MLB pre-game probabilities needed no stretching, unlike NBA (1.48) and NFL (1.32).
+  - *Pre-registered targets: 5 of 5 PASS.* The first sport where every live target holds.
+    - Beats the pre-game-held baseline every third of the game (LL 0.616 / 0.476 / 0.306 vs 0.678 / 0.678 / 0.684).
+    - Overall ECE 0.0098 < 0.03 (LL 0.468 vs 0.680 held).
+    - First pitch within 0.02 of pre-game (max gap 0.0138 on the training range).
+    - Monotone in d.
+    - Away team up 5 with 2 out in the bottom of the 9th ≥ 0.97 (worst case 0.9994).
+  - *Weak spot:* innings 1–3 ECE 0.022 is higher than the held pre-game baseline's 0.010, although LL is better. Early-game live numbers are less well calibrated than the pre-game number they start from.
+  - *Notes:* samples are ~75 correlated PAs per game. The test era includes the extra-inning runner (2020+ regular season), which training never saw.
 - **Dashboard / API (N5):**
   - *All MLB facts on the site come from the MLB Stats API,* attributed as "MLB Advanced Media (non-commercial use)": schedule, live linescore, 40-man roster status, injured list, player year-by-year and career stats, and headshots. ESPN is not used for MLB.
   - *Champion = winner of the last World Series game;* reproduces ATL 2021, HOU 2022, TEX 2023, LAD 2024.
   - *Today's probabilities include the probable starters' adjustment from the frozen pitcher state.* If a team hasn't named a starter, it gets no adjustment, and the page says "TBD".
   - *The game-detail "rating gap" includes both starters' adjustments* (labelled "incl. starters"), so the three cards add up to the headline probability. The pitching card shows each adjustment separately.
   - *Availability:* "Available" = 40-man players with Active status. "Ruled out" = injured-list statuses (D7 / D10 / D15 / D60). Optioned or minor-league players are omitted.
-  - *No live win probability yet* (v1.1). Live games show the inning, half and outs.
 - **No logos:** inherits NHL §13.I.
 
 ---

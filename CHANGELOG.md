@@ -2,6 +2,14 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-11 — MLB v1.1: live win probability (5 of 5 targets PASS)
+
+- **Download:** 22,000+ games of `playByPlay` (2010–14 training, 2022–25 test), zero mismatches; 1.7 MB of PA-state samples committed.
+- `app/mlb/live_wp.py`: outs-remaining, base-out RE table (training only; matches published values), three-coefficient logistic, checks, predict. `scripts/mlb_live_wp_fit.py` → β0 +0.166, β1 +0.998, β2 +2.039.
+- `scripts/mlb_live_wp_evaluate.py` (one-shot): **live LL 0.468 vs 0.680 held, ECE 0.0098; every pre-registered target passes.** Innings 1–3 ECE 0.022 is noted as the weak spot.
+- `/mlb/games/today` attaches `live_wp` from the linescore (inning half, outs, runners). MLB tag → v1.1.
+- +6 tests (299).
+
 ## 2026-10-11 — College football methodology v0.1-draft (pre-code)
 
 New `methodology/CFB.md`, pending author approval.

@@ -54,3 +54,15 @@ def test_mlb_live_and_history(client):
     assert h["cup_winner"] == "LAD" and h["n_franchises"] == 30
     cal = client.get("/mlb/calibration/current").json()
     assert cal["test_seasons"] == [2022, 2023, 2024, 2025]
+
+
+def test_live_block_uses_bases_outs_and_score():
+    from app.mlb import live_wp
+    if not live_wp.ARTIFACT.exists():
+        pytest.skip("live model not fitted")
+    ls = {"currentInning": 9, "inningHalf": "Bottom", "outs": 2, "offense": {}}
+    late_lead_away = mlb_api.live_block(ls, 2, 7, 0.5)["live_wp"]["home_win_prob"]
+    assert late_lead_away < 0.03
+    loaded = mlb_api.live_block({**ls, "outs": 0, "offense": {"first": {}, "second": {}, "third": {}}}, 3, 4, 0.5)
+    empty = mlb_api.live_block({**ls, "outs": 2, "offense": {}}, 3, 4, 0.5)
+    assert loaded["live_wp"]["home_win_prob"] > empty["live_wp"]["home_win_prob"]

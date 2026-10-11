@@ -142,6 +142,25 @@ def _live_label(ls: dict) -> str:
     return f"{half} {inn}" + (f" · {outs} out" if outs is not None else "") if inn else "Live"
 
 
+def live_block(ls: dict, home: int, away: int, p_home: float) -> dict:
+    """Live inning/outs/score plus the v1.1 live WP (§12) from the linescore."""
+    from . import live_wp  # lazy: live_wp imports this module
+
+    inning = ls.get("currentInning") or 1
+    bottom = (ls.get("inningHalf") or ls.get("inningState") or "").lower().startswith(("bot", "end"))
+    outs = min(int(ls.get("outs") or 0), 2)
+    off = ls.get("offense") or {}
+    bases = (1 if off.get("first") else 0) | (2 if off.get("second") else 0) | (4 if off.get("third") else 0)
+    out = {"live_state": {"game_state": "LIVE", "period": inning, "time_remaining_s": 0,
+                          "home_score": home, "away_score": away, "label": _live_label(ls)}}
+    if live_wp.ARTIFACT.exists():
+        beta, re = live_wp.load()
+        wp = live_wp.predict(beta, re, pre_game_p=p_home, inning=inning, bottom=bottom, outs=outs,
+                             bases=bases, d=home - away)
+        out["live_wp"] = {"home_win_prob": round(wp, 4), "n_samples": 0, "smoothed": False}
+    return out
+
+
 async def _schedule_today(client: httpx.AsyncClient) -> list[dict]:
     today = datetime.now(EASTERN).date().isoformat()
     r = await client.get(f"{API}/schedule", params={"sportId": 1, "date": today, "gameType": pipeline.GAME_TYPES,
@@ -181,10 +200,7 @@ async def games_today():
             "pitching": {"home": ph, "away": pa},
         }
         if state == "LIVE":
-            ls = g.get("linescore") or {}
-            m["live_state"] = {"game_state": "LIVE", "period": ls.get("currentInning") or 1, "time_remaining_s": 0,
-                               "home_score": m["home_score"] or 0, "away_score": m["away_score"] or 0,
-                               "label": _live_label(ls)}
+            m.update(live_block(g.get("linescore") or {}, m["home_score"] or 0, m["away_score"] or 0, p))
         out.append(m)
     live_history.record_matchups("mlb", out)
     return {"date": datetime.now(EASTERN).date().isoformat(), "frozen_params": True, "matchups": out}
@@ -297,7 +313,7 @@ async def game_detail(game_id: int):
         "sport": "mlb", "game": m, "probability": breakdown,
         "pitching": m["pitching"],
         "model": {"name": "MLB v1 Elo + starting pitcher", "home_bump": c.params.home_bump,
-                  "k_regular": c.params.k_regular, "mov": c.params.mov, "live": "not yet (MLB v1.1)"},
+                  "k_regular": c.params.k_regular, "mov": c.params.mov, "live": "MLB v1.1 base-out model"},
         "calibration_context": core_detail.calibration_context(m["home_win_prob"], buckets, "MLB one-shot test (2022–2025)"),
         "home": side(m["home"], h_id, rh), "away": side(m["away"], a_id, ra),
         "head_to_head": core_detail.head_to_head(m["home"], m["away"], games),

@@ -11,7 +11,7 @@ const cfg: SportConfig = {
   periodLabel: (p) => `Inn ${p}`,
   emptyNote: "Spring training and exhibitions aren't modeled.",
   footnote:
-    "Pre-game probabilities from the frozen MLB v1 model, including each team's probable starter. Postseason calibration was poor in testing (worse than a coin flip on log-loss), so read October numbers with caution.",
+    "Pre-game probabilities from the frozen MLB v1 model (incl. probable starters); live probabilities from the v1.1 base-out model (score, inning, outs, runners), refreshed every 60 s. Pre-game postseason calibration was poor in testing, so read October pre-game numbers with caution.",
   championLabel: (team, season) => `${team} won the ${season} World Series`,
   breakdownRows: [
     ["2022", (b) => b.per_season["2022"]],

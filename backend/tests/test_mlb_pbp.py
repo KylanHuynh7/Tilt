@@ -25,3 +25,20 @@ def test_extra_inning_ghost_runner_only_when_flagged():
     plays = [_play(10, "top", 1, 3, 3)]
     assert pbp.states_from_plays(plays, ghost_runner=True)[0]["bases"] == 2
     assert pbp.states_from_plays(plays, ghost_runner=False)[0]["bases"] == 0
+
+
+def test_outs_remaining_formula():
+    from app.mlb import live_wp
+    assert live_wp.outs_remaining(1, False, 0) == 54      # first pitch
+    assert live_wp.outs_remaining(9, True, 2) == 1        # bottom 9th, 2 out
+    assert live_wp.outs_remaining(9, False, 0) == 6
+    assert live_wp.outs_remaining(11, False, 1) == 5      # extras: current inning only
+    assert live_wp.outs_remaining(11, True, 1) == 2
+
+
+def test_live_evaluator_guardrails(tmp_path):
+    from scripts import mlb_live_wp_evaluate
+    assert mlb_live_wp_evaluate.main(["--out", str(tmp_path / "x.json")]) == 2
+    f = tmp_path / "r.json"
+    f.write_text("{}")
+    assert mlb_live_wp_evaluate.main(["--confirm", "--out", str(f)]) == 3

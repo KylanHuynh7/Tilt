@@ -1,0 +1,65 @@
+{
+  "2010": {
+    "final_mismatch": 0,
+    "games": 2462,
+    "kept": 2462,
+    "no_plays": 0,
+    "pa_rows": 188334
+  },
+  "2011": {
+    "final_mismatch": 0,
+    "games": 2467,
+    "kept": 2467,
+    "no_plays": 0,
+    "pa_rows": 188682
+  },
+  "2012": {
+    "final_mismatch": 0,
+    "games": 2467,
+    "kept": 2467,
+    "no_plays": 0,
+    "pa_rows": 187447
+  },
+  "2013": {
+    "final_mismatch": 0,
+    "games": 2469,
+    "kept": 2469,
+    "no_plays": 0,
+    "pa_rows": 188040
+  },
+  "2014": {
+    "final_mismatch": 0,
+    "games": 2462,
+    "kept": 2462,
+    "no_plays": 0,
+    "pa_rows": 186829
+  },
+  "2022": {
+    "final_mismatch": 0,
+    "games": 2470,
+    "kept": 2470,
+    "no_plays": 0,
+    "pa_rows": 185470
+  },
+  "2023": {
+    "final_mismatch": 0,
+    "games": 2471,
+    "kept": 2471,
+    "no_plays": 0,
+    "pa_rows": 187599
+  },
+  "2024": {
+    "final_mismatch": 0,
+    "games": 2472,
+    "kept": 2472,
+    "no_plays": 0,
+    "pa_rows": 186175
+  },
+  "2025": {
+    "final_mismatch": 0,
+    "games": 2477,
+    "kept": 2477,
+    "no_plays": 0,
+    "pa_rows": 187029
+  }
+}
