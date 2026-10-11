@@ -212,6 +212,11 @@ Reading: the pre-game edge fades with time, a lead matters more as time runs out
 - **Houston (2002) seeded at 1500,** overstating an expansion team early.
 - **Live state depends on an unverified ESPN `situation` block** until first observed live.
 - **Play-by-play models are trained on 2004–2014 football.** Rule changes since (kickoff rules 2024, OT rules 2022 / 2025, PAT distance 2015) shift game-state values.
+- **Frozen parameters (N3, 2026-10-11):** `K_regular 20, K_playoff 10, carry 0.60, H 35, mov on`, from the 1,440-cell grid on 2015–2021. Validation (n = 1,889): LL 0.63402, Brier 0.22067, ECE 0.01781. Baselines: naive LL 0.69315, home-rate LL 0.68852, static rating LL 0.73021. Validation numbers only; the test pass is what counts.
+  - *H = 35 is inside the pre-registered 20–60.*
+  - *MOV helps:* LL 0.63402 vs 0.63952 for the best MOV-off cell.
+  - *K_playoff < K_regular again,* as in NHL and NBA. K_playoff = 10 is the grid floor. The best cell with K_playoff ≥ K_regular is 0.00014 LL worse.
+- **§8 home-advantage drift flag — FIRED before freezing.** Home win rate (non-neutral games, ties as 0.5) by validation season: 2015 54.0%, 2016 58.6%, 2017 57.5%, 2018 60.1%, 2019 52.3%, 2020 50.4%, 2021 51.4%. That's a drop of roughly 7–9 points between the first and second halves of the window, the same shape that sank NHL v2 (NHL §13.C). Per §8 the response is to document it, not to add a time-varying term mid-cycle. The single frozen H = 35 (about 55% for equal teams) sits between the two regimes. If the 2022–25 home rate stays near 51%, expect the test calibration to show home teams over-predicted.
 - **No logos:** inherits NHL §13.I.
 
 ---

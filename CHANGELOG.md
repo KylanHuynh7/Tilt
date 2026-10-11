@@ -2,6 +2,14 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-11 — NFL N3: validation grid + freeze
+
+- `app/nfl/tuner.py` (1,440-cell §5 grid on 2015–2021; test seasons cut before loading) and `scripts/nfl_freeze.py` (≈33 s, writes `artifacts/nfl/frozen_params.json`, refuses to overwrite).
+- **Frozen:** K 20 / 10, carry 0.60, H 35, MOV on. Validation LL 0.63402 / Brier 0.22067 / ECE 0.01781 (n = 1,889) vs home-rate baseline 0.68852.
+- **Pre-registration:** H inside 20–60 ✓; MOV helps ✓; K_playoff < K_regular again.
+- **§8 drift flag fired:** home rate fell from 57.5–60.1% (2016–18) to 50.4–52.3% (2019–21). Documented in NFL §13 before the test pass, as §8 requires.
+- +5 tests (247).
+
 ## 2026-10-11 — NFL N2: rating engine + walk-forward backtest
 
 - `app/nfl/ratings.py`: §5 rule. Neutral-aware home bump; W ∈ {1, 0.5, 0}; FiveThirtyEight NFL MOV multiplier with fixed constants; **ties use M = 1** so unequal teams still move.
