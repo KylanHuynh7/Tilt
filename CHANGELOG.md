@@ -2,6 +2,15 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-11 — College football N4: one-shot test (PASS ×4, postseason flagged)
+
+`scripts/cfb_evaluate.py` (FBS-vs-FBS metrics only; FCS games reported separately). Ran once on 2022–2025 (n = 3,174): **LL 0.57072, Brier 0.19461, ECE 0.02450, beats home-rate (0.67842): all PASS.**
+- Postseason ECE 0.0906 (flag fired; LL 0.685).
+- Weeks 1–4 better than mid-season, against the §2 prediction.
+- 2024 / 2025 ECE 0.040 / 0.043 individually.
+- FBS-vs-FCS: 485 games, FBS 95.5% wins.
+- +2 tests.
+
 ## 2026-10-11 — Lineups and depth charts on game pages
 
 User request: show players the way teams take the field, not grouped by position.

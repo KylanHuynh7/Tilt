@@ -1,7 +1,7 @@
 # College Football (FBS) Rating System — Methodology Document
 ## Version 1.2
 **Author:** Kylan Huynh
-**Status:** APPROVED 2026-10-11 — all six **[DECISION]** items resolved as recommended. Later changes to §§3–6 or §12 are version-tagged amendments.
+**Status:** v1 frozen and evaluated 2026-10-11 — **all four §6 criteria PASS** on 2022–2025 (postseason flagged). APPROVED 2026-10-11 — all six **[DECISION]** items resolved as recommended. Later changes to §§3–6 or §12 are version-tagged amendments.
 **Last updated:** 2026-10-11
 
 **Amendment log:**
@@ -168,6 +168,12 @@ Inherits the NFL §12 five-term form (pre-game edge fading over time, score marg
   - *League mean:* the FBS mean is 1492.2, outside the inherited ±1 of 1500, because rating points move to and from the pooled FCS rating and entrants start at the pool value.
   - *Audit, as §8 requires before proceeding:* (1) the MOV multiplier matches the approved formula exactly; (2) the extremes are the right programs (Georgia, Alabama, Cincinnati and Ohio State on top; UMass, UConn, FIU and New Mexico State at the bottom); (3) extreme predictions are calibrated (validation 0.9–1.0 bucket: predicted 0.939, won 0.959; 0.0–0.1: predicted 0.069, won 0.078).
   - *Conclusion:* the bands, inherited from leagues with far less talent dispersion, don't fit FBS. Reported as a finding; parameters unchanged.
+- **Test evaluation (N4, run once 2026-10-11, `results/cfb/test_evaluation.json`):** 2022–2025, FBS-vs-FBS games, n = 3,174. **LL 0.57072 (PASS < 0.600), Brier 0.19461 (PASS 0.170–0.210), ECE 0.02450 (PASS < 0.04)**, and it beats the home-rate baseline (0.67842). **All four §6 criteria pass.** Naive 0.69315; static 0.79033. Locked per §10 #2.
+  - ***Postseason flag fired:*** bowls + playoff n = 176, LL 0.68453 (barely below the coin flip), ECE **0.0906**. Neutral-site games (mostly bowls) are similar: LL 0.667, ECE 0.098. Reported as a weakness; consistent with opt-outs, interim coaches and long layoffs (§2).
+  - ***Pre-registration miss:*** §2 expected weeks 1–4 to be the worst segment by a wide margin. They are better than mid-season (LL 0.558 vs 0.584; ECE 0.033 vs 0.042). Late season is best (LL 0.540, ECE 0.030). Late-season flag not fired (ratio 0.72).
+  - *Per season:* ECE 0.037 / 0.035 / **0.040 / 0.043** (2022–2025). The two expanded-playoff seasons sit at or just over the target individually.
+  - *Conference vs non-conference:* ECE 0.022 vs 0.036.
+  - *FBS-vs-FCS games, reported separately as agreed (never pooled):* n = 485, FBS teams won 95.5%, LL 0.169.
 - **No logos:** inherits NHL §13.I. Headshots follow the author's ESPN-headshot decision (§13.I).
 
 ---
