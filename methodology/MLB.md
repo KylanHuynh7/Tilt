@@ -1,5 +1,5 @@
 # MLB Rating System — Methodology Document
-## Version 1.1
+## Version 1.2
 **Author:** Kylan Huynh
 **Status:** v1 frozen and evaluated 2026-10-11 — **all four §6 criteria PASS** on 2022–2025 (postseason flagged: worse than a coin flip). APPROVED 2026-10-11 — all six **[DECISION]** items resolved as recommended. Later changes to §§3–6 or §12 are version-tagged amendments.
 **Last updated:** 2026-10-11
@@ -8,6 +8,14 @@
 - *v0.1-draft (2026-10-11):* First draft, after a data-availability probe and before any MLB ingest, rating code, or metric.
 - *v1.0 (2026-10-11):* Author approved with every [DECISION] as recommended: (1) test 2022–2025, (2) MOV on/off, (3) starting-pitcher adjustment in v1, (4) no K_playoff ≥ K_regular constraint, (5) thresholds LL < 0.685, Brier 0.235–0.248, ECE < 0.03, beat home-rate, (6) v1.1 live targets as in §12.
 - *v1.1 (2026-10-11):* Ingest-phase validity rule, made before any rating code or metric. A game counts only if it is final **and** has both scores: the API lists some games as final with no score (35 in 2000). Same-day, same-teams pairs are **not** collapsed, because in MLB they are real doubleheaders (unlike the NBA v1.1 duplicate rule). With the rule applied, 2000 has 2,429 of 2,430 regular-season games and passes coverage. Pitcher-term details, also fixed before any rating code ran: (i) a team's `rGS_t` starts at the league's running mean game score up to that game (50.0 before the first game), with no look-ahead; (ii) pitcher `rGS_p` and team `rGS_t` carry over between seasons unchanged, and only Elo regresses; (iii) after every game both the actual starter's `rGS_p` and the team's `rGS_t` update with that start's game score, using the same α; (iv) when the 2010+ probable pitcher is missing, the actual starter is used; (v) the 2000 phantom rows have boxscores fetched, but they never enter the model because they fail the validity rule.
+- *v1.2 (2026-10-11):* Pre-download clarifications to §12, written before any play-by-play was fetched.
+  - **Source:** `game/{pk}/playByPlay` (≈50 KB per game) replaces `feed/live`; it carries the same state fields. Only `about.inning / halfInning`, `count.outs`, `result.homeScore / awayScore` and `matchup.postOnFirst / Second / Third` are read.
+  - **Samples:** one per plate appearance, taking the state *before* it. Outs and bases come from the previous play in the same half-inning, and reset at each new half.
+  - **o (outs remaining):** in regulation, top of inning i with k outs gives o = (3 − k) + 3 + 6·(9 − i), and the bottom gives o = (3 − k) + 6·(9 − i). In extra innings, top = (3 − k) + 3 and bottom = 3 − k.
+  - **Extra-inning runner:** for 2020+ regular-season games, each half from the 10th inning starts with a runner on second (never in the postseason).
+  - **RE table:** a 24-cell base-out run-expectancy table computed once from the 2010–2014 training plate appearances (mean runs scored from that state to the end of the half-inning).
+  - **Validity:** a game is used only if its last play's score equals the official final.
+  - **Test data:** test-season (2022–2025) play-by-play is downloaded now but read only by the one-shot evaluator.
 
 ---
 
