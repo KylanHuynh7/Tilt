@@ -2,6 +2,13 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-11 — MLB N3: validation grid + freeze
+
+5,120-cell grid on 2015–2021, about 32 min.
+- **Frozen:** K 4 / 2, carry 0.60, H 25, MOV on, c 3.0, α 0.1. Validation LL 0.67666 / Brier 0.24188 / ECE 0.00251 (n = 15,743) vs home-rate 0.69049 and team-only 0.67783.
+- **Pre-registration:** H inside 15–40 ✓; the pitcher term helps (−0.0012 LL) but less than "clearly". **Miss:** team-only beat the home-rate baseline by 0.0127, not the predicted ≤ ~0.01. K_playoff < K_regular again (at grid floor). No home-drift flag.
+- The freeze process aborted (exit 134) after writing a complete artifact; verified by recomputing the winner exactly. Documented in MLB §13.
+
 ## 2026-10-11 — Backend moved from Render to Google Cloud Run
 
 User request. The backend now runs on Cloud Run (`tilt-sports-kylan`, us-central1, service `tilt-backend`).

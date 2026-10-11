@@ -179,6 +179,14 @@ RE  = run expectancy for the current base-out state, a 24-cell table computed fr
   - *Neutral sites (< 5 home games at that venue):* 0–12 per season, except **47 in 2020**. COVID make-ups often listed the "home" team batting last in the opponent's park, plus the Blue Jays' displaced games. Toronto's 26 games at Buffalo's Sahlen Field remain home games.
   - *Limitations:* the neutral rule cannot tell a true neutral site from a one-off relocated home game (e.g. hurricane moves). Both get no home bump.
 - **Engine (N2):** on warm-up + validation the league mean stays at exactly 1500, ratings span 1398–1617, 1,854 pitchers are tracked, and team rGS spans 42–59. No new limitations beyond §5 / §13.
+- **Frozen parameters (N3, 2026-10-11):** `K_regular 4, K_playoff 2, carry 0.60, H 25, mov on, c 3.0, α 0.1`, from the 5,120-cell grid on 2015–2021. Validation (n = 15,743): LL 0.67666, Brier 0.24188, ECE 0.00251. Baselines: naive 0.69315, home-rate 0.69049 (rate 53.65%), static 0.69984, **best team-only (c = 0) 0.67783**.
+  - *H = 25 is inside the pre-registered 15–40.*
+  - *The pitcher term helps modestly:* −0.0012 LL vs the best team-only cell.
+  - ***Pre-registration miss:*** §2 expected team-only Elo to land within ~0.01 LL of the home-rate baseline. It beat it by 0.0127, so team strength alone carries more signal than predicted. The pitcher term widens that gap only slightly (to 0.0138), rather than "clearly".
+  - *MOV helps marginally:* best MOV-off cell LL 0.67723.
+  - *K_playoff = 2 is the grid floor and below K_regular,* the same direction as every other sport. The best cell honoring K_playoff ≥ K_regular is +0.00003 LL, i.e. noise.
+  - *Home rate by validation season:* 54.1 / 53.0 / 54.3 / 52.8 / 53.0 / **55.8 (2020)** / 54.0%. No trend; §8 drift flag not fired.
+- **Freeze run exited with code 134 (abort) after writing the artifact.** The 1.6 MB JSON is complete (all sections, 5,120 grid rows, winner = grid[0]), and recomputing the winner's validation metrics from scratch reproduced LL / Brier / ECE exactly. The abort hit during the final console summary; the cause was not diagnosed. Freezes are verified by recomputation, not by exit code.
 - **No logos:** inherits NHL §13.I.
 
 ---
