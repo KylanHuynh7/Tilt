@@ -2,6 +2,15 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-11 — College football methodology v0.1-draft (pre-code)
+
+New `methodology/CFB.md`, pending author approval.
+- **Data:** ESPN college scoreboard by week (FBS group 80), coverage from 2001.
+- **Split:** warm-up 2001–2013, validation 2014–2021, test 2022–2025.
+- **Model:** the NFL Elo form plus a **pooled FCS opponent rating**; FBS-vs-FCS games update ratings but are excluded from metrics. New FBS programs start at the pooled FCS rating. 2,304-cell grid.
+- **v1.1:** live WP inherits NFL's five-term form.
+- Six [DECISION] items. Contamination disclosure: only game/team counts and field names were seen.
+
 ## 2026-10-11 — MLB N5: API + dashboard (MLB goes live)
 
 Backend: `app/mlb/api.py` under `/mlb`:
