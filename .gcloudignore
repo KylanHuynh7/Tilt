@@ -1,0 +1,10 @@
+# Only the backend is built on Cloud Build; keep uploads small.
+.git
+.gitignore
+.playwright-mcp/
+frontend/
+**/node_modules/
+**/.venv/
+**/__pycache__/
+**/.pytest_cache/
+*.png

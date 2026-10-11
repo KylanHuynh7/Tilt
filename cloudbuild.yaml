@@ -1,0 +1,43 @@
+# Cloud Build → Cloud Run continuous deploy for the Tilt backend.
+# A Cloud Build trigger on pushes to `main` runs this file: build the
+# backend image, push it to Artifact Registry, deploy it to Cloud Run.
+#
+# Cost guards: scale to zero (min-instances 0) and at most 2 instances, so
+# idle costs nothing and a traffic spike can't run up a bill. Cloud Run sets
+# $PORT itself; the Dockerfile already honors it.
+substitutions:
+  _REGION: us-central1
+  _SERVICE: tilt-backend
+  _REPO: tilt
+  _CORS: https://tilt-nhl.vercel.app
+
+steps:
+  - id: build
+    name: gcr.io/cloud-builders/docker
+    args: ["build", "-t", "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/backend:${BUILD_ID}", "backend"]
+
+  - id: push
+    name: gcr.io/cloud-builders/docker
+    args: ["push", "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/backend:${BUILD_ID}"]
+
+  - id: deploy
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - ${_SERVICE}
+      - --image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/backend:${BUILD_ID}
+      - --region=${_REGION}
+      - --allow-unauthenticated
+      - --memory=1Gi
+      - --cpu=1
+      - --min-instances=0
+      - --max-instances=2
+      - --set-env-vars=CORS_ALLOWED_ORIGINS=${_CORS}
+
+images:
+  - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/backend:${BUILD_ID}
+
+options:
+  logging: CLOUD_LOGGING_ONLY

@@ -131,3 +131,9 @@ def test_nhl_routes_mirrored_under_prefix(client: TestClient, path: str):
     root, prefixed = client.get(path), client.get(f"/nhl{path}")
     assert root.status_code == prefixed.status_code == 200
     assert root.json() == prefixed.json()
+
+
+def test_health_alias_matches_healthz(client: TestClient):
+    """Cloud Run reserves /healthz; /health must serve the same payload."""
+    assert client.get("/health").status_code == 200
+    assert client.get("/health").json()["ok"] == client.get("/healthz").json()["ok"]

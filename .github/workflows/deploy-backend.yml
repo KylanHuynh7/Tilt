@@ -1,0 +1,44 @@
+# Deploy the backend to Google Cloud Run on every push to main that touches
+# it. Auth is keyless (Workload Identity Federation): GitHub's OIDC token is
+# exchanged for short-lived Google credentials, and only this repository is
+# allowed to impersonate the deployer service account.
+name: Deploy backend (Cloud Run)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - "cloudbuild.yaml"
+      - ".github/workflows/deploy-backend.yml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  id-token: write   # required to mint the OIDC token
+
+concurrency:
+  group: deploy-backend
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/1062950279645/locations/global/workloadIdentityPools/github/providers/github
+          service_account: github-deployer@tilt-sports-kylan.iam.gserviceaccount.com
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Build and deploy via Cloud Build
+        run: gcloud builds submit --config cloudbuild.yaml --project tilt-sports-kylan .
+
+      - name: Smoke test
+        run: |
+          URL=$(gcloud run services describe tilt-backend --region us-central1 --project tilt-sports-kylan --format='value(status.url)')
+          curl -fsS "$URL/health" | head -c 300
+          curl -fsS "$URL/sports" | head -c 300

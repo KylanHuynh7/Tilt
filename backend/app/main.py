@@ -148,6 +148,10 @@ def _cache_or_503():
 
 # ---- Endpoints -----------------------------------------------------------------
 
+# `/health` is the canonical path: Cloud Run reserves paths ending in "z"
+# (e.g. /healthz) for its own infrastructure, so /healthz is unreachable
+# there. /healthz is kept for Render and local use.
+@nhl.get("/health")
 @nhl.get("/healthz")
 async def healthz():
     try:

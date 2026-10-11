@@ -4,9 +4,22 @@ Tilt deploys cleanly as a two-piece app: the FastAPI backend behind a container 
 
 The backend ships with the full parquet cache committed (~2 MB), so cold start is ~1.5 s once the container is awake — no build-time data ingest needed.
 
-This guide leads with **Render** as the primary backend target because it's truly free, doesn't require a credit card, and supports our `Dockerfile` directly. Alternatives are listed at the bottom.
+This guide previously led with **Render**; the backend now runs on **Google Cloud Run** (first section). The Render notes are kept as a fallback. Render was chosen originally because it's truly free, doesn't require a credit card, and supports our `Dockerfile` directly. Alternatives are listed at the bottom.
 
 ---
+
+## Backend — Google Cloud Run (current, since 2026-10-11)
+
+The backend runs on **Cloud Run** in project `tilt-sports-kylan` (region `us-central1`), service `tilt-backend`, at <https://tilt-backend-xp2vlopuya-uc.a.run.app>.
+
+- **Auto-deploy:** `.github/workflows/deploy-backend.yml` runs on every push to `main` that touches `backend/`, `cloudbuild.yaml` or the workflow itself. It authenticates with **Workload Identity Federation** (no keys or secrets; only `KylanHuynh7/Tilt` may impersonate `github-deployer@…`), runs `gcloud builds submit` with `cloudbuild.yaml` (build image → Artifact Registry `tilt` → `gcloud run deploy`), then smoke-tests `/health` and `/sports`.
+- **Manual deploy:** `gcloud builds submit --config cloudbuild.yaml .` from the repo root (`.gcloudignore` keeps the upload to the backend).
+- **Service settings:** 1 GiB memory, 1 vCPU, **min 0 / max 2 instances** (scales to zero when idle; at most 2 instances bounds cost), `CORS_ALLOWED_ORIGINS=https://tilt-nhl.vercel.app`.
+- **Billing:** billing account "My Billing Account 1" with **Budget1 = $1/month**, alerting at 50 / 90 / 100%. Budgets alert; they do not cap spend. The instance cap is the hard limit.
+- **Health check path:** use **`/health`**. Cloud Run reserves paths ending in `z`, so `/healthz` returns Google's 404 there.
+- **Frontend:** Vercel's `VITE_API_BASE` points at the Cloud Run URL.
+
+The Render instructions below are kept for reference; Render was the host until 2026-10-11.
 
 ## Backend — Render (free tier, no credit card)
 

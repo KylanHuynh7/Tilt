@@ -2,6 +2,16 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-11 — Backend moved from Render to Google Cloud Run
+
+User request. The backend now runs on Cloud Run (`tilt-sports-kylan`, us-central1, service `tilt-backend`).
+- `cloudbuild.yaml`: build → Artifact Registry → `gcloud run deploy` (1 GiB, scale 0–2, CORS for Vercel). `.gcloudignore` uploads the backend only.
+- `.github/workflows/deploy-backend.yml`: keyless auto-deploy via Workload Identity Federation (pool `github`, restricted to `KylanHuynh7/Tilt`; service account `github-deployer` with build-only roles), plus a post-deploy smoke test.
+- `/health` alias for `/healthz`, which Cloud Run reserves. +1 test.
+- First manual deploy smoke-tested: all sports, NFL game detail, player card, and CORS for the Vercel origin.
+- Billing: new open billing account with the author's **Budget1 ($1, alerts at 50 / 90 / 100%)**, verified via CLI.
+- Docs: DEPLOY.md leads with Cloud Run (Render kept as fallback); METHODOLOGY §13.G covers the move's operational caveats.
+
 ## 2026-10-11 — MLB N1 + N2: ingest, lineage, rating engine with starting-pitcher term
 
 `methodology/MLB.md` v1.0 approved (all six decisions as recommended); v1.1 adds the validity rule (final + both scores; doubleheaders kept) and five pitcher-term details, all fixed before any rating code ran.
