@@ -29,6 +29,7 @@ from dataclasses import asdict
 
 from . import cup_simulator, engine, historical, live_wp, standings
 from .nba import api as nba_api
+from .nfl import api as nfl_api
 from .franchises import current_code
 from .seasons import parse as parse_season
 from .teams import TEAMS
@@ -113,7 +114,7 @@ nhl = APIRouter()
 SPORTS = [
     {"id": "nhl", "name": "NHL", "status": "live"},
     {"id": "nba", "name": "NBA", "status": "live"},
-    {"id": "nfl", "name": "NFL", "status": "planned"},
+    {"id": "nfl", "name": "NFL", "status": "live"},
     {"id": "mlb", "name": "MLB", "status": "planned"},
 ]
 
@@ -388,3 +389,4 @@ async def admin_refresh():
 app.include_router(nhl)
 app.include_router(nhl, prefix="/nhl")
 app.include_router(nba_api.router)
+app.include_router(nfl_api.router)

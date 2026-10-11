@@ -2,6 +2,19 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-11 — NFL N5: API + dashboard (NFL goes live)
+
+Backend:
+- `app/nfl/espn.py`: current-week ESPN scoreboard client. Reads score, clock, period, neutral and the live `situation` block; never `odds`.
+- `app/nfl/api.py` under `/nfl`: seasons, current ratings, history with era codes (STL/SD/OAK) and Super Bowl champion, this week's games (frozen-param pre-game probability, neutral-aware, live score/clock), calibration (locked results + flags + breakdowns), admin refresh. `/sports` reports NFL live.
+- +7 tests (257).
+
+Frontend:
+- NBA dashboard generalized into `components/SportDashboard.tsx` with a per-sport `SportConfig` (fetchers, labels, period labels, breakdown rows, §8 flag notes). `sports/nba` and the new `sports/nfl` are thin configs.
+- NFL pill live with tag `v1`; the turf world now has real content.
+
+Docs: NFL §13 N5 limitations; README status.
+
 ## 2026-10-11 — NFL N4: one-shot test evaluation (PASS ×4, playoff flag)
 
 `scripts/nfl_evaluate.py` (§10 #1 guardrails, every §6 breakdown in the single pass). Ran once on 2022–2025 (n = 1,139): **LL 0.63440, Brier 0.22135, ECE 0.02870, beats home-rate baseline 0.68768: all PASS.**

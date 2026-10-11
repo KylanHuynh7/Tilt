@@ -224,6 +224,12 @@ Reading: the pre-game edge fades with time, a lead matters more as time runs out
   - *Per season:* 2022 ECE 0.0347, **2023 0.0629**, 2024 0.0488, 2025 0.0397. Two of four seasons sit near or over the target on their own.
   - *The home-advantage collapse did not persist.* The observed test home rate is 55.3%, close to what H = 35 implies, so the §8 drift risk flagged at freeze did not materialize as a test miss.
   - *Neutral-site games:* n = 28, ECE 0.258 — noise at that size.
+- **Dashboard / API (N5):**
+  - *"This week" is whatever ESPN's default scoreboard calls the current week.* Between Tuesday and Thursday it may still show the finished week.
+  - *Champion = winner of the season's last `SB` game.* It reproduces KC 2019, TB 2020, LA 2021, KC 2022–23, PHI 2024.
+  - *Pre-game probabilities ignore starting-QB news* (DECISION 4). A backup starting is invisible to the model and to the card.
+  - *ESPN `situation` parsing is written* (possession, yards to end zone, down, distance) but still unverified against a live game. It isn't used until v1.1.
+  - *Similar team colors* (e.g. PHI and JAX, both teal-green) make the team-colored probability bar harder to read; the percentages are authoritative (NHL §13.I).
 - **No logos:** inherits NHL §13.I.
 
 ---

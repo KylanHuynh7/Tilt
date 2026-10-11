@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { NhlDashboard } from "./sports/nhl/NhlDashboard";
 import { NbaDashboard } from "./sports/nba/NbaDashboard";
+import { NflDashboard } from "./sports/nfl/NflDashboard";
 
 type SportId = "nhl" | "nba" | "nfl" | "mlb";
 type Sport = {
@@ -16,7 +17,7 @@ type Sport = {
 const SPORTS: Sport[] = [
   { id: "nhl", name: "NHL", status: "live", version: "v2", color: "var(--c-nhl)" },
   { id: "nba", name: "NBA", status: "live", version: "v1.1", color: "var(--c-nba)" },
-  { id: "nfl", name: "NFL", status: "in_development", color: "var(--c-nfl)" },
+  { id: "nfl", name: "NFL", status: "live", version: "v1", color: "var(--c-nfl)" },
   { id: "mlb", name: "MLB", status: "planned", color: "var(--c-mlb)" },
 ];
 
@@ -127,6 +128,8 @@ export default function App() {
         <NhlDashboard />
       ) : sportId === "nba" ? (
         <NbaDashboard />
+      ) : sportId === "nfl" ? (
+        <NflDashboard />
       ) : (
         <section className="panel">
           <div className="panel-title">
