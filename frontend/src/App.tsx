@@ -14,7 +14,7 @@ type Sport = {
 // backend is asleep or on an older build.
 const SPORTS: Sport[] = [
   { id: "nhl", name: "NHL", status: "live", version: "v2" },
-  { id: "nba", name: "NBA", status: "live", version: "v1" },
+  { id: "nba", name: "NBA", status: "live", version: "v1.1" },
   { id: "nfl", name: "NFL", status: "planned" },
   { id: "mlb", name: "MLB", status: "planned" },
 ];

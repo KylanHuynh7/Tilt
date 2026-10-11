@@ -5,7 +5,7 @@ Interpretable rating systems that produce calibrated, game-by-game win probabili
 | Sport | Status | Methodology |
 |---|---|---|
 | **NHL** | Live — v2 (evaluated, see below) | [`METHODOLOGY.md`](./METHODOLOGY.md) |
-| **NBA** | Live — v1 (all §6 targets PASS on test); live win probability next (v1.1) | [`methodology/NBA.md`](./methodology/NBA.md) |
+| **NBA** | Live — v1.1: pre-game model (all §6 targets PASS on test) + live in-game win probability | [`methodology/NBA.md`](./methodology/NBA.md) |
 | NFL | Planned (college football possibly later) | — |
 | MLB | Planned | — |
 
@@ -57,6 +57,18 @@ Frozen on validation 2018-19 → 2023-24 (`K_regular 15, K_playoff 10, carry 0.6
 | §6 target | < 0.640 | 0.200–0.225 | < 0.04 | — | — |
 
 Caveats reported alongside the pass: 2025-26 alone has ECE 0.0419 (just over target); the pre-registered late-season flag fired (late ECE 2.85× mid), but the model is *under*confident late (consistent with tanking), the opposite of the predicted rest effect; the pre-registered home-bump range (50–110) was missed at validation (chosen 40).
+
+### NBA v1.1 — live in-game win probability
+
+`logit P = β0 + β1·pre·(τ/2880) + β2·d/√(m+1)`, fitted on 2009-10 → 2017-18 play-by-play (11,488 games): β0 +0.151, β1 +1.478, β2 +0.665. Evaluated once on 2024-25 + 2025-26 (126,786 game-minute samples):
+
+| | Q1 | Q2 | Q3 | Q4 | All |
+|---|---:|---:|---:|---:|---:|
+| Live log-loss | 0.599 | 0.533 | 0.438 | 0.283 | **0.464** |
+| Pre-game held, log-loss | 0.608 | 0.608 | 0.608 | 0.608 | 0.608 |
+| Live ECE | **0.050** | 0.032 | 0.017 | 0.011 | 0.026 |
+
+Two of three §12 checks pass; **the tip-off check fails** (the model recalibrates the pre-game probability by up to 0.105 instead of echoing it), and Q1 calibration is worse than simply holding the pre-game number. Details in `methodology/NBA.md` §13.
 
 ## v1 results — held-out test set (2023-24 + 2024-25)
 

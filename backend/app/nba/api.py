@@ -20,7 +20,7 @@ from zoneinfo import ZoneInfo
 import httpx
 from fastapi import APIRouter, HTTPException
 
-from . import backtest, espn, pipeline, ratings
+from . import backtest, espn, live_wp, pipeline, ratings
 from .teams import DISPLAY_COLORS, TEAMS, display_abbr, is_franchise
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -164,6 +164,23 @@ async def ratings_history(season: int):
     }
 
 
+def live_block(r: dict, p_home: float) -> dict:
+    """Live score/clock plus the v1.1 live WP (§12). The WP is omitted, not
+    faked, if the live model artifact is missing.
+    """
+    period = r["n_periods"] or 1
+    home, away = r["home_score"] or 0, r["away_score"] or 0
+    out = {"live_state": {
+        "game_state": "LIVE", "period": period, "time_remaining_s": int(r["clock_s"]),
+        "home_score": home, "away_score": away,
+    }}
+    if live_wp.ARTIFACT.exists():
+        wp = live_wp.predict(live_wp.load(), pre_game_p=p_home, period=period,
+                             sec_left=r["clock_s"], d=home - away)
+        out["live_wp"] = {"home_win_prob": round(wp, 4), "n_samples": 0, "smoothed": False}
+    return out
+
+
 def _today_eastern() -> date:
     return datetime.now(EASTERN).date()
 
@@ -207,13 +224,7 @@ async def games_today():
             "away_score": r["away_score"],
         }
         if state == "LIVE":
-            m["live_state"] = {
-                "game_state": "LIVE",
-                "period": r["n_periods"] or 1,
-                "time_remaining_s": int(r["clock_s"]),
-                "home_score": r["home_score"] or 0,
-                "away_score": r["away_score"] or 0,
-            }
+            m.update(live_block(r, p_home))
         matchups.append(m)
     return {"date": today.isoformat(), "frozen_params": True, "matchups": matchups}
 

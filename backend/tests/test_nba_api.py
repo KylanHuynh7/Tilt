@@ -53,3 +53,15 @@ def test_calibration_matches_locked_results(client):
     assert body["test_seasons"] == [20242025, 20252026]
     assert set(body["metrics"]) >= {"model", "naive_baseline", "static_rating_baseline", "home_rate_baseline"}
     assert body["frozen_params"]["decay_carry"] == body["frozen_params"]["carry"]
+
+
+def test_live_block_adds_live_wp():
+    from app.nba import live_wp
+    if not live_wp.ARTIFACT.exists():
+        pytest.skip("live model not fitted")
+    row = {"n_periods": 4, "home_score": 100, "away_score": 80, "clock_s": 60.0}
+    out = nba_api.live_block(row, p_home=0.5)
+    assert out["live_state"]["period"] == 4 and out["live_state"]["time_remaining_s"] == 60
+    assert out["live_wp"]["home_win_prob"] > 0.99
+    tied = nba_api.live_block({**row, "home_score": 90, "away_score": 90, "clock_s": 720.0}, 0.5)
+    assert 0.4 < tied["live_wp"]["home_win_prob"] < 0.7

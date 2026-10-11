@@ -1,0 +1,33 @@
+{
+  "methodology_version": "nba-1.2",
+  "fitted_at": "2026-10-11T05:01:48.382198+00:00",
+  "coefficients": {
+    "b0": 0.15140710920665446,
+    "b1": 1.477702837778465,
+    "b2": 0.6654235461330726
+  },
+  "training_seasons": [
+    20092010,
+    20102011,
+    20112012,
+    20122013,
+    20132014,
+    20142015,
+    20152016,
+    20162017,
+    20172018
+  ],
+  "n_games": 11488,
+  "n_samples": 555544,
+  "checks_on_training_range": {
+    "pre_game_p_range": [
+      0.0759,
+      0.9599
+    ],
+    "tipoff_max_abs_gap_to_pregame": 0.10510277365510734,
+    "tipoff_within_0_01": false,
+    "monotone_in_score_diff": true,
+    "leader_by_20_with_2_min_left_min_wp": 0.9993492492559679,
+    "leader_by_20_with_2_min_left_ge_0_97": true
+  }
+}

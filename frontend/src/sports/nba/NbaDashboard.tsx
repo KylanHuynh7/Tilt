@@ -179,7 +179,7 @@ export function NbaDashboard() {
               colorFor={fallbackColor}
               periodLabel={nbaPeriod}
               emptyNote="Preseason and exhibition games aren't modeled."
-              footnote="Pre-game probabilities from the frozen NBA v1 model. Live score and clock refresh every 60 s; a live win probability arrives in NBA v1.1."
+              footnote="Pre-game probabilities from the frozen NBA v1 model; live probabilities from the v1.1 in-game model (score margin, time left, and pre-game edge), refreshed every 60 s."
             />
           )}
         </section>

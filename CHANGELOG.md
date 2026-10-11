@@ -2,6 +2,17 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-11 — NBA v1.1: live in-game win probability
+
+Methodology v1.2 (pre-fit): minute-mark sampling, final-score validity rule, only ESPN `plays` read (never its win-probability / odds blocks), and an explicit note that §12 sets no pass/fail target.
+
+- `app/nba/pbp.py`: ESPN summary → minute-mark states, clock parsing ("11:34" / "34.5"), validity check, per-season parquets at `data_cache/nba/pbp/` (1.2 MB). Training 2009-10 → 2017-18 (11,488 games kept, 90 final-score mismatches dropped); test 2024-25 + 2025-26 (2,627 kept).
+- `app/nba/live_wp.py`: §12 features, pure-Python Newton logistic fit (no numpy), `predict`, §12 checks. `scripts/nba_live_wp_fit.py` → `artifacts/nba/live_wp_v1.json` (β0 +0.151, β1 +1.478, β2 +0.665). Refuses to refit without `--force`.
+- `scripts/nba_live_wp_evaluate.py` (one-shot, `--confirm`, no overwrite): **live LL 0.464 vs 0.608 for the pre-game-held baseline; ECE 0.026**; beats the baseline every quarter. Q1 ECE 0.050 (worse than held, 0.025). §12 checks: monotone ✓, 20-point lead late ✓, **tip-off within 0.01 ✗ (gap 0.105)**.
+- `/nba/games/today` now attaches `live_wp` to in-progress games (`api.live_block`); the frontend live bar renders it. NBA tag → v1.1.
+- Render deploy verified: ESPN is reachable from the backend host.
+- +9 tests (216).
+
 ## 2026-10-10 — NBA N5: API + dashboard (NBA goes live)
 
 Backend:

@@ -1,5 +1,5 @@
 # NBA Rating System — Methodology Document
-## Version 1.1
+## Version 1.2
 **Author:** Kylan Huynh
 **Status:** v1 rating model frozen and evaluated (2026-10-10): **all four §6 criteria PASS** on 2024-25 + 2025-26 (see §13). APPROVED 2026-10-10 — all seven **[DECISION]** items resolved as recommended. Implementation may begin. Any later change to §§3–6 or §12 is a version-tagged amendment.
 **Last updated:** 2026-10-10
@@ -8,6 +8,7 @@
 - *v0.1-draft (2026-10-10):* First draft. Written after a data-availability probe and before any NBA ingest, rating code, or metric computation.
 - *v1.0 (2026-10-10):* Author approved the draft with every [DECISION] resolved as recommended: (1) first season 1993-94, (2) test 2024-25 + 2025-26, (3) Charlotte lineage by roster continuity / ESPN ids, (4) MOV on/off in the grid, (5) no K_playoff ≥ K_regular constraint, (6) thresholds LL < 0.640, Brier 0.200–0.225, ECE < 0.04, must beat home-rate baseline, (7) three-term logistic live WP. No text below changed except this header.
 - *v1.1 (2026-10-10):* Ingest-phase clarifications, made after ingest and before any rating code or metric. (a) **Data-validity rules** (§3): completed 0-0 games are dropped as impossible, and rows sharing (date, home, away) collapse to one game, keeping a valid score and then the lowest ESPN id. Raw parquets are untouched; the rules run on read and the manifest records every drop. (b) **Coverage outcome:** 1999-2000 fails the 1% rule (1,166 / 1,189 after cleaning), so under DECISION 1 the warm-up **starts in 2000-01**, not 1993-94. Every season from 2000-01 through 2025-26 passes. (c) Empty `{}` events in ESPN payloads are skipped; any other malformed event still raises. See §13.
+- *v1.2 (2026-10-10):* Pre-fit clarifications to §12, written before any play-by-play was ingested or any live-WP coefficient fitted. (a) **Sampling:** one sample per game-minute: 48 regulation marks at 12:00, 11:00, … 1:00 of each quarter, plus 5:00 … 1:00 of each OT. The score at a mark is the running score after every play at or before it. (b) **Validity:** a game's play-by-play is used only if its last play's score equals the scoreboard final; others are dropped and counted. (c) **Inputs:** only the `plays` list of ESPN's summary is read. Its `winprobability`, `odds`, `pickcenter` and `againstTheSpread` blocks are never read (§10). (d) **Evaluation:** §12 as approved sets no pass/fail target for the live model, and none is added now. The one-shot evaluation reports LL / Brier / ECE overall and per quarter (Q1–Q4, OT) against two context baselines (the pre-game probability held constant all game, and 0.5), plus the three §12 checks.
 
 ---
 
@@ -291,11 +292,18 @@ Written before any results exist; extended at every phase.
   - *Early segment:* ECE 0.0463, also above target; the 0.7–0.8 bucket won 0.877 vs 0.746 predicted (n = 73).
   - *Heavy home underdogs:* the 0.1–0.2 bucket (n = 51) predicted 0.168 and won 0.039.
   - *Neutral-site games:* n = 12 (NBA Cup knockouts, international games). ECE 0.31 is noise at that size; reported only for completeness.
+- **v1.1 live win probability (fitted + evaluated once, 2026-10-10):**
+  - *Data.* ESPN play-by-play, one sample per game-minute. Training 2009-10 → 2017-18: 11,488 games, 555,544 samples. 90 games were dropped because the last play's score didn't match the final (missing or double-counted baskets, typically 2–5 points), and 1 had no plays. Test 2024-25 + 2025-26: 2,627 games, 126,786 samples, with 16 dropped for mismatch.
+  - *Fit:* β0 = +0.151, β1 = +1.478, β2 = +0.665 (`artifacts/nba/live_wp_v1.json`).
+  - *§12 checks.* Monotone in d: **pass**. Leader by 20 with 2 min left ≥ 0.97: **pass** (worst case 0.9994). Tip-off reproduces the pre-game probability within 0.01: **FAIL**, with a largest gap of 0.105 at the extremes of the pre-game range. β1 > 1 means the frozen pre-game logits were too compressed for 2009-18 outcomes (the same underconfidence as the N4 late-season finding). β0 > 0 re-adds home advantage that H = 40 under-states for an era with ~59–60% home win rates. So at tip-off the live model recalibrates the pre-game number rather than echoing it. Reported as a failed check; the pre-registered form is unchanged.
+  - *Test results (`results/nba/live_wp_test_evaluation.json`, no pass/fail targets per v1.2 d).* Overall LL 0.46376 / Brier 0.15516 / ECE 0.0261, against the pre-game-held baseline's LL 0.60796 / ECE 0.0250. By quarter, live LL is 0.599 / 0.533 / 0.438 / 0.283 (Q1–Q4) and 0.536 in OT, beating the held baseline in every period.
+  - *Q1 is the weak spot:* live ECE **0.0502**, double the held baseline's 0.0253. The early-game recalibration learned on 2009-18 doesn't transfer to the lower-home-advantage test era, consistent with the failed tip-off check. ECE falls to 0.032 / 0.017 / 0.011 in Q2–Q4. OT (n = 690 samples) has ECE 0.045.
+  - *Sample correlation:* metrics pool ~48 correlated samples per game, so the effective sample size is closer to the 2,627 games than to 126,786.
+  - *Live inputs come from the ESPN scoreboard's period and clock.* During breaks the clock reads 0 of the finished period, so the live WP is the end-of-period value (same behaviour as NHL §13.H).
 - **Dashboard / API (N5):**
-  - *ESPN reachability from Render is still unverified.* `/nba/games/today` calls ESPN on every request (no caching) and returns 502 if it's unreachable; history and calibration don't depend on ESPN at request time.
+  - *ESPN is reachable from Render* (verified 2026-10-11 after deploy: `/nba/games/today` returned 200). It is still called on every request with no caching, and returns 502 if unreachable; history and calibration don't depend on ESPN at request time.
   - *Champion = winner of the season's last playoff game.* That is the Finals clincher in every modeled season (it reproduces MIL 2021, GSW 2022, DEN 2023, BOS 2024, OKC 2025). Not shown for the in-progress season.
   - *Preseason games are omitted from "Today's games"* rather than shown without a probability. Early October therefore looks empty.
-  - *No live win probability yet.* Live games show score and clock only, until v1.1 (§12).
   - *Display colors substitute for dark primaries* (e.g. Spurs and Nets lines use silver/grey, Bucks cream, Nuggets gold), the same coupling as NHL §13.I.
   - *`/nba/admin/refresh` is unauthenticated and its ingest is ephemeral* on free hosting, inheriting NHL §13.G.
 - *Rating engine (N2):* no limitations beyond those §5 already lists. One display detail: each team's season trajectory opens at its first game's date, carrying the post-regression rating.
