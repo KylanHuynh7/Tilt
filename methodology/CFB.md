@@ -1,5 +1,5 @@
 # College Football (FBS) Rating System — Methodology Document
-## Version 1.2
+## Version 1.3
 **Author:** Kylan Huynh
 **Status:** v1 frozen and evaluated 2026-10-11 — **all four §6 criteria PASS** on 2022–2025 (postseason flagged). APPROVED 2026-10-11 — all six **[DECISION]** items resolved as recommended. Later changes to §§3–6 or §12 are version-tagged amendments.
 **Last updated:** 2026-10-11
@@ -14,6 +14,14 @@
   - **(d) Coverage rule** counts regular-season games *listed* (completed, or cancelled/postponed) and requires ≥ 11, not "12 from 2006". The rule exists to detect missing data, not unplayed games: the 9/11 week (2001) and hurricanes Harvey and Irma (2017) cancelled real games, and 12-game schedules were optional from 2006. With (a)–(d) every season 2001–2025 passes; 2020 is exempt.
   - **(e)** Games with no FBS team (FCS playoff games returned by date queries) are dropped.
 - *v1.2 (2026-10-11):* Pooled-FCS details, fixed before any backtest ran. §5 calls the FCS rating's per-season regression "tuned", but the approved grid has no separate parameter for it. Resolution: the pooled FCS rating regresses toward its own starting value `fcs_init` using the **same `carry`** as FBS teams, which adds no new tuned dimension. A program that leaves FBS (e.g. Idaho after 2017) drops out of the FBS state and is represented by the pool. Teams already FBS in 2001 start at 1500. A program entering FBS starts at the pool's current value (DECISION 3).
+- *v1.3 (2026-10-11):* Pre-download clarifications to §12, written before any college play-by-play was fetched.
+  - **Source and fields:** ESPN `summary` → `drives.previous[].plays[]`. Only `period.number`, `clock.displayValue`, `homeScore`, `awayScore`, `start.down`, `start.yardsToEndzone` and `start.team.id` are read. The payload's `winprobability`, `odds` and `pickcenter` blocks are never read (§10).
+  - **Training seasons: 2004–2013** (ESPN college play-by-play starts in 2004; all are warm-up seasons). **Test: 2022–2025.** FBS-vs-FBS games only, matching the v1 evaluation (DECISION 2).
+  - **Samples:** one per play with down 1–4, 1 ≤ yards-to-end-zone ≤ 99, and a possessing team that is the home or away team. Older ESPN data has inconsistent field-position values, so plays failing these checks are dropped.
+  - **Validity:** a game is used only if its last play's score equals the official final **and** at least half its plays pass the sample checks; drops are counted per season.
+  - **Time:** regulation τ = (4 − q) × 900 + clock. **College overtime is untimed** (alternating possessions), so OT plays use τ = 0, which leaves the score, possession and field-position terms acting alone.
+  - **Possession:** s = +1 if the home team has the ball, −1 if the away team does. y = yards to the opponent's end zone.
+  - **Targets and checks:** inherit NFL DECISION 6 exactly.
 
 ---
 
