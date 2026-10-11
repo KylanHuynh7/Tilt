@@ -14,6 +14,7 @@ import {
 import { getJson } from "../http";
 import { navigate } from "../router";
 import type { DetailSide, FormGame, GameDetailResponse, RosterPlayer } from "../types";
+import { PlayerAvatar, PlayerCard } from "./PlayerCard";
 
 type Props = {
   sport: string;
@@ -42,7 +43,7 @@ function FormStrip({ form }: { form: FormGame[] }) {
   );
 }
 
-function RosterList({ side, color }: { side: DetailSide; color: string }) {
+function RosterList({ side, color, onPick }: { side: DetailSide; color: string; onPick: (p: RosterPlayer) => void }) {
   if (!side.roster.loaded) return <div className="empty">Roster unavailable right now.</div>;
   const r = side.roster;
   const gtd = r.available.flatMap((g) => g.players).filter((p) => p.status).length;
@@ -63,8 +64,8 @@ function RosterList({ side, color }: { side: DetailSide; color: string }) {
           <ul>
             {g.players.map((p: RosterPlayer, i) => (
               <li key={i} className={p.status ? "flagged" : ""}>
-                <span className="jersey">{p.jersey ?? "–"}</span>
-                <span className="pname">{p.name}</span>
+                <PlayerAvatar p={p} color={color} />
+                <PlayerName p={p} onPick={onPick} />
                 <span className="pos">{p.position}</span>
                 {p.status && <span className="status-chip">{p.status}</span>}
               </li>
@@ -78,8 +79,8 @@ function RosterList({ side, color }: { side: DetailSide; color: string }) {
         <ul className="ruled-out">
           {r.ruled_out.map((p, i) => (
             <li key={i}>
-              <span className="jersey">{p.jersey ?? "–"}</span>
-              <span className="pname">{p.name}</span>
+              <PlayerAvatar p={p} color={color} />
+              <PlayerName p={p} onPick={onPick} />
               <span className="pos">{p.position}</span>
               <span className="out-chip">{p.reason}</span>
             </li>
@@ -89,6 +90,15 @@ function RosterList({ side, color }: { side: DetailSide; color: string }) {
         <div className="empty">Nobody ruled out.</div>
       )}
     </div>
+  );
+}
+
+function PlayerName({ p, onPick }: { p: RosterPlayer; onPick: (p: RosterPlayer) => void }) {
+  if (!p.id) return <span className="pname">{p.name}</span>;
+  return (
+    <button className="pname pname-btn" onClick={() => onPick(p)} title={`${p.name}: season & career stats`}>
+      {p.name}
+    </button>
   );
 }
 
@@ -102,6 +112,7 @@ function prettyGroup(g: string): string {
 
 export function GameDetail({ sport, gameId, colorFor, periodLabel }: Props) {
   const [d, setD] = useState<GameDetailResponse | null>(null);
+  const [picked, setPicked] = useState<{ p: RosterPlayer; team: string; color: string } | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
@@ -311,15 +322,20 @@ export function GameDetail({ sport, gameId, colorFor, periodLabel }: Props) {
       <section className="panel">
         <div className="panel-title"><h2>Players &amp; availability</h2><span className="meta">rosters + injury report from ESPN</span></div>
         <div className="roster-grid">
-          <RosterList side={d.away} color={awayColor} />
-          <RosterList side={d.home} color={homeColor} />
+          <RosterList side={d.away} color={awayColor} onPick={(p) => setPicked({ p, team: d.away.code, color: awayColor })} />
+          <RosterList side={d.home} color={homeColor} onPick={(p) => setPicked({ p, team: d.home.code, color: homeColor })} />
         </div>
         <div className="disclaimer ok">
           Starting lineups aren't published before the game, so this lists everyone available
           rather than starters vs bench. Tilt's models are team-level: they don't see who plays
           and don't project player stats — that would be a separate, pre-registered model.
+          Click a player for season and career stats. Photos and stats: ESPN.
         </div>
       </section>
+
+      {picked && (
+        <PlayerCard sport={sport} player={picked.p} team={picked.team} color={picked.color} onClose={() => setPicked(null)} />
+      )}
     </div>
   );
 }

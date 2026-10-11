@@ -88,3 +88,27 @@ def test_nba_detail_endpoint_with_stubbed_slate(monkeypatch):
     assert d["home"]["code"] == "BOS" and d["projections"] is None
     assert d["probability"]["rating_gap"] == 50.0
     assert len(d["home"]["form"]) == 10
+
+
+def test_player_stats_normalize_maps_teams_and_sorts_newest_first():
+    from app.core import players
+    payload = {
+        "teams": {"los-angeles-lakers": {"id": "13", "abbreviation": "LAL"},
+                  "cleveland-cavaliers": {"id": "5", "abbreviation": "CLE"}},
+        "categories": [{"name": "averages", "displayName": "Regular Season Averages", "labels": ["GP", "PTS"],
+                        "statistics": [
+                            {"teamId": "5", "season": {"year": 2004, "displayName": "2003-04"}, "stats": ["79", "20.9"]},
+                            {"teamSlug": "los-angeles-lakers", "season": {"year": 2026, "displayName": "2025-26"}, "stats": ["60", "25.1"]},
+                        ],
+                        "totals": ["1622", "26.9"]}],
+    }
+    out = players.normalize(payload)
+    seasons = out["categories"][0]["seasons"]
+    assert [(r["season"], r["team"]) for r in seasons] == [("2025-26", "LAL"), ("2003-04", "CLE")]
+    assert out["categories"][0]["career"] == ["1622", "26.9"]
+
+
+def test_roster_player_carries_id_and_headshot():
+    r = rosters.parse({"athletes": [{"id": "1966", "displayName": "X", "headshot": {"href": "https://h/x.png"}}]})
+    p = r["available"][0]["players"][0]
+    assert p["id"] == "1966" and p["headshot"] == "https://h/x.png"

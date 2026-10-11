@@ -28,7 +28,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from dataclasses import asdict
 
 from . import cup_simulator, engine, historical, live_wp, pipeline, standings
-from .core import detail as core_detail, live_history, rosters
+from .core import detail as core_detail, live_history, players as core_players, rosters
 from .franchises import franchise_for
 from .nba import api as nba_api
 from .nfl import api as nfl_api
@@ -119,6 +119,17 @@ SPORTS = [
     {"id": "nfl", "name": "NFL", "status": "live"},
     {"id": "mlb", "name": "MLB", "status": "planned"},
 ]
+
+
+@app.get("/{sport}/players/{athlete_id}")
+async def player_stats(sport: str, athlete_id: str):
+    """Season-by-season + career stats for one athlete (ESPN facts, no model)."""
+    if sport not in core_players.SPORT_PATHS or not athlete_id.isdigit():
+        raise HTTPException(status_code=404, detail="unknown sport or athlete")
+    try:
+        return await core_players.fetch(sport, athlete_id)
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(status_code=502, detail=f"player stats unavailable: {exc}") from exc
 
 
 @app.get("/sports")

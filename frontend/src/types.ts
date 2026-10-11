@@ -96,7 +96,16 @@ export type FormGame = {
   date: string; season: string | null; opponent: string; at_home: boolean;
   for: number; against: number; result: "W" | "L" | "T";
 };
-export type RosterPlayer = { name: string; position: string | null; jersey: string | null; status: string | null };
+export type RosterPlayer = {
+  id: string | null; name: string; position: string | null; jersey: string | null;
+  headshot: string | null; status: string | null;
+};
+export type PlayerStatsCategory = {
+  name: string; display_name: string; labels: string[]; descriptions: string[];
+  seasons: { season: string | null; year: number | null; team: string | null; stats: string[] }[];
+  career: string[];
+};
+export type PlayerStatsResponse = { sport: string; athlete_id: string; categories: PlayerStatsCategory[]; source: string };
 export type Roster = {
   loaded: boolean;
   available: { group: string; players: RosterPlayer[] }[];     // healthy + game-time decisions

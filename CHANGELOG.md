@@ -2,6 +2,15 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-11 — Player headshots + clickable player stats cards
+
+User request: headshots, and clicking a player shows this season, past seasons and career totals.
+- **Headshots:** ESPN's player photos (CDN) next to every player on the game-detail page, ringed in team color, falling back to initials. Raised first as an IP concern, like the no-logos decision (§13.I); the author chose to use them. Credited on the page.
+- **Player stats card:** `GET /{nba|nfl|nhl}/players/{id}` (`app/core/players.py`) normalizes ESPN's season-by-season stats and career totals for every category (NBA averages/totals, NFL passing/rushing/receiving/defense/scoring, NHL skater or goalie lines). 1-hour cache. Only abbreviations are read from its team map; logos are never used.
+- **Frontend:** `components/PlayerCard.tsx` modal (Esc/backdrop to close, focus on open, body scroll locked) with large headshot, status chip, category tabs, latest season highlighted, past seasons, and a career row. Names in both the Available and Ruled-out lists are buttons.
+- Verified: Caleb Williams' card (passing tab, 2024–2026 + career), and all 136 roster headshots load on CHI @ GB.
+- +3 tests (274).
+
 ## 2026-10-11 — MLB methodology v0.1-draft (pre-code) + college football on the agenda
 
 - New `methodology/MLB.md`, pending author approval:

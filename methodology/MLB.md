@@ -1,11 +1,12 @@
 # MLB Rating System — Methodology Document
-## Version 0.1-draft
+## Version 1.0
 **Author:** Kylan Huynh
-**Status:** DRAFT — pre-code. **No MLB model code may be written until the author approves this document.** Items marked **[DECISION]** need an explicit ruling; each carries a recommendation.
+**Status:** APPROVED 2026-10-11 — all six **[DECISION]** items resolved as recommended. Later changes to §§3–6 or §12 are version-tagged amendments.
 **Last updated:** 2026-10-11
 
 **Amendment log:**
 - *v0.1-draft (2026-10-11):* First draft, after a data-availability probe and before any MLB ingest, rating code, or metric.
+- *v1.0 (2026-10-11):* Author approved with every [DECISION] as recommended: (1) test 2022–2025, (2) MOV on/off, (3) starting-pitcher adjustment in v1, (4) no K_playoff ≥ K_regular constraint, (5) thresholds LL < 0.685, Brier 0.235–0.248, ECE < 0.03, beat home-rate, (6) v1.1 live targets as in §12.
 
 ---
 
@@ -174,7 +175,7 @@ RE  = run expectancy for the current base-out state, a 24-cell table computed fr
 
 ---
 
-## Decisions needed before implementation
+## Decisions (resolved 2026-10-11 — all as recommended)
 
 | # | Decision | Recommendation |
 |---|---|---|

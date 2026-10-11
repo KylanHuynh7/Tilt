@@ -26,9 +26,11 @@ RULED_OUT_STATUSES = {"out", "injured reserve", "suspension", "suspended", "out 
 def _player(a: dict) -> dict:
     injuries = a.get("injuries") or []
     return {
+        "id": a.get("id"),                                   # ESPN athlete id (player stats card)
         "name": a.get("displayName") or a.get("fullName"),
         "position": (a.get("position") or {}).get("abbreviation"),
         "jersey": a.get("jersey"),
+        "headshot": (a.get("headshot") or {}).get("href"),   # ESPN CDN photo (user-approved, §13.I)
         "status": injuries[0].get("status") if injuries else None,
     }
 
