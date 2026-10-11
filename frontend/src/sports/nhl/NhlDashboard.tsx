@@ -235,6 +235,7 @@ export function NhlDashboard() {
             <TodaysGames
               data={today}
               league="NHL"
+              sport="nhl"
               colorFor={colorFor}
               periodLabel={nhlPeriod}
               footnote="Pre-game probabilities from the frozen v2 rating model; live probabilities from the v2.2 in-game model, refreshed every 60 s."

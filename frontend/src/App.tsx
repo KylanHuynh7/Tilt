@@ -2,6 +2,15 @@ import { useEffect, useState } from "react";
 import { NhlDashboard } from "./sports/nhl/NhlDashboard";
 import { NbaDashboard } from "./sports/nba/NbaDashboard";
 import { NflDashboard } from "./sports/nfl/NflDashboard";
+import { GameDetail } from "./components/GameDetail";
+import { colorFor as nhlColorFor } from "./sports/nhl/teamColors";
+import { navigate, parseRoute } from "./router";
+
+const PERIOD_LABELS: Record<string, (p: number) => string> = {
+  nhl: (p) => (p >= 4 ? "OT" : `P${p}`),
+  nba: (p) => (p <= 4 ? `Q${p}` : p === 5 ? "OT" : `${p - 4}OT`),
+  nfl: (p) => (p <= 4 ? `Q${p}` : "OT"),
+};
 
 type SportId = "nhl" | "nba" | "nfl" | "mlb";
 type Sport = {
@@ -63,34 +72,26 @@ function SportGlyph({ id }: { id: SportId }) {
   }
 }
 
-// Path-based routing: /nhl, /nba, … ("/" is NHL). vercel.json rewrites every
-// path to index.html, so deep links work without a router library.
-function sportFromPath(): SportId {
-  const seg = window.location.pathname.split("/")[1]?.toLowerCase();
-  return SPORTS.some((s) => s.id === seg) ? (seg as SportId) : "nhl";
-}
-
 export default function App() {
-  const [sportId, setSportId] = useState<SportId>(sportFromPath);
+  const ids = SPORTS.map((x) => x.id);
+  const [route, setRoute] = useState(() => parseRoute(ids));
+  const sportId = route.sport as SportId;
   const sport = SPORTS.find((s) => s.id === sportId)!;
 
   useEffect(() => {
-    const onPop = () => setSportId(sportFromPath());
+    const onPop = () => setRoute(parseRoute(ids));
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Per-sport accent color is driven from CSS via this attribute.
   useEffect(() => {
     document.documentElement.dataset.sport = sportId;
-    document.title = `Tilt — ${sport.name}`;
-  }, [sportId, sport.name]);
+    document.title = route.gameId ? `Tilt — ${sport.name} game` : `Tilt — ${sport.name}`;
+  }, [sportId, sport.name, route.gameId]);
 
-  const go = (id: SportId) => {
-    if (id === sportId) return;
-    window.history.pushState(null, "", `/${id}`);
-    setSportId(id);
-  };
+  const go = (id: SportId) => navigate(`/${id}`);
 
   return (
     <div className="app">
@@ -124,7 +125,15 @@ export default function App() {
         ))}
       </nav>
 
-      {sportId === "nhl" ? (
+      {route.gameId && sport.status === "live" ? (
+        <GameDetail
+          key={`${sportId}-${route.gameId}`}
+          sport={sportId}
+          gameId={route.gameId}
+          colorFor={sportId === "nhl" ? nhlColorFor : () => "#888888"}
+          periodLabel={PERIOD_LABELS[sportId] ?? ((p) => `P${p}`)}
+        />
+      ) : sportId === "nhl" ? (
         <NhlDashboard />
       ) : sportId === "nba" ? (
         <NbaDashboard />

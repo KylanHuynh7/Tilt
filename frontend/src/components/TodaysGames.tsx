@@ -1,8 +1,10 @@
 import type { Matchup, TodayResponse } from "../types";
+import { navigate } from "../router";
 
 type Props = {
   data: TodayResponse;
-  league: string;                         // "NHL", "NBA", … for the empty state
+  league: string;
+  sport: string;                          // route segment, e.g. "nba"                         // "NHL", "NBA", … for the empty state
   colorFor: (code: string) => string;     // fallback when the payload has no color
   periodLabel: (period: number) => string;
   footnote: string;                       // model/disclaimer line under the cards
@@ -27,8 +29,9 @@ function TeamBadge({ team, color }: { team: string; color: string }) {
   );
 }
 
-function GameCard({ m, colorFor, periodLabel }: {
+function GameCard({ m, sport, colorFor, periodLabel }: {
   m: Matchup;
+  sport: string;
   colorFor: Props["colorFor"];
   periodLabel: Props["periodLabel"];
 }) {
@@ -41,7 +44,20 @@ function GameCard({ m, colorFor, periodLabel }: {
   // Card, edge stripe, and probability bars are painted in the teams' colors.
   const teamVars = { "--away": awayColor, "--home": homeColor } as React.CSSProperties;
   return (
-    <div className={`game ${isLive ? "live" : ""}`} style={teamVars}>
+    <div
+      className={`game clickable ${isLive ? "live" : ""}`}
+      style={teamVars}
+      role="link"
+      tabIndex={0}
+      aria-label={`${m.away} at ${m.home}: open game analysis`}
+      onClick={() => navigate(`/${sport}/game/${m.game_id}`)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          navigate(`/${sport}/game/${m.game_id}`);
+        }
+      }}
+    >
       <div className="team">
         <TeamBadge team={m.away} color={awayColor} />
         <span className="abbr">{m.away}</span>
@@ -110,11 +126,12 @@ function GameCard({ m, colorFor, periodLabel }: {
           </div>
         </>
       )}
+      <span className="card-cta">Game analysis →</span>
     </div>
   );
 }
 
-export function TodaysGames({ data, league, colorFor, periodLabel, footnote, emptyNote }: Props) {
+export function TodaysGames({ data, league, sport, colorFor, periodLabel, footnote, emptyNote }: Props) {
   if (data.matchups.length === 0) {
     return (
       <div className="empty">
@@ -126,7 +143,7 @@ export function TodaysGames({ data, league, colorFor, periodLabel, footnote, emp
     <>
       <div className="games-grid">
         {data.matchups.map((m) => (
-          <GameCard key={m.game_id} m={m} colorFor={colorFor} periodLabel={periodLabel} />
+          <GameCard key={m.game_id} m={m} sport={sport} colorFor={colorFor} periodLabel={periodLabel} />
         ))}
       </div>
       {!data.frozen_params && (

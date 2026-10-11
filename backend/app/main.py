@@ -27,7 +27,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from dataclasses import asdict
 
-from . import cup_simulator, engine, historical, live_wp, standings
+from . import cup_simulator, engine, historical, live_wp, pipeline, standings
+from .core import detail as core_detail, live_history, rosters
+from .franchises import franchise_for
 from .nba import api as nba_api
 from .nfl import api as nfl_api
 from .franchises import current_code
@@ -244,10 +246,75 @@ async def ratings_history(season: int):
 async def games_today():
     _cache_or_503()  # ensure cache exists; fail clearly if not
     matchups = await engine.todays_matchups()
+    live_history.record_matchups("nhl", matchups)
     return {
         "date": date.today().isoformat(),
         "frozen_params": True,  # v1 milestone-2 complete; frozen artifact in use
         "matchups": matchups,
+    }
+
+
+# ESPN's hockey roster codes differ from the NHL's for four teams.
+ESPN_NHL_ROSTER_CODES = {"NJD": "nj", "SJS": "sj", "TBL": "tb", "LAK": "la"}
+
+
+def _nhl_games(seasons: list[int]) -> list[dict]:
+    out = []
+    for sid in seasons:
+        if not pipeline.season_exists(sid):
+            continue
+        for r in pipeline.read_season(sid).to_pylist():
+            if r["game_type"] not in (2, 3) or r["state"] not in ("OFF", "FINAL") or r["home_score"] is None:
+                continue
+            fh, fa = franchise_for(r["home"], sid), franchise_for(r["away"], sid)
+            if not fh or not fa:
+                continue
+            out.append({"date": r["game_date"].isoformat(), "season_label": parse_season(sid).label,
+                        "home": current_code(fh), "away": current_code(fa),
+                        "home_score": r["home_score"], "away_score": r["away_score"]})
+    return out
+
+
+@nhl.get("/games/{game_id}/detail")
+async def game_detail(game_id: int):
+    """Deeper look at one of today's NHL games (no new model; see core.detail)."""
+    cache = _cache_or_503()
+    matchups = await engine.todays_matchups()
+    m = next((x for x in matchups if str(x["game_id"]) == str(game_id)), None)
+    if m is None:
+        raise HTTPException(404, f"game {game_id} is not on today's NHL slate")
+    latest = max(cache.trajectories)
+    games = _nhl_games([latest - 20002, latest - 10001, latest])
+    traj = historical.season_trajectory(latest)
+
+    def pts(code):
+        fid = historical.franchise_for_active_code(code)
+        return [{"date": p.date, "rating": round(p.rating, 2)} for p in traj.get(fid, [])]
+
+    buckets = json.loads(RESULTS_PATH.read_text()).get("calibration_buckets", []) if RESULTS_PATH.exists() else []
+    import httpx
+    async with httpx.AsyncClient(headers={"User-Agent": "tilt-nhl"}) as client:
+        rh = await rosters.fetch(client, "hockey/nhl", ESPN_NHL_ROSTER_CODES.get(m["home"], m["home"].lower()))
+        ra = await rosters.fetch(client, "hockey/nhl", ESPN_NHL_ROSTER_CODES.get(m["away"], m["away"].lower()))
+    side = lambda code, roster: {  # noqa: E731
+        "code": code, "name": TEAMS.get(code, code), "color": None, "roster": roster,
+        "form": core_detail.team_form(code, games),
+        "trend": core_detail.trend(pts(code), parse_season(latest).label),
+    }
+    return {
+        "sport": "nhl", "game": m,
+        "probability": core_detail.probability_breakdown(
+            m["home_rating"], m["away_rating"], home_bump=cache.params.home_bump,
+            neutral=False, p_home=m["home_win_prob"]),
+        "model": {"name": "NHL v2 Elo", "home_bump": cache.params.home_bump,
+                  "k_regular": cache.params.k_regular, "mov": False, "live": "NHL v2.2 in-game lookup"},
+        "calibration_context": core_detail.calibration_context(
+            m["home_win_prob"], buckets, "NHL v2 one-shot test (2025-26)"),
+        "home": side(m["home"], rh),
+        "away": side(m["away"], ra),
+        "head_to_head": core_detail.head_to_head(m["home"], m["away"], games),
+        "live_history": live_history.get("nhl", game_id),
+        "projections": None,  # no player model (METHODOLOGY §13.A)
     }
 
 

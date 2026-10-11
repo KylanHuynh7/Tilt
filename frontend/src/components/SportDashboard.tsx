@@ -188,6 +188,7 @@ export function SportDashboard({ cfg }: { cfg: SportConfig }) {
             <TodaysGames
               data={today}
               league={cfg.league}
+              sport={cfg.league.toLowerCase()}
               colorFor={fallbackColor}
               periodLabel={cfg.periodLabel}
               emptyNote={cfg.emptyNote}

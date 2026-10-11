@@ -2,6 +2,23 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-11 — Game-detail pages (click any game card)
+
+User request: clickable game cards opening an in-depth analysis plus the players for the game. Player stat projections were discussed and deferred, since no player model exists and building one would need its own methodology.
+
+Backend (shared in `app/core/`):
+- `detail.py`: probability breakdown (rating gap, home-edge contribution, neutral site), team form, head-to-head, calibration context from the locked test buckets, trend.
+- `rosters.py`: ESPN roster + injury report split into **available** (healthy + tagged game-time decisions) and **ruled out** (Out / IR / Suspended), with practice squads hidden. 30-min cache.
+- `live_history.py`: in-memory live-WP trail recorded whenever a today endpoint computes a live WP.
+- Endpoints `GET /nhl/games/{id}/detail` (also at root), `/nba/games/{id}/detail`, `/nfl/games/{id}/detail`. Every response has `projections: null`.
+
+Frontend:
+- `router.ts` (`/{sport}/game/{id}`); game cards are keyboard-accessible links with a "Game analysis →" cue.
+- `components/GameDetail.tsx`: team-color hero with score/state; big probability headline and split bar (live WP when in progress); "why these odds" cards (rating gap, home edge, track record); live WP area chart; season rating trend for both teams; last-10 form chips; head-to-head; available / ruled-out player lists.
+- Per user follow-up: player lists show only available players plus a separate "Ruled out" section, not full rosters.
+
+Docs: METHODOLOGY §13.K game-detail limitations. +10 tests (273).
+
 ## 2026-10-11 — NFL v1.1: live in-game win probability
 
 Methodology v1.1 pre-fit clarifications: per-play samples, τ definition, column projection (model-output columns never loaded), final-score validity rule, check definitions, ESPN situation mapping.

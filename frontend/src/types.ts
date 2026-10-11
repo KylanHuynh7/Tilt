@@ -89,3 +89,40 @@ export type CalibrationResponse = {
   calibration_buckets: CalibrationBucket[];
   section_6_targets: { log_loss_max: number; brier_band: [number, number]; ece_max: number };
 };
+
+// ---- Game detail (shared by NHL / NBA / NFL) --------------------------------
+
+export type FormGame = {
+  date: string; season: string | null; opponent: string; at_home: boolean;
+  for: number; against: number; result: "W" | "L" | "T";
+};
+export type RosterPlayer = { name: string; position: string | null; jersey: string | null; status: string | null };
+export type Roster = {
+  loaded: boolean;
+  available: { group: string; players: RosterPlayer[] }[];     // healthy + game-time decisions
+  ruled_out: (RosterPlayer & { reason: string })[];           // out, IR, suspended
+  source: string;
+};
+export type DetailSide = {
+  code: string; name: string; color: string | null;
+  form: FormGame[]; roster: Roster;
+  trend: { season: string | null; points: { date: string; rating: number }[] };
+};
+export type GameDetailResponse = {
+  sport: string;
+  game: Matchup;
+  probability: {
+    home_win_prob: number; rating_gap: number; p_home_without_home_edge: number;
+    home_edge_elo: number; home_edge_prob_points: number; neutral: boolean;
+    favorite: "home" | "away" | null;
+  };
+  model: { name: string; home_bump: number; k_regular: number; mov: boolean; live: string };
+  calibration_context: {
+    lo: number; hi: number; n: number; mean_predicted: number; home_win_rate: number; source: string;
+  } | null;
+  home: DetailSide;
+  away: DetailSide;
+  head_to_head: { date: string; season: string | null; home: string; away: string; home_score: number; away_score: number }[];
+  live_history: { t: string; period: number; time_remaining_s: number; home_score: number; away_score: number; home_wp: number }[];
+  projections: null;
+};
