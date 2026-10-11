@@ -1,7 +1,7 @@
 # NBA Rating System — Methodology Document
 ## Version 1.1
 **Author:** Kylan Huynh
-**Status:** APPROVED 2026-10-10 — all seven **[DECISION]** items resolved as recommended. Implementation may begin. Any later change to §§3–6 or §12 is a version-tagged amendment.
+**Status:** v1 rating model frozen and evaluated (2026-10-10): **all four §6 criteria PASS** on 2024-25 + 2025-26 (see §13). APPROVED 2026-10-10 — all seven **[DECISION]** items resolved as recommended. Implementation may begin. Any later change to §§3–6 or §12 is a version-tagged amendment.
 **Last updated:** 2026-10-10
 
 **Amendment log:**
@@ -284,6 +284,13 @@ Written before any results exist; extended at every phase.
 - **MOV helped as pre-registered,** but modestly: best MOV-off cell LL 0.63350 vs 0.63072.
 - **Home-court rate by validation season** (non-neutral games): 2018-19 59.0%, 2019-20 55.3%, 2020-21 54.7%, 2021-22 54.8%, 2022-23 58.2%, 2023-24 54.7%. There is no monotone trend, so the §8 drift check does not flag. But the year-to-year swing (±2 pts) is the same size as the home-ice drop that sank NHL v2, and a single H = 40 cannot follow it.
 - **The static-rating baseline is far worse than naive on validation** (LL 0.754). It holds end-of-2017-18 ratings for six seasons, so it mainly measures how fast NBA team strength turns over, not a model defect.
+- **Test evaluation (N4, run once 2026-10-10, `results/nba/test_evaluation.json`):** 2024-25 + 2025-26, n = 2,643. Model **LL 0.60744 (PASS < 0.640), Brier 0.20991 (PASS 0.200–0.225), ECE 0.02590 (PASS < 0.04)**, and it beats the home-rate baseline (LL 0.68834) — **all four §6 criteria pass.** Naive LL 0.69315; static rating (frozen end of 2023-24) LL 0.70867. Locked per §10 #2.
+  - *Per season:* 2024-25 ECE 0.0155; **2025-26 ECE 0.0419**, which would miss the 0.04 target on its own. The pooled pass leans on 2024-25.
+  - *Postseason (play-in + playoffs, n = 181):* LL 0.65136, ECE 0.0549. Below the 0.08 flag, but clearly worse than the regular season (ECE 0.0312), as §2 expected.
+  - *§8 late-season flag fired.* Late-segment ECE 0.0855 is 2.85× mid-segment (0.0300). **The direction contradicts §2's mechanism.** §2 predicted overconfidence from favorites resting starters. Instead the model is *underconfident* late: favorites at 0.55 / 0.65 / 0.75 won 0.64 / 0.75 / 0.86, and underdogs at 0.26 / 0.35 won 0.18 / 0.21. That fits tanking (weak teams losing more than their rating implies) better than rest. Late-segment LL (0.543) is the best of the three segments, because outcomes there are *more* predictable than the model says.
+  - *Early segment:* ECE 0.0463, also above target; the 0.7–0.8 bucket won 0.877 vs 0.746 predicted (n = 73).
+  - *Heavy home underdogs:* the 0.1–0.2 bucket (n = 51) predicted 0.168 and won 0.039.
+  - *Neutral-site games:* n = 12 (NBA Cup knockouts, international games). ECE 0.31 is noise at that size; reported only for completeness.
 - *Rating engine (N2):* no limitations beyond those §5 already lists. One display detail: each team's season trajectory opens at its first game's date, carrying the post-regression rating.
 - **No logos.** Team identity uses colored badges, inheriting NHL §13.I trademark reasoning.
 

@@ -2,6 +2,12 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-10 — NBA N4: one-shot test evaluation (PASS ×4)
+
+`scripts/nba_evaluate.py` (§10 #1 quarantined: `--confirm` required, refuses overwrite without `--force`, frozen artifact only, refuses if a test season fails coverage). Emits every §6 breakdown in the single pass: per season, regular vs postseason, early/mid/late segments (mean of both teams' game numbers, scaled boundaries), neutral site, calibration buckets for each, and §8 flags.
+
+Ran once on 2024-25 + 2025-26 (n = 2,643): **LL 0.60744 PASS, Brier 0.20991 PASS, ECE 0.02590 PASS, beats home-rate baseline (0.68834) PASS.** Flags: postseason ECE 0.0549 (< 0.08, no flag); **late-segment ECE 2.85× mid (flag fired)**. The model is underconfident late, contradicting §2's predicted mechanism (rest) and consistent with tanking. 2025-26 alone ECE 0.0419. Written up in methodology/NBA.md §13 and the README. +10 guardrail/segment tests (201).
+
 ## 2026-10-10 — NBA N3: validation grid + freeze
 
 - `app/nba/tuner.py`: §5 grid (5 × 5 × 4 × 6 × 2 = 1,200 cells), validation 2018-19 → 2023-24, selection by LL then ECE then Brier. Static-rating and home-rate baselines. Test seasons named but never loaded (`load_rows` asserts it).

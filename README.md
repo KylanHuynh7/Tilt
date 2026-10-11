@@ -5,7 +5,7 @@ Interpretable rating systems that produce calibrated, game-by-game win probabili
 | Sport | Status | Methodology |
 |---|---|---|
 | **NHL** | Live — v2 (evaluated, see below) | [`METHODOLOGY.md`](./METHODOLOGY.md) |
-| **NBA** | In development — methodology draft under review | [`methodology/NBA.md`](./methodology/NBA.md) |
+| **NBA** | Model frozen + evaluated — all §6 targets PASS; dashboard in progress | [`methodology/NBA.md`](./methodology/NBA.md) |
 | NFL | Planned (college football possibly later) | — |
 | MLB | Planned | — |
 
@@ -43,6 +43,20 @@ Key methodology commitments (unchanged from v1):
 - **No silent exclusion** of seasons or game subsets to improve numbers (§10 #4).
 
 `METHODOLOGY.md` §13 consolidates every known limitation across the model, data, lineage choices, Cup-sim approximations, and live-polling layer.
+
+## NBA v1 results — held-out test set (2024-25 + 2025-26)
+
+Frozen on validation 2018-19 → 2023-24 (`K_regular 15, K_playoff 10, carry 0.65, home bump 40, margin-of-victory on`), evaluated once on 2026-10-10. Full breakdowns in [`backend/results/nba/test_evaluation.json`](./backend/results/nba/test_evaluation.json) and `methodology/NBA.md` §13.
+
+| | log-loss | Brier | ECE | n | §6 verdict |
+|---|---:|---:|---:|---:|:---:|
+| **NBA model** | **0.60744** | **0.20991** | **0.02590** | 2,643 | log-loss **PASS**, Brier **PASS**, ECE **PASS** |
+| Home-rate baseline | 0.68834 | 0.24760 | 0.01118 | 2,643 | beaten on log-loss (**PASS**) |
+| Naive 50% | 0.69315 | 0.25000 | 0.05010 | 2,643 | beaten |
+| Static rating | 0.70867 | 0.25345 | 0.09957 | 2,643 | beaten |
+| §6 target | < 0.640 | 0.200–0.225 | < 0.04 | — | — |
+
+Caveats reported alongside the pass: 2025-26 alone has ECE 0.0419 (just over target); the pre-registered late-season flag fired (late ECE 2.85× mid), but the model is *under*confident late (consistent with tanking), the opposite of the predicted rest effect; the pre-registered home-bump range (50–110) was missed at validation (chosen 40).
 
 ## v1 results — held-out test set (2023-24 + 2024-25)
 
