@@ -101,6 +101,7 @@ export type CupTeam = {
 };
 export type CupResponse = {
   season: number;
+  playoffs_started: boolean;   // false → no bracket yet; teams is empty
   simulated_at: string;
   n_simulations: number;
   wall_seconds: number;

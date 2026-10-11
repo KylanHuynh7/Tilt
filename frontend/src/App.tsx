@@ -38,7 +38,7 @@ export default function App() {
   const [cupErr, setCupErr] = useState<string | null>(null);
 
   // Load season list once. The default selection is the most-recent season
-  // (the API returns sorted desc), which is the current 2025-26.
+  // (the API returns sorted desc), which is the in-progress season.
   useEffect(() => {
     fetchSeasons()
       .then((res) => {
@@ -91,16 +91,19 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // v2.3 §16 hero-chart live refresh: when viewing the in-progress 2025-26
+  // v2.3 §16 hero-chart live refresh: when viewing the in-progress
   // season, poll the trajectory every 60s so newly-completed games appear
   // without a manual refresh.
+  // The API lists seasons newest-first, so the first row is the current one.
+  const currentSeason = seasons?.[0]?.season_id ?? null;
+
   useEffect(() => {
-    if (season !== 20252026) return;
+    if (season == null || season !== currentSeason) return;
     const interval = setInterval(() => {
-      fetchHistory(20252026).then(setHistory).catch(() => {});
+      fetchHistory(season).then(setHistory).catch(() => {});
     }, 60_000);
     return () => clearInterval(interval);
-  }, [season]);
+  }, [season, currentSeason]);
 
   // Cup odds: load once when first entering the Trajectories tab, then poll
   // every 5 minutes so probabilities track new games without spamming the sim.
@@ -134,7 +137,7 @@ export default function App() {
     <div className="app">
       <div className="header">
         <h1>Tilt — NHL Rating System</h1>
-        <span className="tag">v1</span>
+        <span className="tag">v2</span>
       </div>
       <div className="subhead">
         Interpretable team ratings with honest calibration reporting. Methodology frozen
@@ -204,11 +207,16 @@ export default function App() {
           {history && <TrajectoryChart data={history} />}
 
           {/* Cup odds panel — only show when viewing the in-progress season */}
-          {season === 20252026 && (
+          {season != null && season === currentSeason && (
             <>
               {cupErr && <div className="error">Couldn't load Cup odds: {cupErr}</div>}
               {!cup && !cupErr && <div className="loading">Loading Cup odds…</div>}
-              {cup && <CupOdds data={cup} />}
+              {cup && cup.playoffs_started && <CupOdds data={cup} />}
+              {cup && !cup.playoffs_started && (
+                <div className="meta">
+                  Stanley Cup odds appear once the playoff bracket is set (§14).
+                </div>
+              )}
             </>
           )}
         </section>

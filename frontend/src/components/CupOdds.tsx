@@ -14,6 +14,12 @@ import { colorFor } from "../teamColors";
 
 type Props = { data: CupResponse };
 
+// 20262027 → "2026-27"
+const seasonLabel = (sid: number) => {
+  const start = Math.floor(sid / 10000);
+  return `${start}-${String((start + 1) % 100).padStart(2, "0")}`;
+};
+
 export function CupOdds({ data }: Props) {
   const rows = useMemo(() => {
     // Sort desc by Cup probability, then alphabetical for ties (all-0 tail).
@@ -30,7 +36,7 @@ export function CupOdds({ data }: Props) {
   return (
     <div className="cup-odds">
       <div className="cup-odds-head">
-        <span className="cup-odds-title">2025-26 Stanley Cup probability</span>
+        <span className="cup-odds-title">{seasonLabel(data.season)} Stanley Cup probability</span>
         <span className="cup-odds-meta">
           {data.n_simulations.toLocaleString()} simulations · run {new Date(data.simulated_at).toLocaleTimeString()}
         </span>

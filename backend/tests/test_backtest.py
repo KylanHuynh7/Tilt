@@ -164,3 +164,23 @@ def test_no_merger_means_dallas_rating_unchanged_pre_1978():
     # california_cleveland should still exist at end of 1977-78
     assert "california_cleveland" in pre.ratings
     assert "dallas_stars" in pre.ratings
+
+
+def test_live_rows_with_partial_scores_are_skipped():
+    """A row ingested mid-game carries a partial (possibly tied) score. It must
+    not update ratings — and a tied LIVE row post-2005 must not reach
+    classify_outcome, which would raise on the impossible tie.
+    """
+    from datetime import date
+
+    row = {
+        "game_id": 2026020082, "season_id": 20262027, "game_date": date(2026, 10, 10),
+        "game_type": 2, "pre_1967": False, "home": "CGY", "away": "ANA",
+        "home_score": 2, "away_score": 2, "period_type": None, "state": "LIVE",
+    }
+    state = {"calgary_flames": 1510.0, "anaheim_ducks": 1490.0}
+    applied = backtest._apply_one_game(
+        row, state, backtest.BacktestParams(), True, [], None,
+    )
+    assert applied is False
+    assert state == {"calgary_flames": 1510.0, "anaheim_ducks": 1490.0}

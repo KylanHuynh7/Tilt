@@ -29,8 +29,15 @@ from .franchises import current_code
 from .seasons import parse as parse_season
 from .teams import TEAMS
 
-CURRENT_SEASON_ID = 20252026  # the in-progress season the Cup sim operates on
 DEFAULT_CUP_SIMS = 10_000
+
+
+def _current_season_id(cache) -> int:
+    """The most recent ingested season — the one the Cup sim operates on.
+    Derived from the data on disk rather than hardcoded so the dashboard
+    rolls forward as soon as a new season's parquet is ingested.
+    """
+    return max(cache.trajectories)
 
 # Cached Cup-sim result; rebuilt on /admin/refresh and at first request.
 _cup_result: cup_simulator.CupSimResult | None = None
@@ -115,6 +122,7 @@ async def healthz():
                 "k_regular": cache.params.k_regular,
                 "k_playoff": cache.params.k_playoff,
                 "decay_carry": cache.params.decay_carry,
+                "home_bump": cache.params.home_bump,
                 "frozen_at": cache.params.frozen_at,
                 "methodology_version": cache.params.methodology_version,
             },
@@ -240,15 +248,28 @@ async def simulation_cup(n: int | None = None, refresh: bool = False):
     """
     global _cup_result
     cache = _cache_or_503()
+    season_id = _current_season_id(cache)
     n_sims = int(n) if n else DEFAULT_CUP_SIMS
+
+    # §14 simulates from an existing bracket; regular-season projection of the
+    # playoff field is out of scope. Before the bracket exists there is
+    # nothing to simulate, so say so explicitly instead of returning zeros.
+    state = standings.derive_playoff_state(season_id)
+    if not state.playoff_field:
+        _cup_result = None
+        return {
+            "season": season_id,
+            "playoffs_started": False,
+            "teams": [],
+        }
+
     needs_fresh = (
         refresh
         or _cup_result is None
         or _cup_result.n_simulations != n_sims
     )
     if needs_fresh:
-        state = standings.derive_playoff_state(CURRENT_SEASON_ID)
-        stand = standings.compute_standings(CURRENT_SEASON_ID)
+        stand = standings.compute_standings(season_id)
         ratings_by_code = cup_simulator.ratings_by_team_code(
             historical.current_active_ratings_with_codes()
         )
@@ -283,7 +304,8 @@ async def simulation_cup(n: int | None = None, refresh: bool = False):
         })
     teams_payload.sort(key=lambda t: -t["cup_probability"])
     return {
-        "season": CURRENT_SEASON_ID,
+        "season": season_id,
+        "playoffs_started": True,
         "simulated_at": _cup_result.simulated_at,
         "n_simulations": _cup_result.n_simulations,
         "wall_seconds": _cup_result.wall_seconds,

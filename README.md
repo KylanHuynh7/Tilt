@@ -8,7 +8,8 @@ An interpretable Elo-variant rating system for NHL teams that produces calibrate
 ## Status
 
 - **v1 — shipped and locked** (commit `f7548f6`, 2026-05-18). The v1 model, v1 freeze, and v1 test-set evaluation are immutable per `METHODOLOGY.md` §10 #2.
-- **v2 — feature-complete, evaluation pending.** All four pre-registered v2 features have landed: home-ice advantage (v2.0), Monte Carlo Cup probabilities (v2.1), live in-game win probability (v2.2), and live polling + hero-chart updates (v2.3). v2's final test-set evaluation against the 2025-26 season is gated on the 2026 Stanley Cup Final completing; `scripts/evaluate.py --confirm` runs that pass exactly once.
+- **v2 — shipped and evaluated** (2026-10-10). All four pre-registered v2 features have landed: home-ice advantage (v2.0), Monte Carlo Cup probabilities (v2.1), live in-game win probability (v2.2), and live polling + hero-chart updates (v2.3). The one-shot test evaluation on 2025-26 **failed all three §6 targets** — see below.
+- **Live season: 2026-27.** The dashboard's "current season" is now derived from the latest ingested parquet, not hardcoded.
 
 ## What it does
 
@@ -49,7 +50,9 @@ Frozen v1 parameters: `K_regular = 10.0`, `K_playoff = 10.0`, `decay_carry = 0.8
 
 The v1 ECE miss is driven almost entirely by 2024-25 (ECE 0.0654); 2023-24 alone meets the target at 0.0382. Every calibration bucket showed the v1 model under-predicting the home team's win rate by 3–8 percentage points — the exact pre-registered signature (§5/§8) of omitting home ice. **v2.0 fixes this** by tuning a `home_bump` parameter on the v2 validation window.
 
-## v2 status — frozen, evaluation pending
+## v2 results — held-out test set (2025-26)
+
+Evaluated once on 2026-10-10 against the completed 2025-26 season (regular season + playoffs, Cup Final ended 2026-06-14). Locked per §10 #2; v1's record is preserved at [`backend/results/test_evaluation_v1.json`](./backend/results/test_evaluation_v1.json).
 
 Frozen v2 parameters (active artifact at [`backend/artifacts/frozen_params.json`](./backend/artifacts/frozen_params.json)):
 
@@ -60,23 +63,20 @@ decay_carry = 0.85
 home_bump   = 40.0   ← v2.0 §12 addition
 ```
 
-Validation metrics on 2021-22 → 2024-25 (n = 5,594 predictions):
+| | log-loss | Brier | ECE | n | §6 verdict |
+|---|---:|---:|---:|---:|:---:|
+| **v2 model** | **0.69315** | **0.24982** | **0.05851** | 1,394 | log-loss **FAIL**, Brier **FAIL**, ECE **FAIL** |
+| Static-rating baseline | 0.70979 | 0.25747 | 0.08150 | 1,394 | beaten on all three |
+| Naive 50% baseline | 0.69315 | 0.25000 | 0.01937 | 1,394 | tied on LL, beaten on Brier by 0.0002 |
+| §6 target | < 0.685 | 0.235–0.245 | < 0.04 | — | — |
 
-| | log-loss | Brier | ECE |
-|---|---:|---:|---:|
-| v2 model | 0.66219 | 0.23495 | **0.01528** |
-| Static-rating baseline | 0.67872 | 0.24276 | 0.02368 |
-| §6 target | < 0.685 | 0.235–0.245 | < 0.04 |
+**v2 fails every pre-registered target on its test season and does no better than a coin flip on log-loss.** Reported as-is; no parameter is re-tuned (§10 #2). What the data shows (full write-up in `METHODOLOGY.md` §13.C):
 
-The validation ECE collapsed from v1's 0.0422 (on v1 validation) to v2's 0.0153 (on the larger v2 validation window) — confirming the §15 pre-registration that home-ice modeling would resolve v1's primary calibration failure.
+- **Home ice shrank.** Regular-season home win rate: 52.4% (2022-23), 54.1% (2023-24), 56.3% (2024-25), then **52.2% in 2025-26**. `home_bump = 40` was tuned on a window that leaned on the high years; on the test season the model's mean home prediction was ~55.6% against an actual ~51.9%.
+- **Overconfident at the extremes.** Games predicted at 70–80% for the home team were won 59% of the time (n = 58); 60–70% predictions were won 59% (n = 375).
+- **The league reshuffled.** End-of-2024-25 ratings held static score *worse than a coin flip* on 2025-26 (LL 0.710), so carry-over information was unusually misleading this season. The model's in-season updates recovered most — but not all — of that.
 
-**v2 test evaluation has not been run.** It is gated on the 2025-26 Stanley Cup Final completing per §12. When that happens, one invocation of:
-
-```
-uv run python -m scripts.evaluate --confirm
-```
-
-…produces `results/test_evaluation.json` (the v1 file is preserved as `test_evaluation_v1.json`) and locks the v2 numbers per §10 #2.
+Validation metrics for context (2021-22 → 2024-25, n = 5,594): LL 0.66219, Brier 0.23495, ECE 0.01528. The gap between validation and test is the overfitting-to-validation risk §13.J flagged in advance.
 
 ## Architecture
 
@@ -123,14 +123,14 @@ Decoupled three-layer per [`METHODOLOGY.md`](./METHODOLOGY.md) §3:
 | GET | `/ratings/current` | 32 active franchises sorted by rating desc |
 | GET | `/ratings/history/{season}` | Per-game trajectory for any season; includes `cup_winner` + `cup_winner_franchise` |
 | GET | `/games/today` | Today's matchups with pre-game WP; in-progress games also carry `live_state` + `live_wp` |
-| GET | `/simulation/cup` | v2.1 Monte Carlo Cup probabilities for all 32 active franchises (0% for non-playoff teams) |
+| GET | `/simulation/cup` | v2.1 Monte Carlo Cup probabilities for all 32 active franchises (0% for non-playoff teams); `playoffs_started: false` with no teams before the bracket exists |
 | GET | `/wp` | v2.2 stateless empirical WP: `?period=&time_remaining_s=&score_diff=` |
-| GET | `/calibration/current` | §6 metrics + bucket data + targets (v1 results until v2 eval runs) |
+| GET | `/calibration/current` | §6 metrics + bucket data + targets (v2 test results on 2025-26) |
 | POST | `/admin/refresh` | Re-ingest current season + rebuild cache + invalidate Cup-sim cache |
 
 ### Frontend tabs (`frontend/src/App.tsx`)
 
-- **Trajectories.** Full-width trajectory chart of every team's rating across the selected season. Cup-winning team's line is thicker / full-opacity with a `{TEAM} 👑` label at the endpoint. Hover tooltip flags the cup winner in their team color. When viewing 2025-26 (in-progress), a vertical bar chart of all 32 teams' Stanley Cup probabilities sits under the trajectory plot. Auto-refresh every 60s for the current season.
+- **Trajectories.** Full-width trajectory chart of every team's rating across the selected season. Cup-winning team's line is thicker / full-opacity with a `{TEAM} 👑` label at the endpoint. Hover tooltip flags the cup winner in their team color. When viewing the in-progress season and its playoff bracket exists, a vertical bar chart of all 32 teams' Stanley Cup probabilities sits under the trajectory plot. Auto-refresh every 60s for the current season.
 - **Today's games.** Card per matchup: team-colored badges (primary brand colors, no trademarked logos — see §13.H), pre-game probability bar, plus a live probability bar + period/clock for any in-progress game. Polls every 60s when there are live games.
 - **Calibration.** §6 metrics table for the model + both baselines, calibration plot rendered from the bucket data.
 
@@ -159,8 +159,7 @@ uv run python -m app.pipeline ingest --all --skip-existing   # ~10 min  (score d
 uv run python -m app.pbp_pipeline ingest --all               # ~15 min  (play-by-play goals, 15 seasons)
 uv run python -m scripts.freeze_params --quiet               # ~25 min  (4-D v2 grid, 600 cells)
 uv run python -m scripts.build_live_wp                       # ~5 s     (WP lookup from PBP)
-# v2 test eval — only after the 2026 Cup Final completes:
-# uv run python -m scripts.evaluate --confirm                # exactly once per §10 #1
+# v2 test eval has already run (2026-10-10) — do NOT re-run; results are locked per §10 #2
 ```
 
 After this the dashboard backend boots in ~1.5 s with full historical ratings, current ratings, today's games (with live WP for in-progress games), Cup probabilities, and the calibration tab populated.
@@ -171,7 +170,7 @@ After this the dashboard backend boots in ~1.5 s with full historical ratings, c
 cd backend && uv run pytest
 ```
 
-**154 tests** across pipeline, lineage, ratings, backtest, metrics, tuner, API, evaluate guardrails, V2.A home_bump, V2.B standings + cup_simulator, V2.C live_wp, and V2.D live_state.
+**158 tests** across pipeline, lineage, ratings, backtest, metrics, tuner, API, evaluate guardrails, V2.A home_bump, V2.B standings + cup_simulator, V2.C live_wp, and V2.D live_state.
 
 ## Disclaimer
 
@@ -179,4 +178,4 @@ Student project for the author's own learning. Not a betting tool, not a power r
 
 **v1**: Brier on test set sits inside the pre-registered band; ECE target is missed. The miss is the documented systematic under-prediction of home wins (every calibration bucket below the diagonal), pre-registered as the expected signature of omitting home ice.
 
-**v2**: Validation metrics suggest the home-ice fix resolves the v1 ECE issue, but the test evaluation is pending the 2026 Cup Final per §12 and that's the number that will count. Until then, all v2 claims should be read as "pre-registered expectations, not yet validated on held-out data."
+**v2**: Validation metrics suggested the home-ice fix resolved the v1 ECE issue, but on the held-out 2025-26 season v2 failed all three §6 targets and tied the coin-flip baseline on log-loss. The pre-registered expectation did not hold up; that is the result.

@@ -2,6 +2,28 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-10 — v2 test evaluation (FAIL ×3) + roll dashboard to 2026-27
+
+**v2 test evaluation, run once per §10 #1.** Re-ingested 2025-26 in full first (the cached parquet stopped at 2026-05-18; the re-pull has 1,312 regular-season + 82 playoff games through the Cup Final on 2026-06-14). `scripts.evaluate --confirm` (no `--force`) on test season `[20252026]` with frozen v2 params (K_regular 10, K_playoff 10, decay_carry 0.85, home_bump 40):
+
+| | LL | Brier | ECE |
+|---|---:|---:|---:|
+| v2 model | 0.69315 FAIL | 0.24982 FAIL | 0.05851 FAIL |
+| naive 50% | 0.69315 | 0.25000 | 0.01937 |
+| static rating | 0.70979 | 0.25747 | 0.08150 |
+
+n = 1,394. Locked per §10 #2. v1 results snapshotted to `results/test_evaluation_v1.json` (byte-identical to the v1 file). Analysis in METHODOLOGY §13.C: home win rate fell from 56.3% (2024-25) to 52.2%, the model is overconfident above 0.6, and prior-season ratings were worse than a coin flip on this season.
+
+**Evaluator guard fix (before the run).** `scripts/evaluate.py` refused on an existing results file *before* snapshotting v1, so the first v2 run would have needed `--force`. The snapshot now runs first, and only a v1 file with a byte-identical snapshot may be overwritten; v2+ files still require `--force`. `home_bump` is now recorded in the results file and banner. +2 guardrail tests.
+
+**Backtest live-row fix.** `backtest._apply_one_game` now applies only `OFF`/`FINAL` rows. Previously LIVE rows (partial scores) would have been scored as final, and a tied LIVE row raised in `classify_outcome` and crashed the cache build — reproduced today with two tied in-progress 2026-27 games. All 70,328 historical completed rows are `OFF`, so no v1/v2 number changes. +1 test.
+
+**Current season is derived, not hardcoded.** `main.py` drops `CURRENT_SEASON_ID = 20252026`; the Cup sim uses the latest ingested season. `/simulation/cup` returns `playoffs_started: false` with no teams before a bracket exists (+1 API test). `/healthz` now reports `home_bump`. Frontend: current season = newest row from `/seasons` (hero-chart refresh + Cup panel), Cup panel title derived from the season, a note replaces the panel pre-playoffs, header tag `v1` → `v2`.
+
+**Data.** Ingested 2026-27 to date (81 completed regular-season games; first 84-game NHL season).
+
+METHODOLOGY: status line + amendment-log "v2 evaluation record" entry; §13.C (v2 failure analysis, missing §8 playoff ECE breakdown), §13.D (live-row bug, 84-game schedule), §13.F (no Cup odds in regular season), §13.J (evaluator ordering bug, `home_bump` missing from v2 results file). README: v2 results table replaces "evaluation pending". 158 tests pass.
+
 ## 2026-05-19 — UI: NHL "broadcast graphics" dark theme
 
 Theme refresh per user request after seeing the deployed dashboard looked flat. Adopts an NHL-branded dark aesthetic: charcoal background, silver-white text, NHL red (`#c8102e`) as the accent. Header gains a small red signal dot before the title, a 56px accent underline, and an uppercase wordmark feel. Tabs uppercase + spaced for a broadcast vibe; active tab gets red underline and a subtle background highlight. Probability bars get a slight inset shadow and bigger height for depth. Live games get a red glow + box-shadow ring. Team badges get a soft ring + drop shadow for premium feel.

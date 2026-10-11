@@ -100,3 +100,18 @@ def test_calibration_returns_test_evaluation(client: TestClient, tmp_path: Path)
     assert "static_rating_baseline" in body["metrics"]
     assert "calibration_buckets" in body
     assert "section_6_targets" in body
+
+
+def test_cup_targets_latest_season_and_flags_missing_bracket(client: TestClient):
+    """The Cup sim runs on the latest ingested season. Before that season's
+    bracket exists, the endpoint says so instead of returning zero odds.
+    """
+    latest = max(s["season_id"] for s in client.get("/seasons").json()["seasons"])
+    r = client.get("/simulation/cup?n=200")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["season"] == latest
+    if body["playoffs_started"]:
+        assert abs(sum(t["cup_probability"] for t in body["teams"]) - 1.0) < 0.01
+    else:
+        assert body["teams"] == []

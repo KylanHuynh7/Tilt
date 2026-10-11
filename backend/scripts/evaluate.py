@@ -81,6 +81,22 @@ def _snapshot_v1_results_if_needed() -> bool:
     return True
 
 
+def _is_preserved_v1(path: Path) -> bool:
+    """True if `path` holds a v1 evaluation that already has a byte-identical
+    snapshot at V1_RESULTS_SNAPSHOT — i.e. overwriting it loses nothing.
+    """
+    if not V1_RESULTS_SNAPSHOT.exists():
+        return False
+    try:
+        text = path.read_text()
+        payload = json.loads(text)
+    except (OSError, ValueError):
+        return False
+    if not str(payload.get("methodology_version", "")).startswith("1"):
+        return False
+    return text == V1_RESULTS_SNAPSHOT.read_text()
+
+
 def _score_predictions(predictions, frozen_ratings):
     probs = [p.home_win_prob for p in predictions]
     actuals = metrics.actuals_from_predictions(predictions)
@@ -125,16 +141,19 @@ def main(argv: list[str] | None = None) -> int:
         print("Re-run with --confirm to acknowledge.", file=sys.stderr)
         return 2
 
-    if args.out.exists() and not args.force:
+    # If the active results are a v1 evaluation, snapshot them before this
+    # v2+ run overwrites the active file. v1 results are immutable per §10 #2.
+    # This runs BEFORE the existence guard so a preserved v1 file does not
+    # block the first v2 evaluation (which would otherwise need --force, a
+    # flag reserved for documented re-evaluations).
+    if args.out == DEFAULT_OUT and _snapshot_v1_results_if_needed():
+        print(f"snapshotted v1 results → {V1_RESULTS_SNAPSHOT}")
+
+    if args.out.exists() and not args.force and not _is_preserved_v1(args.out):
         print(f"REFUSED: results file already exists at {args.out}", file=sys.stderr)
         print("Re-run with --force only if you have a documented justification "
               "for re-evaluation (§10 #2).", file=sys.stderr)
         return 3
-
-    # If the active results are a v1 evaluation, snapshot them before this
-    # v2+ run overwrites the active file. v1 results are immutable per §10 #2.
-    if _snapshot_v1_results_if_needed():
-        print(f"snapshotted v1 results → {V1_RESULTS_SNAPSHOT}")
 
     params, artifact = _load_frozen_params()
 
@@ -146,7 +165,8 @@ def main(argv: list[str] | None = None) -> int:
     print("=" * 72)
     print(f"Frozen artifact:    {ARTIFACT_PATH}")
     print(f"Frozen params:      K_regular={params.k_regular}, "
-          f"K_playoff={params.k_playoff}, decay_carry={params.decay_carry}")
+          f"K_playoff={params.k_playoff}, decay_carry={params.decay_carry}, "
+          f"home_bump={params.home_bump}")
     print(f"Warm-up seasons:    {len(warmup_seasons)} "
           f"({warmup_seasons[0]} → {warmup_seasons[-1]})")
     print(f"TEST seasons (read once): {test_seasons}")
@@ -196,6 +216,7 @@ def main(argv: list[str] | None = None) -> int:
             "k_regular": params.k_regular,
             "k_playoff": params.k_playoff,
             "decay_carry": params.decay_carry,
+            "home_bump": params.home_bump,
         },
         "warmup_seasons": warmup_seasons,
         "test_seasons": test_seasons,

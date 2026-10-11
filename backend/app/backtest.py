@@ -52,6 +52,7 @@ from .ratings import (
 
 REGULAR = 2
 PLAYOFF = 3
+FINAL_STATES = ("OFF", "FINAL")
 
 
 @dataclass(frozen=True)
@@ -171,6 +172,11 @@ def _apply_one_game(
     away_score = row["away_score"]
     if home_score is None or away_score is None:
         return False  # unfinished game — nothing to update
+    if row.get("state") not in FINAL_STATES:
+        # LIVE/CRIT rows carry partial scores (possibly tied) when ingested
+        # mid-game; scoring them would leak an unfinished result into the
+        # ratings. Same rule as standings.py.
+        return False
 
     is_playoff = row["game_type"] == PLAYOFF
     period_type = row["period_type"]
