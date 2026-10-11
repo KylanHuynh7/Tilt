@@ -28,6 +28,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from dataclasses import asdict
 
 from . import cup_simulator, engine, historical, live_wp, standings
+from .nba import api as nba_api
 from .franchises import current_code
 from .seasons import parse as parse_season
 from .teams import TEAMS
@@ -111,7 +112,7 @@ nhl = APIRouter()
 # listed so the frontend can render the switcher without hardcoding.
 SPORTS = [
     {"id": "nhl", "name": "NHL", "status": "live"},
-    {"id": "nba", "name": "NBA", "status": "in_development"},
+    {"id": "nba", "name": "NBA", "status": "live"},
     {"id": "nfl", "name": "NFL", "status": "planned"},
     {"id": "mlb", "name": "MLB", "status": "planned"},
 ]
@@ -386,3 +387,4 @@ async def admin_refresh():
 
 app.include_router(nhl)
 app.include_router(nhl, prefix="/nhl")
+app.include_router(nba_api.router)

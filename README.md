@@ -5,7 +5,7 @@ Interpretable rating systems that produce calibrated, game-by-game win probabili
 | Sport | Status | Methodology |
 |---|---|---|
 | **NHL** | Live — v2 (evaluated, see below) | [`METHODOLOGY.md`](./METHODOLOGY.md) |
-| **NBA** | Model frozen + evaluated — all §6 targets PASS; dashboard in progress | [`methodology/NBA.md`](./methodology/NBA.md) |
+| **NBA** | Live — v1 (all §6 targets PASS on test); live win probability next (v1.1) | [`methodology/NBA.md`](./methodology/NBA.md) |
 | NFL | Planned (college football possibly later) | — |
 | MLB | Planned | — |
 
@@ -155,9 +155,11 @@ Decoupled three-layer per [`METHODOLOGY.md`](./METHODOLOGY.md) §3:
 
 Every NHL path above is also served under `/nhl` (e.g. `/nhl/games/today`).
 
+NBA endpoints (`backend/app/nba/api.py`) use the same response shapes under `/nba`: `/nba/seasons`, `/nba/ratings/current`, `/nba/ratings/history/{season}`, `/nba/games/today` (pre-game probability + live score/clock from ESPN), `/nba/calibration/current` (adds the home-rate baseline, §8 flags and breakdowns), `POST /nba/admin/refresh`. The NBA cache is built lazily on first request (~0.6 s).
+
 ### Frontend
 
-`frontend/src/App.tsx` is the multi-sport shell: header + sport switcher (NHL / NBA / NFL / MLB), path-based routing (`/nhl`, `/nba`, …; `/` is NHL), and a per-sport accent color via `data-sport` on `<html>`. Each sport lives in `frontend/src/sports/{sport}/`; shared fetch logic is `frontend/src/http.ts`.
+`frontend/src/App.tsx` is the multi-sport shell: header + sport switcher (NHL / NBA / NFL / MLB), path-based routing (`/nhl`, `/nba`, …; `/` is NHL), and a per-sport accent color via `data-sport` on `<html>`. Each sport lives in `frontend/src/sports/{sport}/`. Shared pieces: `frontend/src/http.ts` (fetch), `frontend/src/types.ts` (response shapes), `frontend/src/components/` (trajectory chart, game cards, calibration panel, parameterized by color lookup / league / period labels).
 
 ### NHL tabs (`frontend/src/sports/nhl/NhlDashboard.tsx`)
 

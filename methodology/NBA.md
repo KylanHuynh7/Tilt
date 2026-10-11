@@ -291,6 +291,13 @@ Written before any results exist; extended at every phase.
   - *Early segment:* ECE 0.0463, also above target; the 0.7–0.8 bucket won 0.877 vs 0.746 predicted (n = 73).
   - *Heavy home underdogs:* the 0.1–0.2 bucket (n = 51) predicted 0.168 and won 0.039.
   - *Neutral-site games:* n = 12 (NBA Cup knockouts, international games). ECE 0.31 is noise at that size; reported only for completeness.
+- **Dashboard / API (N5):**
+  - *ESPN reachability from Render is still unverified.* `/nba/games/today` calls ESPN on every request (no caching) and returns 502 if it's unreachable; history and calibration don't depend on ESPN at request time.
+  - *Champion = winner of the season's last playoff game.* That is the Finals clincher in every modeled season (it reproduces MIL 2021, GSW 2022, DEN 2023, BOS 2024, OKC 2025). Not shown for the in-progress season.
+  - *Preseason games are omitted from "Today's games"* rather than shown without a probability. Early October therefore looks empty.
+  - *No live win probability yet.* Live games show score and clock only, until v1.1 (§12).
+  - *Display colors substitute for dark primaries* (e.g. Spurs and Nets lines use silver/grey, Bucks cream, Nuggets gold), the same coupling as NHL §13.I.
+  - *`/nba/admin/refresh` is unauthenticated and its ingest is ephemeral* on free hosting, inheriting NHL §13.G.
 - *Rating engine (N2):* no limitations beyond those §5 already lists. One display detail: each team's season trajectory opens at its first game's date, carrying the post-regression rating.
 - **No logos.** Team identity uses colored badges, inheriting NHL §13.I trademark reasoning.
 

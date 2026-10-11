@@ -1,90 +1,20 @@
 import { getJson } from "../../http";
 
-export type SeasonRow = { season_id: number; label: string; pre_1967: boolean };
-export type SeasonsResponse = { count: number; seasons: SeasonRow[] };
-
-export type HistoryPoint = { game_id: number | null; date: string; rating: number };
-export type TeamHistory = {
-  franchise_id: string;
-  team: string | null;
-  name: string;
-  is_defunct: boolean;
-  points: HistoryPoint[];
-};
-export type RatingsHistoryResponse = {
-  season: number;
-  label: string;
-  pre_1967: boolean;
-  n_franchises: number;
-  cup_winner: string | null;             // 3-letter team code, or null
-  cup_winner_franchise: string | null;   // stable franchise_id, or null
-  teams: TeamHistory[];
-};
-
-export type LiveStateBlock = {
-  game_state: string;
-  period: number;
-  time_remaining_s: number;
-  home_score: number;
-  away_score: number;
-};
-export type LiveWPBlock = {
-  home_win_prob: number;
-  n_samples: number;
-  smoothed: boolean;
-};
-export type Matchup = {
-  game_id: number;
-  game_date: string;
-  state: string;
-  home: string;
-  away: string;
-  home_rating: number;
-  away_rating: number;
-  home_win_prob: number;
-  away_win_prob: number;
-  home_score: number | null;
-  away_score: number | null;
-  // v2.3 §16 — present when the game is LIVE/CRIT and the PBP fetch succeeded.
-  live_state?: LiveStateBlock;
-  live_wp?: LiveWPBlock;
-};
-export type TodayResponse = {
-  date: string;
-  frozen_params: boolean;
-  matchups: Matchup[];
-};
-
-export type CalibrationBucket = {
-  lo: number;
-  hi: number;
-  n: number;
-  mean_predicted: number;
-  mean_actual: number;
-};
-export type MetricBlock = { n: number; brier: number; log_loss: number; ece: number };
-export type CalibrationResponse = {
-  evaluated_at: string;
-  methodology_version: string;
-  frozen_at: string;
-  frozen_params: { k_regular: number; k_playoff: number; decay_carry: number };
-  warmup_seasons: number[];
-  test_seasons: number[];
-  n_test_predictions: number;
-  metrics: {
-    model: MetricBlock;
-    naive_baseline: MetricBlock;
-    static_rating_baseline: MetricBlock;
-  };
-  per_season: Record<string, {
-    model: MetricBlock;
-    naive_baseline: MetricBlock;
-    static_rating_baseline: MetricBlock;
-  }>;
-  calibration_buckets: CalibrationBucket[];
-  section_6_targets: { log_loss_max: number; brier_band: [number, number]; ece_max: number };
-};
-
+export type {
+  SeasonRow,
+  SeasonsResponse,
+  HistoryPoint,
+  TeamHistory,
+  RatingsHistoryResponse,
+  LiveStateBlock,
+  LiveWPBlock,
+  Matchup,
+  TodayResponse,
+  CalibrationBucket,
+  MetricBlock,
+  CalibrationResponse,
+} from "../../types";
+import type { CalibrationResponse, RatingsHistoryResponse, SeasonsResponse, TodayResponse } from "../../types";
 
 export type CupTeam = {
   team: string;

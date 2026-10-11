@@ -2,6 +2,21 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-10 — NBA N5: API + dashboard (NBA goes live)
+
+Backend:
+- `app/nba/api.py` router under `/nba`: seasons, current ratings, per-season history (era codes like SEA/NJN/NOH, Finals champion), today's games (frozen-param pre-game probability, neutral-site aware, live score/clock from ESPN), calibration (locked results reshaped to the NHL contract plus home-rate baseline, flags, breakdowns), admin refresh. Lazy cache (~0.6 s build).
+- `app/nba/teams.py`: dark-theme display colors and era-aware display codes. `espn.py` also captures live state + clock (not persisted).
+- `/sports` reports NBA `live`. +6 API tests (207).
+
+Frontend:
+- Shared `src/types.ts` and `src/components/` (TrajectoryChart, TodaysGames, CalibrationPanel) parameterized by color lookup, league, period labels, footnote, params label. NHL dashboard rewired, with no behavior change except the corrected footnote ("frozen v1 model … deferred to v2" was stale).
+- New `src/sports/nba/` dashboard: trajectories with Finals champion, today's games (Q1–Q4/OT labels), calibration with home-rate baseline row, pass list and a breakdown table with the §8 late-season flag. NBA pill is live with tag `v1`.
+- Fixed a shared calibration-plot bug: a `Scatter` series without an x key drew each bucket's point a second time at the wrong x. Present on the NHL tab since v1; the metrics were never affected (NHL §13.K).
+- Chart right margin widened so the 👑 champion label isn't clipped.
+
+Docs: methodology/NBA.md §13 N5 limitations; NHL METHODOLOGY §13.K calibration-plot note; README NBA status, endpoints and frontend layout.
+
 ## 2026-10-10 — NBA N4: one-shot test evaluation (PASS ×4)
 
 `scripts/nba_evaluate.py` (§10 #1 quarantined: `--confirm` required, refuses overwrite without `--force`, frozen artifact only, refuses if a test season fails coverage). Emits every §6 breakdown in the single pass: per season, regular vs postseason, early/mid/late segments (mean of both teams' game numbers, scaled boundaries), neutral site, calibration buckets for each, and §8 flags.

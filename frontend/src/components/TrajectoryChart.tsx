@@ -10,10 +10,13 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import type { RatingsHistoryResponse } from "../api";
-import { colorFor } from "../teamColors";
+import type { RatingsHistoryResponse } from "../types";
 
-type Props = { data: RatingsHistoryResponse };
+type Props = {
+  data: RatingsHistoryResponse;
+  // Fallback color lookup by team code; a per-team `color` in the payload wins.
+  colorFor: (code: string) => string;
+};
 
 // Renders "{TEAM} 👑" at the last data point of the cup-winner's line.
 // Recharts' LabelList iterates every (index, value); we return null for
@@ -71,7 +74,7 @@ function makeTooltipContent(cupWinnerFranchise: string | null) {
   };
 }
 
-export function TrajectoryChart({ data }: Props) {
+export function TrajectoryChart({ data, colorFor }: Props) {
   const { rows, teams, yDomain } = useMemo(() => {
     const byDate = new Map<string, Record<string, number | null>>();
     let minR = Infinity;
@@ -108,15 +111,19 @@ export function TrajectoryChart({ data }: Props) {
     const hi = Math.max(1525, Math.ceil((maxR + 25) / 25) * 25);
     return {
       rows,
-      teams: data.teams.map((t) => ({ id: t.franchise_id, code: t.team })),
+      teams: data.teams.map((t) => ({
+        id: t.franchise_id,
+        code: t.team,
+        color: t.color ?? (t.team ? colorFor(t.team) : "#888"),
+      })),
       yDomain: [lo, hi] as [number, number],
     };
-  }, [data]);
+  }, [data, colorFor]);
 
   return (
     <div className="chart-wrap">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={rows} margin={{ top: 8, right: 16, bottom: 8, left: 0 }}>
+        <LineChart data={rows} margin={{ top: 8, right: 64, bottom: 8, left: 0 }}>
           <CartesianGrid stroke="var(--grid)" strokeDasharray="3 3" />
           <XAxis dataKey="date" stroke="var(--text-dim)" fontSize={11} minTickGap={32} />
           <YAxis
@@ -138,7 +145,7 @@ export function TrajectoryChart({ data }: Props) {
                 type="monotone"
                 dataKey={team.id}
                 name={team.code ?? team.id}
-                stroke={team.code ? colorFor(team.code) : "#888"}
+                stroke={team.color}
                 strokeOpacity={isChampion ? 1.0 : 0.75}
                 strokeWidth={isChampion ? 2.25 : 1.5}
                 dot={false}
@@ -150,7 +157,7 @@ export function TrajectoryChart({ data }: Props) {
                     content={makeCrownContent(
                       rows.length - 1,
                       team.code ?? "?",
-                      team.code ? colorFor(team.code) : "#333",
+                      team.color,
                     )}
                   />
                 )}

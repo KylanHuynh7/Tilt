@@ -66,6 +66,9 @@ def parse_event(event: dict, game_date: date) -> dict:
             "status": str(stype["name"]),
             "espn_neutral": bool(comp.get("neutralSite", False)),
             "venue_city": ((comp.get("venue") or {}).get("address") or {}).get("city"),
+            # Live-only fields (not persisted in the parquet schema):
+            "state": str(stype.get("state", "")),        # "pre" / "in" / "post"
+            "clock_s": float(status.get("clock") or 0.0),  # seconds left in period
         }
     except (KeyError, IndexError, TypeError, ValueError) as exc:
         raise SchemaError(f"unexpected ESPN event shape (id={event.get('id')}): {exc!r}") from exc

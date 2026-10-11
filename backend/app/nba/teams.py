@@ -64,5 +64,35 @@ TEAMS: dict[int, Team] = {
 }
 
 
+# Dashboard line/badge colors tuned for the dark UI (same reasoning as NHL
+# §13.I): navy/black primaries vanish on charcoal, so those teams use their
+# published alternate (gold, silver, cream, light blue) or a lightened
+# primary. Keyed by franchise so historical names (SEA, NJN, NOH) inherit.
+DISPLAY_COLORS: dict[int, str] = {
+    1: "#E03A3E", 2: "#00A35C", 3: "#B4975A", 4: "#CE1141", 5: "#B23A63",
+    6: "#2B8BE0", 7: "#FEC524", 8: "#3A66C4", 9: "#FDB927", 10: "#CE0E2D",
+    11: "#FFD520", 12: "#C8102E", 13: "#8A5CC9", 14: "#D0103A", 15: "#EEE1C6",
+    16: "#79BC43", 17: "#D0D0D0", 18: "#F58426", 19: "#2F7BE0", 20: "#5B8DEF",
+    21: "#E56020", 22: "#E03A3E", 23: "#9B6BD6", 24: "#C4CED4", 25: "#2FA4E7",
+    26: "#79A3DC", 27: "#E31837", 28: "#D91244", 29: "#7D95C7", 30: "#00A6C0",
+}
+
+# ESPN's historical abbreviations → conventional display codes. Era-specific
+# names are kept (VAN in 2000-01, SEA through 2007-08, NJN through 2011-12);
+# only ESPN's non-standard spellings are normalized.
+_ABBR_FIX = {"GS": "GSW", "NY": "NYK", "SA": "SAS", "UTAH": "UTA", "WSH": "WAS", "NJ": "NJN"}
+
+
+def display_abbr(espn_id: int, espn_abbr: str | None, season_id: int) -> str:
+    """Era-appropriate code for a franchise in a given season."""
+    if espn_abbr is None:
+        return TEAMS[espn_id].abbr
+    if espn_id == 3:  # Charlotte (2000-02) → New Orleans Hornets → Pelicans (2013)
+        if espn_abbr == "CHA":
+            return "CHH"
+        return "NOP" if season_id >= 20132014 else "NOH"
+    return _ABBR_FIX.get(espn_abbr, espn_abbr)
+
+
 def is_franchise(espn_id: int | None) -> bool:
     return espn_id in TEAMS

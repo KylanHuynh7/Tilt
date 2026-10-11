@@ -393,3 +393,5 @@ table.metrics td.tag.fail { color: var(--neg); font-weight: 700; font-size: 10px
 /* Per-sport accent. NHL keeps the original red from :root. */
 :root[data-sport="nba"] { --accent: #3d7be0; --accent-soft: #6b9cf0; --accent-deep: #1d428a; }
 .sport-nav + .panel { margin-top: 24px; }
+.metrics td.warn { color: var(--warn); }
+.cal-breakdowns { margin-top: 32px; }

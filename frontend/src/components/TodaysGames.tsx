@@ -1,15 +1,16 @@
-import type { Matchup, TodayResponse } from "../api";
-import { colorFor } from "../teamColors";
+import type { Matchup, TodayResponse } from "../types";
 
-type Props = { data: TodayResponse };
+type Props = {
+  data: TodayResponse;
+  league: string;                         // "NHL", "NBA", … for the empty state
+  colorFor: (code: string) => string;     // fallback when the payload has no color
+  periodLabel: (period: number) => string;
+  footnote: string;                       // model/disclaimer line under the cards
+  emptyNote?: string;
+};
 
 function pct(n: number): string {
   return `${(n * 100).toFixed(1)}%`;
-}
-
-function periodLabel(period: number): string {
-  if (period === 4) return "OT";
-  return `P${period}`;
 }
 
 function clockLabel(seconds: number): string {
@@ -18,22 +19,26 @@ function clockLabel(seconds: number): string {
   return `${mm}:${ss}`;
 }
 
-function TeamBadge({ team }: { team: string }) {
+function TeamBadge({ team, color }: { team: string; color: string }) {
   return (
-    <div className="team-badge" style={{ backgroundColor: colorFor(team) }}>
+    <div className="team-badge" style={{ backgroundColor: color }}>
       {team}
     </div>
   );
 }
 
-function GameCard({ m }: { m: Matchup }) {
+function GameCard({ m, colorFor, periodLabel }: {
+  m: Matchup;
+  colorFor: Props["colorFor"];
+  periodLabel: Props["periodLabel"];
+}) {
   const awayPct = m.away_win_prob * 100;
   const homePct = m.home_win_prob * 100;
   const isLive = !!m.live_state;
   return (
     <div className={`game ${isLive ? "live" : ""}`}>
       <div className="team">
-        <TeamBadge team={m.away} />
+        <TeamBadge team={m.away} color={m.away_color ?? colorFor(m.away)} />
         <span className="abbr">{m.away}</span>
         <span className="rating">{m.away_rating.toFixed(0)}</span>
       </div>
@@ -46,7 +51,7 @@ function GameCard({ m }: { m: Matchup }) {
         {!isLive && <span>@</span>}
       </div>
       <div className="team right">
-        <TeamBadge team={m.home} />
+        <TeamBadge team={m.home} color={m.home_color ?? colorFor(m.home)} />
         <span className="abbr">{m.home}</span>
         <span className="rating">{m.home_rating.toFixed(0)}</span>
       </div>
@@ -95,15 +100,19 @@ function GameCard({ m }: { m: Matchup }) {
   );
 }
 
-export function TodaysGames({ data }: Props) {
+export function TodaysGames({ data, league, colorFor, periodLabel, footnote, emptyNote }: Props) {
   if (data.matchups.length === 0) {
-    return <div className="empty">No NHL games scheduled for {data.date}.</div>;
+    return (
+      <div className="empty">
+        No {league} games scheduled for {data.date}.{emptyNote ? ` ${emptyNote}` : ""}
+      </div>
+    );
   }
   return (
     <>
       <div className="games-grid">
         {data.matchups.map((m) => (
-          <GameCard key={m.game_id} m={m} />
+          <GameCard key={m.game_id} m={m} colorFor={colorFor} periodLabel={periodLabel} />
         ))}
       </div>
       {!data.frozen_params && (
@@ -113,11 +122,7 @@ export function TodaysGames({ data }: Props) {
           is not yet evaluated.
         </div>
       )}
-      {data.frozen_params && (
-        <div className="disclaimer ok">
-          Probabilities derived from the frozen v1 model. Live in-game updates are deferred to v2.
-        </div>
-      )}
+      {data.frozen_params && <div className="disclaimer ok">{footnote}</div>}
     </>
   );
 }

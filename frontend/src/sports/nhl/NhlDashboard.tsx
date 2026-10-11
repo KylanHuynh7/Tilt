@@ -11,10 +11,13 @@ import {
   type SeasonRow,
   type TodayResponse,
 } from "./api";
-import { TrajectoryChart } from "./components/TrajectoryChart";
-import { TodaysGames } from "./components/TodaysGames";
-import { CalibrationPanel } from "./components/CalibrationPanel";
+import { TrajectoryChart } from "../../components/TrajectoryChart";
+import { TodaysGames } from "../../components/TodaysGames";
+import { CalibrationPanel } from "../../components/CalibrationPanel";
 import { CupOdds } from "./components/CupOdds";
+import { colorFor } from "./teamColors";
+
+const nhlPeriod = (p: number) => (p === 4 ? "OT" : `P${p}`);
 
 type Tab = "trajectories" | "today" | "calibration";
 
@@ -200,7 +203,7 @@ export function NhlDashboard() {
 
           {historyErr && <div className="error">Couldn't load trajectories: {historyErr}</div>}
           {!history && !historyErr && season != null && <div className="loading">Loading…</div>}
-          {history && <TrajectoryChart data={history} />}
+          {history && <TrajectoryChart data={history} colorFor={colorFor} />}
 
           {/* Cup odds panel — only show when viewing the in-progress season */}
           {season != null && season === currentSeason && (
@@ -228,7 +231,15 @@ export function NhlDashboard() {
             <div className="error">Couldn't load today's games: {todayErr}</div>
           )}
           {!today && !todayErr && <div className="loading">Loading…</div>}
-          {today && <TodaysGames data={today} />}
+          {today && (
+            <TodaysGames
+              data={today}
+              league="NHL"
+              colorFor={colorFor}
+              periodLabel={nhlPeriod}
+              footnote="Pre-game probabilities from the frozen v2 rating model; live probabilities from the v2.2 in-game model, refreshed every 60 s."
+            />
+          )}
         </section>
       )}
 
@@ -240,7 +251,12 @@ export function NhlDashboard() {
           </div>
           {calErr && <div className="error">Couldn't load calibration: {calErr}</div>}
           {!cal && !calErr && <div className="loading">Loading…</div>}
-          {cal && <CalibrationPanel data={cal} />}
+          {cal && (
+            <CalibrationPanel
+              data={cal}
+              paramsLabel={`K=${cal.frozen_params.k_regular}/${cal.frozen_params.k_playoff}, c=${cal.frozen_params.decay_carry}`}
+            />
+          )}
         </section>
       )}
     </>

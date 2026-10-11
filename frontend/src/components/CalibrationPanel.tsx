@@ -4,15 +4,17 @@ import {
   Line,
   ReferenceLine,
   ResponsiveContainer,
-  Scatter,
   ComposedChart,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
-import type { CalibrationResponse, MetricBlock } from "../api";
+import type { CalibrationResponse, MetricBlock } from "../types";
 
-type Props = { data: CalibrationResponse };
+type Props = {
+  data: CalibrationResponse;
+  paramsLabel: string;  // e.g. "K=10/10, c=0.85, home=40"
+};
 
 function fmt(x: number, digits = 4): string {
   return Number.isFinite(x) ? x.toFixed(digits) : "—";
@@ -39,7 +41,7 @@ function MetricRow({ label, m, targets }: { label: string; m: MetricBlock; targe
   );
 }
 
-export function CalibrationPanel({ data }: Props) {
+export function CalibrationPanel({ data, paramsLabel }: Props) {
   const { metrics, section_6_targets: targets, calibration_buckets } = data;
 
   const plotData = useMemo(() =>
@@ -58,8 +60,7 @@ export function CalibrationPanel({ data }: Props) {
     <div className="cal">
       <div className="cal-meta">
         Evaluated {new Date(data.evaluated_at).toLocaleDateString()} ·
-        Frozen params K={data.frozen_params.k_regular}/{data.frozen_params.k_playoff},
-        c={data.frozen_params.decay_carry} ·
+        Frozen params {paramsLabel} ·
         n={data.n_test_predictions} test predictions ·
         seasons {data.test_seasons.join(", ")}
       </div>
@@ -79,6 +80,9 @@ export function CalibrationPanel({ data }: Props) {
             </thead>
             <tbody>
               <MetricRow label="Model" m={metrics.model} />
+              {metrics.home_rate_baseline && (
+                <MetricRow label="Home-rate baseline" m={metrics.home_rate_baseline} />
+              )}
               <MetricRow label="Static-rating baseline" m={metrics.static_rating_baseline} />
               <MetricRow label="Naive 50% baseline" m={metrics.naive_baseline} />
               <tr className="target">
@@ -102,6 +106,12 @@ export function CalibrationPanel({ data }: Props) {
             <li className={pass(metrics.model.ece, v => v < targets.ece_max)}>
               ECE &lt; {targets.ece_max}: {fmt(metrics.model.ece, 4)}
             </li>
+            {metrics.home_rate_baseline && (
+              <li className={pass(metrics.model.log_loss, v => v < metrics.home_rate_baseline!.log_loss)}>
+                beats home-rate baseline on log-loss: {fmt(metrics.model.log_loss, 5)} vs{" "}
+                {fmt(metrics.home_rate_baseline.log_loss, 5)}
+              </li>
+            )}
           </ul>
         </div>
 
@@ -154,7 +164,6 @@ export function CalibrationPanel({ data }: Props) {
                   isAnimationActive={false}
                   name="actual"
                 />
-                <Scatter dataKey="mean_actual" fill="var(--accent)" />
               </ComposedChart>
             </ResponsiveContainer>
           </div>
