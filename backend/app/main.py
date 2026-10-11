@@ -1,5 +1,8 @@
 """FastAPI app — Phase D wired to the frozen historical engine.
 
+NHL endpoints are served at the root and, identically, under /nhl.
+GET /sports lists every sport and its status.
+
 Endpoints:
   GET  /healthz                      liveness + cache status
   GET  /seasons                      list of all available seasons (sorted)
@@ -19,7 +22,7 @@ from contextlib import asynccontextmanager
 from datetime import date
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
+from fastapi import APIRouter, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from dataclasses import asdict
@@ -99,6 +102,26 @@ app.add_middleware(
 )
 
 
+# NHL endpoints live on a router mounted twice: at the root (the original
+# contract the deployed frontend uses) and under /nhl (the multi-sport
+# contract). Other sports mount their own routers under /{sport}.
+nhl = APIRouter()
+
+# Sports the site knows about. "live" = model frozen and served; others are
+# listed so the frontend can render the switcher without hardcoding.
+SPORTS = [
+    {"id": "nhl", "name": "NHL", "status": "live"},
+    {"id": "nba", "name": "NBA", "status": "in_development"},
+    {"id": "nfl", "name": "NFL", "status": "planned"},
+    {"id": "mlb", "name": "MLB", "status": "planned"},
+]
+
+
+@app.get("/sports")
+async def list_sports():
+    return {"sports": SPORTS}
+
+
 # ---- Helpers -------------------------------------------------------------------
 
 def _cache_or_503():
@@ -110,7 +133,7 @@ def _cache_or_503():
 
 # ---- Endpoints -----------------------------------------------------------------
 
-@app.get("/healthz")
+@nhl.get("/healthz")
 async def healthz():
     try:
         cache = historical.get_cache()
@@ -131,7 +154,7 @@ async def healthz():
         return {"ok": False, "error": str(exc)}
 
 
-@app.get("/seasons")
+@nhl.get("/seasons")
 async def list_seasons():
     cache = _cache_or_503()
     ids = sorted(cache.trajectories.keys(), reverse=True)
@@ -148,7 +171,7 @@ async def list_seasons():
     }
 
 
-@app.get("/ratings/current")
+@nhl.get("/ratings/current")
 async def ratings_current():
     cache = _cache_or_503()
     rows = []
@@ -165,7 +188,7 @@ async def ratings_current():
     }
 
 
-@app.get("/ratings/history/{season}")
+@nhl.get("/ratings/history/{season}")
 async def ratings_history(season: int):
     cache = _cache_or_503()
     if season not in cache.trajectories:
@@ -215,7 +238,7 @@ async def ratings_history(season: int):
     }
 
 
-@app.get("/games/today")
+@nhl.get("/games/today")
 async def games_today():
     _cache_or_503()  # ensure cache exists; fail clearly if not
     matchups = await engine.todays_matchups()
@@ -226,7 +249,7 @@ async def games_today():
     }
 
 
-@app.get("/calibration/current")
+@nhl.get("/calibration/current")
 async def calibration_current():
     if not RESULTS_PATH.exists():
         raise HTTPException(
@@ -239,7 +262,7 @@ async def calibration_current():
     return json.loads(RESULTS_PATH.read_text())
 
 
-@app.get("/simulation/cup")
+@nhl.get("/simulation/cup")
 async def simulation_cup(n: int | None = None, refresh: bool = False):
     """Monte Carlo Cup-win probabilities per §14.
 
@@ -320,7 +343,7 @@ async def simulation_cup(n: int | None = None, refresh: bool = False):
     }
 
 
-@app.get("/wp")
+@nhl.get("/wp")
 async def wp(period: int, time_remaining_s: int, score_diff: int):
     """v2.2 §15 — empirical state-aware home win probability.
 
@@ -353,9 +376,13 @@ async def wp(period: int, time_remaining_s: int, score_diff: int):
     }
 
 
-@app.post("/admin/refresh")
+@nhl.post("/admin/refresh")
 async def admin_refresh():
     global _cup_result
     status = await engine.refresh_current_season()
     _cup_result = None  # force the Cup sim to rebuild next request
     return {"ok": True, **status}
+
+
+app.include_router(nhl)
+app.include_router(nhl, prefix="/nhl")

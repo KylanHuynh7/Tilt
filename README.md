@@ -1,6 +1,15 @@
-# Tilt — NHL Rating System
+# Tilt — Sports Rating System
 
-An interpretable Elo-variant rating system for NHL teams that produces calibrated, game-by-game win probabilities. The goal is **honest calibration reporting**, not beating Vegas.
+Interpretable rating systems that produce calibrated, game-by-game win probabilities, one pre-registered model per sport. The goal is **honest calibration reporting**, not beating Vegas.
+
+| Sport | Status | Methodology |
+|---|---|---|
+| **NHL** | Live — v2 (evaluated, see below) | [`METHODOLOGY.md`](./METHODOLOGY.md) |
+| **NBA** | In development — methodology draft under review | [`methodology/NBA.md`](./methodology/NBA.md) |
+| NFL | Planned (college football possibly later) | — |
+| MLB | Planned | — |
+
+Everything below this table describes the NHL model unless stated otherwise. Each sport gets its own methodology document, written and approved before that sport's model code, with its own train/validation/test split and §13-style limitations.
 
 > Student project. Not a betting tool. Not a power ranking. Not a Vegas competitor.
 > Pre-1967 seasons are available in the dashboard for historical exploration only and are excluded from all model evaluation.
@@ -76,7 +85,7 @@ home_bump   = 40.0   ← v2.0 §12 addition
 - **Overconfident at the extremes.** Games predicted at 70–80% for the home team were won 59% of the time (n = 58); 60–70% predictions were won 59% (n = 375).
 - **The league reshuffled.** End-of-2024-25 ratings held static score *worse than a coin flip* on 2025-26 (LL 0.710), so carry-over information was unusually misleading this season. The model's in-season updates recovered most — but not all — of that.
 
-Validation metrics for context (2021-22 → 2024-25, n = 5,594): LL 0.66219, Brier 0.23495, ECE 0.01528. The gap between validation and test is the overfitting-to-validation risk §13.J flagged in advance.
+Validation metrics for context (2021-22 → 2024-25, n = 5,599): LL 0.66219, Brier 0.23495, ECE 0.01531 (per `artifacts/frozen_params.json`; earlier README text quoted n = 5,594 / ECE 0.01528 in error). The gap between validation and test is the overfitting-to-validation risk §13.J flagged in advance.
 
 ## Architecture
 
@@ -106,7 +115,8 @@ Decoupled three-layer per [`METHODOLOGY.md`](./METHODOLOGY.md) §3:
 | `live_state.py` | Async PBP fetch + parse for live in-progress games. | v2.3 |
 | `historical.py` | Loads frozen params, runs full backtest at startup, caches per-season trajectories. | v1 |
 | `engine.py` | Live NHL-API integration for `/games/today` (with v2.3 live WP enrichment) and `/admin/refresh`. | v1 + v2.3 |
-| `main.py` | FastAPI app + endpoints. | v1 + v2 |
+| `main.py` | FastAPI app. NHL endpoints live on a router mounted at the root (original contract) **and** under `/nhl`; `GET /sports` lists sports. | v1 + v2 + Phase 0 |
+| `core/elo.py` | Sport-agnostic Elo primitives (`expected`, `regress`). NHL `ratings.py` delegates to it. | Phase 0 |
 
 ### Scripts (`backend/scripts/`)
 
@@ -118,6 +128,7 @@ Decoupled three-layer per [`METHODOLOGY.md`](./METHODOLOGY.md) §3:
 
 | | Path | Notes |
 |---|---|---|
+| GET | `/sports` | Every sport with its status (`live` / `in_development` / `planned`) |
 | GET | `/healthz` | Cache status + frozen params metadata |
 | GET | `/seasons` | All 108 ingested seasons with pre-1967 flag |
 | GET | `/ratings/current` | 32 active franchises sorted by rating desc |
@@ -128,7 +139,13 @@ Decoupled three-layer per [`METHODOLOGY.md`](./METHODOLOGY.md) §3:
 | GET | `/calibration/current` | §6 metrics + bucket data + targets (v2 test results on 2025-26) |
 | POST | `/admin/refresh` | Re-ingest current season + rebuild cache + invalidate Cup-sim cache |
 
-### Frontend tabs (`frontend/src/App.tsx`)
+Every NHL path above is also served under `/nhl` (e.g. `/nhl/games/today`).
+
+### Frontend
+
+`frontend/src/App.tsx` is the multi-sport shell: header + sport switcher (NHL / NBA / NFL / MLB), path-based routing (`/nhl`, `/nba`, …; `/` is NHL), and a per-sport accent color via `data-sport` on `<html>`. Each sport lives in `frontend/src/sports/{sport}/`; shared fetch logic is `frontend/src/http.ts`.
+
+### NHL tabs (`frontend/src/sports/nhl/NhlDashboard.tsx`)
 
 - **Trajectories.** Full-width trajectory chart of every team's rating across the selected season. Cup-winning team's line is thicker / full-opacity with a `{TEAM} 👑` label at the endpoint. Hover tooltip flags the cup winner in their team color. When viewing the in-progress season and its playoff bracket exists, a vertical bar chart of all 32 teams' Stanley Cup probabilities sits under the trajectory plot. Auto-refresh every 60s for the current season.
 - **Today's games.** Card per matchup: team-colored badges (primary brand colors, no trademarked logos — see §13.H), pre-game probability bar, plus a live probability bar + period/clock for any in-progress game. Polls every 60s when there are live games.

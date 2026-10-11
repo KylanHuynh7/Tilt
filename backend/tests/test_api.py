@@ -115,3 +115,19 @@ def test_cup_targets_latest_season_and_flags_missing_bracket(client: TestClient)
         assert abs(sum(t["cup_probability"] for t in body["teams"]) - 1.0) < 0.01
     else:
         assert body["teams"] == []
+
+
+def test_sports_lists_nhl_live(client: TestClient):
+    r = client.get("/sports")
+    assert r.status_code == 200
+    by_id = {s["id"]: s for s in r.json()["sports"]}
+    assert by_id["nhl"]["status"] == "live"
+    assert {"nba", "nfl", "mlb"} <= set(by_id)
+
+
+@pytest.mark.parametrize("path", ["/seasons", "/ratings/current", "/calibration/current"])
+def test_nhl_routes_mirrored_under_prefix(client: TestClient, path: str):
+    """The root routes (deployed contract) and /nhl routes return the same body."""
+    root, prefixed = client.get(path), client.get(f"/nhl{path}")
+    assert root.status_code == prefixed.status_code == 200
+    assert root.json() == prefixed.json()

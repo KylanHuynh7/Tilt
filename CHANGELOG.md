@@ -2,6 +2,22 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-10 — Phase 0: multi-sport platform shell
+
+First step of expanding Tilt from NHL-only to NHL / NBA / NFL / MLB, one sport at a time. **No NHL model change**: v2 validation metrics reproduce exactly after the refactor (n = 5,599, LL 0.66219, Brier 0.23495, ECE 0.01531), checked against the pre-refactor commit in a separate worktree.
+
+Backend:
+- `app/core/elo.py`: sport-agnostic `expected()` / `regress()`. NHL `ratings.win_probability` and `apply_decay` delegate to it.
+- `main.py`: NHL endpoints moved onto an `APIRouter` mounted at the root (unchanged contract) and under `/nhl`. New `GET /sports` lists each sport's status.
+- +5 API tests (sports listing; root vs `/nhl` parity on three routes). 167 tests pass.
+
+Frontend:
+- New shell `src/App.tsx`: header + sport switcher pills, path routing (`/nhl`, `/nba`, `/nfl`, `/mlb`; `/` → NHL), per-sport accent via `data-sport` (NBA blue). Non-live sports show a status panel.
+- NHL dashboard + components + API module + team colors moved to `src/sports/nhl/`; shared `src/http.ts`. NHL calls stay on root paths so the frontend works against the older backend build still on Render.
+- Header dot glow now follows the accent color.
+
+Docs: README gains a sport-status table and the new layout; METHODOLOGY §13.K documents the duplicated routes, duplicated sport list, asymmetric NHL layout, and single-process/lazy-cache constraint. Corrected the README/§13.C v2 validation figures (n = 5,594 / ECE 0.01528 → n = 5,599 / ECE 0.01531, per the frozen artifact).
+
 ## 2026-10-10 — v2 test evaluation (FAIL ×3) + roll dashboard to 2026-27
 
 **v2 test evaluation, run once per §10 #1.** Re-ingested 2025-26 in full first (the cached parquet stopped at 2026-05-18; the re-pull has 1,312 regular-season + 82 playoff games through the Cup Final on 2026-06-14). `scripts.evaluate --confirm` (no `--force`) on test season `[20252026]` with frozen v2 params (K_regular 10, K_playoff 10, decay_carry 0.85, home_bump 40):

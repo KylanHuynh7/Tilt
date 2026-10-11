@@ -1,4 +1,4 @@
-const BASE = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000";
+import { getJson } from "../../http";
 
 export type SeasonRow = { season_id: number; label: string; pre_1967: boolean };
 export type SeasonsResponse = { count: number; seasons: SeasonRow[] };
@@ -85,11 +85,6 @@ export type CalibrationResponse = {
   section_6_targets: { log_loss_max: number; brier_band: [number, number]; ece_max: number };
 };
 
-async function getJson<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE}${path}`);
-  if (!res.ok) throw new Error(`${res.status} ${res.statusText} — ${path}`);
-  return (await res.json()) as T;
-}
 
 export type CupTeam = {
   team: string;

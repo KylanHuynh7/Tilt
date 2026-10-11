@@ -18,6 +18,8 @@ The v1 model is locked at home_bump=0 — see §10 #2.
 from dataclasses import dataclass
 from typing import Literal
 
+from .core import elo
+
 INITIAL_RATING: float = 1500.0
 LEAGUE_MEAN: float = 1500.0
 DIVISOR: float = 400.0
@@ -71,8 +73,7 @@ def win_probability(
     paths) can ignore this argument. The v1 frozen model is locked at
     home_bump=0 per §10 #2.
     """
-    effective_gap = (rating_b - rating_a - home_bump) / DIVISOR
-    return 1.0 / (1.0 + 10.0 ** effective_gap)
+    return elo.expected(rating_a, rating_b, home_bump=home_bump, divisor=DIVISOR)
 
 
 @dataclass
@@ -113,7 +114,7 @@ def apply_decay(rating: float, *, carry: float = DECAY_CARRY) -> float:
     Expansion teams (with no prior rating) should be initialized at 1500 and
     must NOT have decay applied — that's a caller-side rule, not enforced here.
     """
-    return LEAGUE_MEAN + carry * (rating - LEAGUE_MEAN)
+    return elo.regress(rating, carry=carry, mean=LEAGUE_MEAN)
 
 
 def classify_outcome(
