@@ -2,6 +2,20 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-11 — College football N1: ingest (methodology/CFB.md v1.0 approved, v1.1)
+
+Author approved `methodology/CFB.md` with all six decisions as recommended.
+- `app/cfb/pipeline.py`: ESPN weeks 1–17 + postseason by date, per-season group-80 list, event-based season type and week, v1.1 FBS rule, coverage.
+- Data 2001–2026 (≈0.6 MB). Every season passes coverage; FBS counts match history exactly.
+
+Three data traps were found and fixed before any rating code (v1.1):
+- the postseason query mislabelled ~390 regular-season games per season;
+- pre-2024 bowls were missing entirely;
+- ESPN's FBS list has placeholder teams.
+
+The coverage rule was also corrected to measure missing data, not cancellations.
++5 tests.
+
 ## 2026-10-11 — MLB v1.1: live win probability (5 of 5 targets PASS)
 
 - **Download:** 22,000+ games of `playByPlay` (2010–14 training, 2022–25 test), zero mismatches; 1.7 MB of PA-state samples committed.

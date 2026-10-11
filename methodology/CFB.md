@@ -1,11 +1,18 @@
 # College Football (FBS) Rating System — Methodology Document
-## Version 0.1-draft
+## Version 1.1
 **Author:** Kylan Huynh
-**Status:** DRAFT — pre-code. **No college football model code may be written until the author approves this document.** Items marked **[DECISION]** need an explicit ruling; each carries a recommendation.
+**Status:** APPROVED 2026-10-11 — all six **[DECISION]** items resolved as recommended. Later changes to §§3–6 or §12 are version-tagged amendments.
 **Last updated:** 2026-10-11
 
 **Amendment log:**
 - *v0.1-draft (2026-10-11):* First draft, after a data-availability probe and before any ingest, rating code or metric.
+- *v1.0 (2026-10-11):* Author approved with every [DECISION] as recommended: (1) ESPN source, (2) pooled FCS rating with FBS-vs-FCS games excluded from metrics, (3) new FBS programs start at the pooled FCS rating, (4) no K_post ≥ K_regular constraint, (5) thresholds as written, (6) live targets inherit NFL's.
+- *v1.1 (2026-10-11):* Ingest-phase clarifications, made before any rating code or metric.
+  - **(a) FBS membership.** ESPN's group-80 list contains never-playing placeholder ids (it shows 145 teams in a 133-team 2023) and omits teams in some early seasons. The rule is now: in ESPN's group-80 list **and** played ≥ 1 completed game, **or** played ≥ 6 completed games against ESPN-listed FBS opponents. That reproduces the official FBS counts exactly (117 in 2001 … 136 in 2025).
+  - **(b) Season type and week come from each event, not the query.** ESPN's `seasontype=3` query returned ~390 regular-season games per pre-2024 season.
+  - **(c) Bowls and playoff** are fetched by date (Dec 1 → Jan 20), keeping events ESPN marks as postseason. Week-based queries never returned pre-2024 bowls. Regular-season weeks run through week 17.
+  - **(d) Coverage rule** counts regular-season games *listed* (completed, or cancelled/postponed) and requires ≥ 11, not "12 from 2006". The rule exists to detect missing data, not unplayed games: the 9/11 week (2001) and hurricanes Harvey and Irma (2017) cancelled real games, and 12-game schedules were optional from 2006. With (a)–(d) every season 2001–2025 passes; 2020 is exempt.
+  - **(e)** Games with no FBS team (FCS playoff games returned by date queries) are dropped.
 
 ---
 
@@ -59,7 +66,7 @@
 
 **Coverage:** data starts in **2001** (2000 returns nothing).
 
-**Coverage rule (§3):** a season enters only if at least 95% of FBS teams (teams with ≥ 10 games that season) have their full regular season recorded (≥ 11 games, ≥ 12 from 2006). **2020** (COVID: cancellations, conference-only schedules) is exempt from the game-count part and flagged.
+**Coverage rule (§3, clarified in v1.1):** a season enters only if at least 95% of FBS teams have ≥ 11 regular-season games listed (completed or cancelled/postponed). **2020** (COVID: cancellations, conference-only schedules) is exempt from the game-count part and flagged.
 
 **[DECISION 1] Alternative source.** CollegeFootballData.com has deeper history (1869+) but needs a personal API key, and it also exposes betting lines and its own ratings (never to be read). Recommendation: **ESPN for v1** (no key, same client as the other sports, coverage from 2001 is enough). CFBD is a fallback if ESPN coverage proves patchy.
 
@@ -153,7 +160,7 @@ Inherits the NFL §12 five-term form (pre-game edge fading over time, score marg
 
 ---
 
-## Decisions needed before implementation
+## Decisions (resolved 2026-10-11 — all as recommended)
 
 | # | Decision | Recommendation |
 |---|---|---|
