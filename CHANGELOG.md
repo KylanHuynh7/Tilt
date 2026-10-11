@@ -2,6 +2,19 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-11 — MLB methodology v0.1-draft (pre-code) + college football on the agenda
+
+- New `methodology/MLB.md`, pending author approval:
+  - MLB Stats API (official, non-commercial terms, attribution shown);
+  - coverage rule;
+  - split: warm-up 2000–2014, validation 2015–2021, test 2022–2025 (~9,800 games);
+  - Elo + home bump + MOV, with a recommended FiveThirtyEight-style **starting-pitcher adjustment** (rolling game score; announced probable pitchers from 2010, so no look-ahead in validation or test);
+  - 5,120-cell grid including c = 0 (team-only) for comparison;
+  - three-coefficient live model using base-out run expectancy.
+  - Six [DECISION] items. Contamination disclosure: only counts, field names and probable-pitcher coverage were seen.
+- **College football** added to the roadmap as the fifth sport, after MLB (README sport table).
+- Correction: the game-detail entry below says 273 tests; the actual count is 271.
+
 ## 2026-10-11 — Game-detail pages (click any game card)
 
 User request: clickable game cards opening an in-depth analysis plus the players for the game. Player stat projections were discussed and deferred, since no player model exists and building one would need its own methodology.
