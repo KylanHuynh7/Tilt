@@ -110,7 +110,7 @@ That is 540 cells per event. The pre-registered expectations are optimal H in [4
 On the test seasons, separately for **point** and **goal**:
 
 1. **Beats Baseline A**, the previous season's position base rate, on log-loss.
-2. **Beats Baseline B**, the player's points (or goals) per game over their last 82 games turned into a probability via Poisson (position rate if fewer than 10 games), on log-loss. This is the natural "how often does he score?" heuristic.
+2. **Beats Baseline B**, the player's points (or goals) per game over their last 82 games turned into a probability via Poisson (position rate if fewer than 10 games), on log-loss. This is the natural "how often does this player score?" heuristic.
 3. **ECE < 0.02.**
 4. **Top-decile calibration:** in the highest 10% of predictions, |mean predicted − observed rate| < 0.03.
 
