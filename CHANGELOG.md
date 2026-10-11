@@ -2,6 +2,16 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-11 — NFL methodology v0.1-draft (pre-code)
+
+New `methodology/NFL.md`, pending author approval.
+- **Data:** nflverse `games.csv` (1999 → present; coverage counts match 248 / 256 / 272 schedules), nflverse play-by-play for v1.1, ESPN scoreboard for live. Betting columns and nflfastR/nflverse model outputs (`wp`, `vegas_wp`, `ep`, …) are explicitly never read.
+- **Split:** warm-up 1999–2014, validation 2015–2021, test 2022–2025.
+- **Model:** Elo with home bump (neutral-aware), FiveThirtyEight NFL MOV multiplier (ties use M = 1), 1,440-cell grid. QB adjustment deferred to v2 as the pre-registered largest error source.
+- **v1.1:** five-term interpretable live logistic (pre-game edge, score, possession, field position).
+- Six **[DECISION]** items, including pre-registered live-model targets (the NBA live model had none).
+- Contamination disclosure: only column names, game counts, location split and team codes were seen.
+
 ## 2026-10-11 — NBA v1.1: live in-game win probability
 
 Methodology v1.2 (pre-fit): minute-mark sampling, final-score validity rule, only ESPN `plays` read (never its win-probability / odds blocks), and an explicit note that §12 sets no pass/fail target.
