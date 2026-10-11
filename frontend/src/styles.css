@@ -882,3 +882,14 @@ table.metrics td:first-child { white-space: nowrap; }
   .cal table.metrics td.num, .cal table.metrics th.num { font-size: 11px; }
   .cal table.metrics th { font-size: 9px; letter-spacing: 0.04em; }
 }
+
+/* ---- MLB pitching matchup ---------------------------------------------------- */
+.pitch-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+.pitch-card { --team: #888; padding: 16px; border-radius: 16px; background: var(--surface); border: 1px solid var(--edge); border-top: 4px solid var(--team); }
+.pitch-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.pitch-team { font-family: var(--font-display); font-weight: 800; font-size: 14px; color: var(--team); letter-spacing: 0.06em; }
+.pitch-name { font-family: var(--font-display); font-weight: 800; font-size: 24px; line-height: 1; }
+.pitch-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.pitch-stats b { display: block; font-family: var(--font-display); font-size: 22px; }
+.pitch-stats b.pos { color: var(--pos); }
+.pitch-stats b.neg { color: var(--neg); }

@@ -167,7 +167,7 @@ export function GameDetail({ sport, gameId, colorFor, periodLabel }: Props) {
   const fav = shownHome >= 0.5 ? d.home : d.away;
   const favP = Math.max(shownHome, 1 - shownHome);
   const gapProb = p.p_home_without_home_edge - 0.5;
-  const state = g.live_state ? `${periodLabel(g.live_state.period)} · ${Math.floor(g.live_state.time_remaining_s / 60)}:${String(g.live_state.time_remaining_s % 60).padStart(2, "0")}` : g.state === "FINAL" || g.state === "OFF" ? "Final" : "Pre-game";
+  const state = g.live_state?.label ? g.live_state.label : g.live_state ? `${periodLabel(g.live_state.period)} · ${Math.floor(g.live_state.time_remaining_s / 60)}:${String(g.live_state.time_remaining_s % 60).padStart(2, "0")}` : g.state === "FINAL" || g.state === "OFF" ? "Final" : "Pre-game";
   const score = g.live_state ? [g.live_state.away_score, g.live_state.home_score] : g.home_score != null && g.state !== "PRE" && g.state !== "FUT" ? [g.away_score, g.home_score] : null;
   const cc = d.calibration_context;
 
@@ -193,6 +193,7 @@ export function GameDetail({ sport, gameId, colorFor, periodLabel }: Props) {
             <div className="hero-at">@</div>
           )}
           {p.neutral && <span className="hero-neutral">Neutral site</span>}
+          {g.series && <span className="hero-neutral">{g.series}</span>}
         </div>
         <div className="hero-team home">
           <div>
@@ -219,7 +220,7 @@ export function GameDetail({ sport, gameId, colorFor, periodLabel }: Props) {
         </div>
         <div className="why-grid">
           <div className="why-card">
-            <div className="why-label">Rating gap</div>
+            <div className="why-label">{d.pitching ? "Rating gap (incl. starters)" : "Rating gap"}</div>
             <div className="why-value">{signed(Math.abs(p.rating_gap))} Elo</div>
             <div className="why-note">
               {p.rating_gap === 0 ? "Evenly rated." : `${p.rating_gap > 0 ? d.home.code : d.away.code} is rated higher — worth ${pct(Math.abs(gapProb))} on its own.`}
@@ -248,6 +249,35 @@ export function GameDetail({ sport, gameId, colorFor, periodLabel }: Props) {
           {cc ? ` · track record from ${cc.source}` : ""}
         </div>
       </section>
+
+      {/* Pitching matchup (MLB) */}
+      {d.pitching && (
+        <section className="panel">
+          <div className="panel-title"><h2>Starting pitchers</h2><span className="meta">probable starters · rolling game score</span></div>
+          <div className="pitch-grid">
+            {([["away", d.away, awayColor], ["home", d.home, homeColor]] as const).map(([k, side, col]) => {
+              const sp = d.pitching![k];
+              return (
+                <div key={k} className="pitch-card" style={{ "--team": col } as React.CSSProperties}>
+                  <div className="pitch-head">
+                    {sp.headshot ? <img className="avatar" src={sp.headshot} alt="" style={{ width: 56, height: 56, "--team": col } as React.CSSProperties} /> : null}
+                    <div>
+                      <div className="pitch-team">{side.code}</div>
+                      <div className="pitch-name">{sp.name ?? "TBD"}</div>
+                    </div>
+                  </div>
+                  <div className="pitch-stats">
+                    <div><span className="why-label">Rolling GS</span><b>{sp.rolling_game_score ?? "—"}</b></div>
+                    <div><span className="why-label">Team avg</span><b>{sp.team_rolling_game_score ?? "—"}</b></div>
+                    <div><span className="why-label">Adjustment</span><b className={sp.adjustment_elo >= 0 ? "pos" : "neg"}>{sp.adjustment_elo >= 0 ? "+" : "−"}{Math.abs(sp.adjustment_elo).toFixed(1)} Elo</b></div>
+                  </div>
+                  {sp.first_start && <div className="why-note">No prior start on record: no adjustment applied.</div>}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* Live WP chart */}
       {d.live_history.length >= 2 && (
@@ -329,7 +359,7 @@ export function GameDetail({ sport, gameId, colorFor, periodLabel }: Props) {
           Starting lineups aren't published before the game, so this lists everyone available
           rather than starters vs bench. Tilt's models are team-level: they don't see who plays
           and don't project player stats — that would be a separate, pre-registered model.
-          Click a player for season and career stats. Photos and stats: ESPN.
+          Click a player for season and career stats. {d.attribution ?? "Photos and stats: ESPN."}
         </div>
       </section>
 

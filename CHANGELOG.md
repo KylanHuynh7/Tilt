@@ -2,6 +2,22 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-11 — MLB N5: API + dashboard (MLB goes live)
+
+Backend: `app/mlb/api.py` under `/mlb`:
+- seasons, ratings, history (era codes, World Series champion);
+- today's games (frozen pre-game probability incl. probable-starter adjustments, postseason series name, live inning/half/outs label);
+- calibration, admin refresh;
+- game detail with a **pitching matchup** block (rolling game score vs team average, Elo adjustment, first-start flag);
+- MLB-API rosters (Active → available, injured list → ruled out, with headshots).
+
+`/mlb/players/{id}` serves year-by-year + career hitting and pitching from the MLB Stats API, with two-way players handled. `/sports` reports MLB live. +4 tests (294).
+
+Frontend:
+- `sports/mlb/MlbDashboard.tsx` (shared SportDashboard config: month segments, first-start breakdown, postseason flag note).
+- Live label support for clock-less sports; pitching-matchup card on game pages; MLB attribution on player cards; "Rating gap (incl. starters)" label.
+- Verified on the live NLCS game (LAD @ MIL); no horizontal overflow at 360 / 390 px.
+
 ## 2026-10-11 — MLB N4: one-shot test evaluation (PASS ×4, postseason worse than coin flip)
 
 Ran once on 2022–2025 (n = 9,890): **LL 0.67805, Brier 0.24258, ECE 0.01112, beats home-rate baseline 0.69152: all PASS.**

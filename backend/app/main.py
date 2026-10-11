@@ -32,6 +32,7 @@ from .core import detail as core_detail, live_history, players as core_players, 
 from .franchises import franchise_for
 from .nba import api as nba_api
 from .nfl import api as nfl_api
+from .mlb import api as mlb_api
 from .franchises import current_code
 from .seasons import parse as parse_season
 from .teams import TEAMS
@@ -117,16 +118,18 @@ SPORTS = [
     {"id": "nhl", "name": "NHL", "status": "live"},
     {"id": "nba", "name": "NBA", "status": "live"},
     {"id": "nfl", "name": "NFL", "status": "live"},
-    {"id": "mlb", "name": "MLB", "status": "planned"},
+    {"id": "mlb", "name": "MLB", "status": "live"},
 ]
 
 
 @app.get("/{sport}/players/{athlete_id}")
 async def player_stats(sport: str, athlete_id: str):
     """Season-by-season + career stats for one athlete (ESPN facts, no model)."""
-    if sport not in core_players.SPORT_PATHS or not athlete_id.isdigit():
+    if (sport not in core_players.SPORT_PATHS and sport != "mlb") or not athlete_id.isdigit():
         raise HTTPException(status_code=404, detail="unknown sport or athlete")
     try:
+        if sport == "mlb":  # MLB stats come from the MLB Stats API, not ESPN
+            return await mlb_api.player_stats(athlete_id)
         return await core_players.fetch(sport, athlete_id)
     except Exception as exc:  # noqa: BLE001
         raise HTTPException(status_code=502, detail=f"player stats unavailable: {exc}") from exc
@@ -472,3 +475,4 @@ app.include_router(nhl)
 app.include_router(nhl, prefix="/nhl")
 app.include_router(nba_api.router)
 app.include_router(nfl_api.router)
+app.include_router(mlb_api.router)

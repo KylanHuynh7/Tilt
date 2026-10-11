@@ -194,6 +194,13 @@ RE  = run expectancy for the current base-out state, a 24-cell table computed fr
   - *Per season:* 2022 0.0059, **2023 0.0299** (at the edge of the target; the pitch-clock / shift-ban year), 2024 0.0175, 2025 0.0202.
   - *Late-season flag not fired:* late/mid ratio 1.14.
   - *Neutral sites:* n = 20, noise.
+- **Dashboard / API (N5):**
+  - *All MLB facts on the site come from the MLB Stats API,* attributed as "MLB Advanced Media (non-commercial use)": schedule, live linescore, 40-man roster status, injured list, player year-by-year and career stats, and headshots. ESPN is not used for MLB.
+  - *Champion = winner of the last World Series game;* reproduces ATL 2021, HOU 2022, TEX 2023, LAD 2024.
+  - *Today's probabilities include the probable starters' adjustment from the frozen pitcher state.* If a team hasn't named a starter, it gets no adjustment, and the page says "TBD".
+  - *The game-detail "rating gap" includes both starters' adjustments* (labelled "incl. starters"), so the three cards add up to the headline probability. The pitching card shows each adjustment separately.
+  - *Availability:* "Available" = 40-man players with Active status. "Ruled out" = injured-list statuses (D7 / D10 / D15 / D60). Optioned or minor-league players are omitted.
+  - *No live win probability yet* (v1.1). Live games show the inning, half and outs.
 - **No logos:** inherits NHL §13.I.
 
 ---

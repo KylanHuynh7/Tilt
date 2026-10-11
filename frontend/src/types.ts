@@ -23,6 +23,7 @@ export type RatingsHistoryResponse = {
 };
 
 export type LiveStateBlock = {
+  label?: string;          // sports without a clock (MLB: "Top 7 · 2 out")
   game_state: string;
   period: number;
   time_remaining_s: number;
@@ -49,6 +50,8 @@ export type Matchup = {
   home_color?: string;     // NBA ships badge colors in the payload
   away_color?: string;
   neutral?: boolean;
+  series?: string | null;  // MLB postseason series name
+  pitching?: { home: PitcherSide; away: PitcherSide };
   // v2.3 §16 — present when the game is LIVE/CRIT and the PBP fetch succeeded.
   live_state?: LiveStateBlock;
   live_wp?: LiveWPBlock;
@@ -90,7 +93,12 @@ export type CalibrationResponse = {
   section_6_targets: { log_loss_max: number; brier_band: [number, number]; ece_max: number };
 };
 
-// ---- Game detail (shared by NHL / NBA / NFL) --------------------------------
+export type PitcherSide = {
+  id: number | null; name: string | null; rolling_game_score: number | null;
+  team_rolling_game_score: number | null; adjustment_elo: number; first_start: boolean; headshot: string | null;
+};
+
+// ---- Game detail (shared by NHL / NBA / NFL / MLB) ---------------------------
 
 export type FormGame = {
   date: string; season: string | null; opponent: string; at_home: boolean;
@@ -133,5 +141,7 @@ export type GameDetailResponse = {
   away: DetailSide;
   head_to_head: { date: string; season: string | null; home: string; away: string; home_score: number; away_score: number }[];
   live_history: { t: string; period: number; time_remaining_s: number; home_score: number; away_score: number; home_wp: number }[];
+  pitching?: { home: PitcherSide; away: PitcherSide };
+  attribution?: string;
   projections: null;
 };

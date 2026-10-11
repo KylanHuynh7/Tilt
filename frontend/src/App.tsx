@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { NhlDashboard } from "./sports/nhl/NhlDashboard";
 import { NbaDashboard } from "./sports/nba/NbaDashboard";
 import { NflDashboard } from "./sports/nfl/NflDashboard";
+import { MlbDashboard } from "./sports/mlb/MlbDashboard";
 import { GameDetail } from "./components/GameDetail";
 import { colorFor as nhlColorFor } from "./sports/nhl/teamColors";
 import { navigate, parseRoute } from "./router";
@@ -10,6 +11,7 @@ const PERIOD_LABELS: Record<string, (p: number) => string> = {
   nhl: (p) => (p >= 4 ? "OT" : `P${p}`),
   nba: (p) => (p <= 4 ? `Q${p}` : p === 5 ? "OT" : `${p - 4}OT`),
   nfl: (p) => (p <= 4 ? `Q${p}` : "OT"),
+  mlb: (p) => `Inn ${p}`,
 };
 
 type SportId = "nhl" | "nba" | "nfl" | "mlb";
@@ -27,7 +29,7 @@ const SPORTS: Sport[] = [
   { id: "nhl", name: "NHL", status: "live", version: "v2", color: "var(--c-nhl)" },
   { id: "nba", name: "NBA", status: "live", version: "v1.1", color: "var(--c-nba)" },
   { id: "nfl", name: "NFL", status: "live", version: "v1.1", color: "var(--c-nfl)" },
-  { id: "mlb", name: "MLB", status: "planned", color: "var(--c-mlb)" },
+  { id: "mlb", name: "MLB", status: "live", version: "v1", color: "var(--c-mlb)" },
 ];
 
 const STATUS_LABEL: Record<Sport["status"], string> = {
@@ -139,6 +141,8 @@ export default function App() {
         <NbaDashboard />
       ) : sportId === "nfl" ? (
         <NflDashboard />
+      ) : sportId === "mlb" ? (
+        <MlbDashboard />
       ) : (
         <section className="panel">
           <div className="panel-title">

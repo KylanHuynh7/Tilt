@@ -110,7 +110,9 @@ export function PlayerCard({ sport, player, team, color, onClose }: Props) {
             </div>
           </>
         )}
-        <div className="pc-foot">Stats and photo: ESPN. Facts only, not a Tilt projection.</div>
+        <div className="pc-foot">
+          {data?.source === "MLB" ? "Stats and photo: MLB Advanced Media (non-commercial use)." : "Stats and photo: ESPN."} Facts only, not a Tilt projection.
+        </div>
       </div>
     </div>
   );

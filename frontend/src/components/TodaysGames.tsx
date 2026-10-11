@@ -66,7 +66,7 @@ function GameCard({ m, sport, colorFor, periodLabel }: {
       <div className="divider">
         {isLive && (
           <span className="live-meta">
-            {periodLabel(m.live_state!.period)} · {clockLabel(m.live_state!.time_remaining_s)}
+            {m.live_state!.label ?? `${periodLabel(m.live_state!.period)} · ${clockLabel(m.live_state!.time_remaining_s)}`}
           </span>
         )}
         {isFinal && <span className="final-tag">Final</span>}
