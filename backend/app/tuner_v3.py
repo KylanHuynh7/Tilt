@@ -82,7 +82,7 @@ def pick(rows: list[dict]) -> tuple[dict, dict]:
 
 
 def run_grid(cells: list[dict], events, workers: int | None = None, log=print) -> list[dict]:
-    workers = workers or os.cpu_count() or 4
+    workers = workers or int(os.environ.get("TILT_WORKERS", 0)) or os.cpu_count() or 4
     t0 = time.time()
     out: list[dict] = []
     with ProcessPoolExecutor(max_workers=workers, initializer=_init, initargs=(events,)) as ex:

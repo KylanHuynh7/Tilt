@@ -44,7 +44,7 @@ def main(argv=None) -> int:
     t0 = time.time()
     cells = [(e, c) for e in pj.EVENTS for c in pj.GRID]
     rows = []
-    with ProcessPoolExecutor(max_workers=os.cpu_count(), initializer=_init) as ex:
+    with ProcessPoolExecutor(max_workers=int(os.environ.get("TILT_WORKERS", 0)) or os.cpu_count(), initializer=_init) as ex:
         for i, r in enumerate(ex.map(_cell, cells, chunksize=4)):
             rows.append(r)
             if (i + 1) % 60 == 0:

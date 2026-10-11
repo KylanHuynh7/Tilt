@@ -34,6 +34,12 @@ async def refresh_current_season(today: date | None = None) -> dict:
     today = today or date.today()
     current_sid = _current_season_id(today)
     await pipeline.ingest_one(current_sid, today=today, force=True)
+    try:
+        # v3 roster moves need the current season's lineups (§20 V3-6).
+        from . import boxscores
+        await boxscores.ingest_season(current_sid, live=True)
+    except Exception as exc:  # noqa: BLE001 — stale lineups must not block a ratings refresh
+        print(f"[refresh] box scores for {current_sid} failed: {exc!r}")
     cache = historical.refresh()
     return {
         "current_season": current_sid,

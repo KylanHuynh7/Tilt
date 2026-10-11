@@ -30,7 +30,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 
-from . import backtest, pipeline, seasons
+from . import backtest, boxscores, pipeline, roster_moves, seasons
 from .franchises import current_code
 
 ARTIFACT_PATH = Path(__file__).resolve().parent.parent / "artifacts" / "frozen_params.json"
@@ -44,6 +44,11 @@ class FrozenParams:
     home_bump: float  # v2.0 §12; defaults to 0.0 when loading a v1 artifact
     frozen_at: str | None
     methodology_version: str | None
+    # v3 (§17, §18, §20); 0.0 when loading a v1/v2 artifact.
+    boost_window: float = 0.0
+    boost_amount: float = 0.0
+    round_scale: float = 0.0
+    elim_bump: float = 0.0
 
     def to_backtest_params(self) -> backtest.BacktestParams:
         return backtest.BacktestParams(
@@ -51,6 +56,10 @@ class FrozenParams:
             k_playoff=self.k_playoff,
             decay_carry=self.decay_carry,
             home_bump=self.home_bump,
+            boost_window=self.boost_window,
+            boost_amount=self.boost_amount,
+            round_scale=self.round_scale,
+            elim_bump=self.elim_bump,
         )
 
 
@@ -71,6 +80,10 @@ def load_frozen_params(path: Path = ARTIFACT_PATH) -> FrozenParams:
         home_bump=float(w.get("home_bump", 0.0)),
         frozen_at=payload.get("frozen_at"),
         methodology_version=payload.get("methodology_version"),
+        boost_window=float(w.get("boost_window", 0.0)),
+        boost_amount=float(w.get("boost_amount", 0.0)),
+        round_scale=float(w.get("round_scale", 0.0)),
+        elim_bump=float(w.get("elim_bump", 0.0)),
     )
 
 
@@ -109,11 +122,18 @@ def _build_cache(params: FrozenParams) -> HistoricalCache:
     We then bucket the resulting snapshot list by (season, franchise).
     """
     season_ids = _ingested_season_ids()
+    events = None
+    if params.boost_amount > 0:
+        # v3 roster moves from every season with box scores on disk, including
+        # the live current season (§20 V3-6). Seasons without box scores get none.
+        events = roster_moves.all_events(
+            [s for s in season_ids if (boxscores.BOX_DIR / f"{s}.parquet").exists()])
     result = backtest.run(
         season_ids,
         params=params.to_backtest_params(),
         record_predictions_for=set(),  # no need for predictions here
         record_snapshots=True,
+        roster_events=events,
     )
     trajectories: dict[int, dict[str, list[TrajectoryPoint]]] = {}
     for snap in result.snapshots:
