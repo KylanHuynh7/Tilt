@@ -51,13 +51,16 @@ def date_range(season_id: int, today: date | None = None) -> tuple[date, date]:
     """Inclusive date window covering everything from the season's first possible
     preseason game through the latest possible Cup Final date.
 
-    Sept 1 → Jul 31 is a safe overshoot. Empty days at the edges are cheap and
-    keep us schedule-independent. For the in-progress current season the upper
+    Sept 1 → Oct 31 of the following year. The end was Jul 31 until 2026-10-11,
+    which silently dropped the 2020 bubble qualifiers and playoffs (Aug 1 → Sep
+    28, 2020). The windows of adjacent seasons now overlap; `pipeline._parse_game`
+    drops games the API tags with a different season. Empty days at the edges are
+    cheap and keep us schedule-independent. For the in-progress current season the upper
     bound is clamped to `today` to avoid pointless future-date calls.
     """
     s = parse(season_id)
     start = date(s.start_year, 9, 1)
-    end = date(s.end_year, 7, 31)
+    end = date(s.end_year, 10, 31)
     if today is not None and end > today:
         end = today
     return start, end

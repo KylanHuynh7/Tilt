@@ -573,6 +573,21 @@ Introduced 2026-10-10 when the codebase began hosting more than one sport. None 
 
 ---
 
+### L. Data gap: the 2020 bubble playoffs were missing (found and fixed 2026-10-11)
+
+- **The gap:** the ingest's season window ended July 31, so the 2019-20 qualifying round and playoffs (130 games, Aug 1 → Sep 28, 2020) were never downloaded.
+- **Who it affected:** v1 and v2 were tuned and frozen without those games. Their training replays skip 2019-20's postseason, so the ratings entering 2020-21 lacked them.
+- **Found** while building v3's series-context feature (§18), which reads playoff game ids.
+- **Fix:**
+  - the window now ends Oct 31;
+  - games the API tags with another season are dropped;
+  - 2019-20 was re-ingested: 1,334 rows, 130 of them postseason, through the Cup Final on 2020-09-28.
+- **What changes:**
+  - The v1 and v2 frozen parameters and their locked test results are untouched, recorded as they ran (§10 #2).
+  - Live v2 ratings shift slightly because the dashboard replays the corrected history.
+  - v3 is tuned on the corrected history.
+  - No other season had games after July 31.
+
 ## Section 14 — v2.1 amendment: Monte Carlo Cup probabilities
 
 **What v2.1 adds.** A new published quantity — for each team currently in the playoff field, the probability (per the model) that they win the 2026 Stanley Cup. Exposed via a new `/simulation/cup` endpoint. This is the second of four pre-registered v2 features; v2.0 added home-ice advantage, v2.2/v2.3 will add live in-game probabilities and hero-chart live updates.

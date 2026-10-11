@@ -29,10 +29,11 @@ def test_parse_rejects_garbage():
         seasons.parse(20232025)  # non-consecutive years
 
 
-def test_date_range_covers_september_to_july():
+def test_date_range_covers_september_to_october():
+    # Ends Oct 31 so late seasons (the 2020 bubble ran to Sep 28) are captured.
     start, end = seasons.date_range(20232024)
     assert start == date(2023, 9, 1)
-    assert end == date(2024, 7, 31)
+    assert end == date(2024, 10, 31)
 
 
 def test_date_range_clamps_to_today():
@@ -44,7 +45,7 @@ def test_date_range_clamps_to_today():
 def test_date_range_no_clamp_when_today_after_window():
     today = date(2025, 1, 1)
     _, end = seasons.date_range(20232024, today=today)
-    assert end == date(2024, 7, 31)
+    assert end == date(2024, 10, 31)
 
 
 def test_known_season_ids_skips_lockout_and_covers_range():
@@ -60,3 +61,11 @@ def test_known_season_ids_skips_lockout_and_covers_range():
 def test_cutoff_pre_1967_boundary():
     assert seasons.parse(19661967).is_pre_1967
     assert not seasons.parse(seasons.CUTOFF_PRE_1967).is_pre_1967
+
+
+def test_parse_game_drops_other_seasons_games():
+    from app import pipeline
+    raw = {"id": 2019030143, "season": 20192020, "gameType": 3, "gameDate": "2020-09-20",
+           "homeTeam": {"abbrev": "TBL", "score": 2}, "awayTeam": {"abbrev": "DAL", "score": 1}, "gameState": "OFF"}
+    assert pipeline._parse_game(raw, 20192020)["game_id"] == 2019030143
+    assert pipeline._parse_game(raw, 20202021) is None

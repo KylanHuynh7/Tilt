@@ -79,6 +79,8 @@ def _parse_game(raw: dict[str, Any], season_id: int) -> dict[str, Any] | None:
         away = raw["awayTeam"]["abbrev"]
     except (KeyError, TypeError, ValueError):
         return None
+    if raw.get("season") is not None and int(raw["season"]) != season_id:
+        return None  # adjacent-season overlap in the date window (seasons.date_range)
     try:
         gd = date.fromisoformat(raw.get("gameDate", ""))
     except ValueError:
