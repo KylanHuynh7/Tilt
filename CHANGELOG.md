@@ -2,6 +2,14 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-10 — NBA N2: rating engine + walk-forward backtest
+
+- `app/nba/ratings.py`: §5 rule. Elo via `core.elo.expected` with home bump (0 at neutral sites), binary W/L, fixed-constant MOV multiplier `(|MOV|+3)^0.8 / (7.5 + 0.006·D)` when `mov` is on, zero-sum update, regression to 1500.
+- `app/nba/backtest.py`: predict-then-update replay from `first_model_season()`, once-per-boundary regression, 1500 expansion seed, predictions carrying the §6 breakdown fields (season type, neutral, team-game numbers, season length), optional per-season trajectories, `rows_by_season` reuse for the tuner.
+- +11 tests (186): formula, zero-sum, MOV direction, 30 franchises from 2000-01, [1100, 1900] bounds and ±1 mean (MOV on and off), Bobcats seeded at 1500 in 2004-05, bubble pin (172 Lake Buena Vista games + 3 international = 175 neutral in 2019-20).
+
+No validation or test metric computed yet.
+
 ## 2026-10-10 — NBA N1: ingest + lineage (methodology/NBA.md v1.1)
 
 Author approved `methodology/NBA.md` with all seven decisions as recommended (v1.0).
