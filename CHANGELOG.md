@@ -2,6 +2,12 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-11 — NFL N2: rating engine + walk-forward backtest
+
+- `app/nfl/ratings.py`: §5 rule. Neutral-aware home bump; W ∈ {1, 0.5, 0}; FiveThirtyEight NFL MOV multiplier with fixed constants; **ties use M = 1** so unequal teams still move.
+- `app/nfl/backtest.py`: predict-then-update by date from 1999, once-per-boundary regression, 1500 seed for Houston (2002), relocated codes continuous via lineage. §6 week segments (1–4 / 5–16 / 17–18; 16-game seasons 1–4 / 5–15 / 16–17); trajectories.
+- +15 tests (242). No metrics computed. No new limitations beyond NFL §13.
+
 ## 2026-10-11 — UI: per-sport "worlds" redesign
 
 User request: the single dark theme was "very boring". Wanted more color and innovation, with sport colors (basketball orange, football green, hockey black, baseball red + blue).
