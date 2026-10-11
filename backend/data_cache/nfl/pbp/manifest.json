@@ -1,0 +1,107 @@
+{
+  "2004": {
+    "final_mismatch": 0,
+    "games": 267,
+    "kept": 267,
+    "not_in_games_csv": 0,
+    "samples": 39563
+  },
+  "2005": {
+    "final_mismatch": 0,
+    "games": 267,
+    "kept": 267,
+    "not_in_games_csv": 0,
+    "samples": 39780
+  },
+  "2006": {
+    "final_mismatch": 0,
+    "games": 267,
+    "kept": 267,
+    "not_in_games_csv": 0,
+    "samples": 39227
+  },
+  "2007": {
+    "final_mismatch": 0,
+    "games": 267,
+    "kept": 267,
+    "not_in_games_csv": 0,
+    "samples": 39097
+  },
+  "2008": {
+    "final_mismatch": 0,
+    "games": 267,
+    "kept": 267,
+    "not_in_games_csv": 0,
+    "samples": 38677
+  },
+  "2009": {
+    "final_mismatch": 0,
+    "games": 267,
+    "kept": 267,
+    "not_in_games_csv": 0,
+    "samples": 39376
+  },
+  "2010": {
+    "final_mismatch": 0,
+    "games": 267,
+    "kept": 267,
+    "not_in_games_csv": 0,
+    "samples": 39605
+  },
+  "2011": {
+    "final_mismatch": 1,
+    "games": 267,
+    "kept": 266,
+    "not_in_games_csv": 0,
+    "samples": 39986
+  },
+  "2012": {
+    "final_mismatch": 0,
+    "games": 267,
+    "kept": 267,
+    "not_in_games_csv": 0,
+    "samples": 40426
+  },
+  "2013": {
+    "final_mismatch": 0,
+    "games": 267,
+    "kept": 267,
+    "not_in_games_csv": 0,
+    "samples": 40628
+  },
+  "2014": {
+    "final_mismatch": 0,
+    "games": 267,
+    "kept": 267,
+    "not_in_games_csv": 0,
+    "samples": 40300
+  },
+  "2022": {
+    "final_mismatch": 0,
+    "games": 284,
+    "kept": 284,
+    "not_in_games_csv": 0,
+    "samples": 41604
+  },
+  "2023": {
+    "final_mismatch": 0,
+    "games": 285,
+    "kept": 285,
+    "not_in_games_csv": 0,
+    "samples": 41925
+  },
+  "2024": {
+    "final_mismatch": 0,
+    "games": 285,
+    "kept": 285,
+    "not_in_games_csv": 0,
+    "samples": 41483
+  },
+  "2025": {
+    "final_mismatch": 0,
+    "games": 285,
+    "kept": 285,
+    "not_in_games_csv": 0,
+    "samples": 40778
+  }
+}

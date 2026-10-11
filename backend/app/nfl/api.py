@@ -113,11 +113,26 @@ async def ratings_history(season: int):
     }
 
 
-def live_block(g: dict) -> dict:
-    return {"live_state": {
-        "game_state": "LIVE", "period": g["period"] or 1, "time_remaining_s": int(g["clock_s"]),
-        "home_score": g["home_score"] or 0, "away_score": g["away_score"] or 0,
+def live_block(g: dict, p_home: float | None = None) -> dict:
+    """Live score/clock plus the v1.1 live WP (§12) when the artifact exists.
+    ESPN's situation gives possession and field position; if it's missing
+    (between plays, breaks) the possession terms are zero.
+    """
+    from . import live_wp  # lazy: live_wp imports this module
+
+    period = g["period"] or 1
+    home, away = g["home_score"] or 0, g["away_score"] or 0
+    out = {"live_state": {
+        "game_state": "LIVE", "period": period, "time_remaining_s": int(g["clock_s"]),
+        "home_score": home, "away_score": away,
     }}
+    if p_home is not None and live_wp.ARTIFACT.exists():
+        s = {"home": 1, "away": -1}.get(g.get("possession"), 0)
+        y = g.get("yardline_100") if g.get("yardline_100") is not None else 50
+        wp = live_wp.predict(live_wp.load(), pre_game_p=p_home, qtr=period, qsr=g["clock_s"],
+                             d=home - away, s=s, y=y)
+        out["live_wp"] = {"home_win_prob": round(wp, 4), "n_samples": 0, "smoothed": False}
+    return out
 
 
 @router.get("/games/today")
@@ -146,7 +161,7 @@ async def games_this_week():
             "home_score": g["home_score"], "away_score": g["away_score"],
         }
         if state == "LIVE":
-            m.update(live_block(g))
+            m.update(live_block(g, p))
         out.append(m)
     week = next((g["week"] for g in events if g["week"]), None)
     return {"date": f"Week {week}" if week else "", "frozen_params": True, "matchups": out}

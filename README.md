@@ -6,7 +6,7 @@ Interpretable rating systems that produce calibrated, game-by-game win probabili
 |---|---|---|
 | **NHL** | Live — v2 (evaluated, see below) | [`METHODOLOGY.md`](./METHODOLOGY.md) |
 | **NBA** | Live — v1.1: pre-game model (all §6 targets PASS on test) + live in-game win probability | [`methodology/NBA.md`](./methodology/NBA.md) |
-| **NFL** | Live — v1 (all §6 targets PASS on test; playoff ECE flagged); live win probability next (v1.1). College football possibly later | [`methodology/NFL.md`](./methodology/NFL.md) |
+| **NFL** | Live — v1.1: pre-game model (all §6 targets PASS; playoff ECE flagged) + live win probability (4 of 5 live targets PASS). College football possibly later | [`methodology/NFL.md`](./methodology/NFL.md) |
 | MLB | Planned | — |
 
 Everything below this table describes the NHL model unless stated otherwise. Each sport gets its own methodology document, written and approved before that sport's model code, with its own train/validation/test split and §13-style limitations.

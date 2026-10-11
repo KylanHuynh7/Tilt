@@ -17,7 +17,7 @@ type Sport = {
 const SPORTS: Sport[] = [
   { id: "nhl", name: "NHL", status: "live", version: "v2", color: "var(--c-nhl)" },
   { id: "nba", name: "NBA", status: "live", version: "v1.1", color: "var(--c-nba)" },
-  { id: "nfl", name: "NFL", status: "live", version: "v1", color: "var(--c-nfl)" },
+  { id: "nfl", name: "NFL", status: "live", version: "v1.1", color: "var(--c-nfl)" },
   { id: "mlb", name: "MLB", status: "planned", color: "var(--c-mlb)" },
 ];
 

@@ -1,5 +1,5 @@
 # NFL Rating System — Methodology Document
-## Version 1.0
+## Version 1.1
 **Author:** Kylan Huynh
 **Status:** v1 frozen and evaluated 2026-10-11 — **all four §6 criteria PASS** on 2022–2025 (playoff ECE flag fired; see §13). APPROVED 2026-10-11 — all six **[DECISION]** items resolved as recommended. Any later change to §§3–6 or §12 is a version-tagged amendment.
 **Last updated:** 2026-10-11
@@ -7,6 +7,15 @@
 **Amendment log:**
 - *v0.1-draft (2026-10-11):* First draft, written after a data-availability probe and before any NFL ingest, rating code, or metric.
 - *v1.0 (2026-10-11):* Author approved with every [DECISION] as recommended: (1) test 2022–2025, (2) MOV on/off in the grid with ties at M = 1, (3) no K_playoff ≥ K_regular constraint, (4) QB adjustment deferred to v2, (5) v1 thresholds LL < 0.660, Brier 0.200–0.235, ECE < 0.05, must beat home-rate baseline, (6) v1.1 live targets pre-registered as in §12. No other text changed.
+- *v1.1 (2026-10-11):* Pre-fit clarifications to §12, written before any play-by-play was downloaded or any coefficient fitted.
+  - **Samples:** one per play with a non-null `posteam` and `down` (drops kickoffs, PATs, timeouts and period markers).
+  - **Time:** τ = (4 − qtr) × 900 + `quarter_seconds_remaining` in regulation; in OT, τ = `quarter_seconds_remaining`. m = τ / 60.
+  - **Columns:** read by column projection, so only `game_id, home_team, posteam, qtr, quarter_seconds_remaining, down, yardline_100, total_home_score, total_away_score` are ever loaded. Model-output columns are never read into memory.
+  - **Validity:** a game is used only if its last play's running score matches the `games.csv` final; others are dropped and counted.
+  - **Storage:** raw files are downloaded to a scratch directory and only the compact extracted samples are committed.
+  - **Kickoff check:** evaluated at τ = 3600, d = 0, s = 0.
+  - **Late-lead check:** worst case over pre-game probability (observed range), s ∈ {−1, 0, +1} and y ∈ [1, 99] for a 17-point leader with 2 minutes left.
+  - **ESPN `situation` mapping (live):** `possession` gives s, and `yardsToEndzone` gives y.
 
 ---
 
@@ -224,11 +233,22 @@ Reading: the pre-game edge fades with time, a lead matters more as time runs out
   - *Per season:* 2022 ECE 0.0347, **2023 0.0629**, 2024 0.0488, 2025 0.0397. Two of four seasons sit near or over the target on their own.
   - *The home-advantage collapse did not persist.* The observed test home rate is 55.3%, close to what H = 35 implies, so the §8 drift risk flagged at freeze did not materialize as a test miss.
   - *Neutral-site games:* n = 28, ECE 0.258 — noise at that size.
+- **v1.1 live win probability (fitted + evaluated once, 2026-10-11):**
+  - *Data.* nflverse play-by-play. Training 2004–2014: 2,936 games, 436,665 plays; 1 game dropped for a final-score mismatch. Test 2022–2025: 1,139 games, 165,790 plays, none dropped.
+  - *Fit:* β0 +0.066, β1 +1.319, β2 +0.765, β3 +3.556, β4 −0.701 (`artifacts/nfl/live_wp_v1.json`). The possession terms combine to `s·(3.56·(1 − y/100) − 0.70)/√(m+1)`: the ball at your own 20 is roughly neutral, and deep in opponent territory is worth a lot.
+  - *Pre-registered targets (DECISION 6): 4 of 5 PASS.*
+    - Beats the pre-game-held baseline on LL in every quarter: **PASS** (Q1 0.615 vs 0.634; Q4 0.328 vs 0.639; OT 0.607 vs 0.659).
+    - Overall ECE < 0.05: **PASS** (0.0137; LL 0.482 vs 0.635 held).
+    - Monotone in d: **PASS**.
+    - 17-point lead with 2 min left ≥ 0.97: **PASS** (worst case 0.997).
+    - **Kickoff within 0.02 of pre-game: FAIL** (gap 0.070). Same mechanism as NBA: β1 > 1 because 2004–14 pre-game logits were too compressed, so at kickoff the model stretches the pre-game probability.
+  - *Notes:* OT ECE 0.052 (1,038 plays) is the weakest period. Q1 calibration (0.027) is better than the held baseline (0.031), unlike NBA. Samples are correlated within games (≈146 plays per game), so the effective n is nearer 1,139.
+  - *Not modeled:* down, distance, timeouts, kickoff/PAT states. Rule changes since 2014 (2024 kickoff, OT rules) are in the test era but not the training era.
 - **Dashboard / API (N5):**
   - *"This week" is whatever ESPN's default scoreboard calls the current week.* Between Tuesday and Thursday it may still show the finished week.
   - *Champion = winner of the season's last `SB` game.* It reproduces KC 2019, TB 2020, LA 2021, KC 2022–23, PHI 2024.
   - *Pre-game probabilities ignore starting-QB news* (DECISION 4). A backup starting is invisible to the model and to the card.
-  - *ESPN `situation` parsing is written* (possession, yards to end zone, down, distance) but still unverified against a live game. It isn't used until v1.1.
+  - *ESPN `situation` parsing* (possession, yards to end zone) feeds the live model. It is still unverified against a real live game: if the field is missing or misnamed, the possession terms fall back to zero (score + time + pre-game edge only) rather than failing.
   - *Similar team colors* (e.g. PHI and JAX, both teal-green) make the team-colored probability bar harder to read; the percentages are authoritative (NHL §13.I).
 - **No logos:** inherits NHL §13.I.
 

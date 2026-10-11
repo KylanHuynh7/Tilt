@@ -1,0 +1,37 @@
+{
+  "methodology_version": "nfl-1.1",
+  "fitted_at": "2026-10-11T05:32:55.398221+00:00",
+  "coefficients": {
+    "b0": 0.06587210368566625,
+    "b1": 1.3185478010912195,
+    "b2": 0.7652932394592994,
+    "b3": 3.5555056724045575,
+    "b4": -0.7005042541855966
+  },
+  "training_seasons": [
+    2004,
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014
+  ],
+  "n_games": 2936,
+  "n_samples": 436665,
+  "checks_on_training_range": {
+    "pre_game_p_range": [
+      0.0987,
+      0.9531
+    ],
+    "kickoff_max_abs_gap_to_pregame": 0.07009133926935351,
+    "kickoff_within_0_02": false,
+    "monotone_in_score_diff": true,
+    "leader_by_17_with_2_min_left_min_wp": 0.9966159368039066,
+    "leader_by_17_with_2_min_left_ge_0_97": true
+  }
+}

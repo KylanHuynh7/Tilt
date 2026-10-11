@@ -2,6 +2,16 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-11 — NFL v1.1: live in-game win probability
+
+Methodology v1.1 pre-fit clarifications: per-play samples, τ definition, column projection (model-output columns never loaded), final-score validity rule, check definitions, ESPN situation mapping.
+- `app/nfl/pbp.py`: nflverse play-by-play downloaded to scratch, projected to 9 columns, compact samples committed (`data_cache/nfl/pbp/`, 1.6 MB).
+- `app/core/logistic.py`: pure-Python n-coefficient Newton logistic fit (Gaussian elimination). `app/nfl/live_wp.py`: the five-term §12 model, checks, predict.
+- `scripts/nfl_live_wp_fit.py` → β0 +0.066, β1 +1.319, β2 +0.765, β3 +3.556, β4 −0.701 on 2004–14.
+- `scripts/nfl_live_wp_evaluate.py` (one-shot) on 2022–25: **live LL 0.482 vs 0.635 held; ECE 0.0137; beats held every quarter. 4 of 5 pre-registered targets PASS; the kickoff check FAILS (0.070 > 0.02).**
+- `/nfl/games/today` attaches `live_wp` using ESPN possession and field position (falls back to zero possession terms if missing). NFL tag → v1.1.
+- +7 tests (263). Correction: the N5 entry below says 257 tests; the actual count was 256.
+
 ## 2026-10-11 — NFL N5: API + dashboard (NFL goes live)
 
 Backend:

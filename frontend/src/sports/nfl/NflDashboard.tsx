@@ -9,7 +9,7 @@ const cfg: SportConfig = {
   periodLabel: (p) => (p <= 4 ? `Q${p}` : "OT"),
   emptyNote: "No regular-season or playoff games this week.",
   footnote:
-    "Pre-game probabilities from the frozen NFL v1 model. Starting-QB changes aren't modeled. Live score and clock refresh every 60 s; a live win probability arrives in NFL v1.1.",
+    "Pre-game probabilities from the frozen NFL v1 model (starting-QB changes aren't modeled); live probabilities from the v1.1 in-game model (score, time, possession, field position), refreshed every 60 s.",
   championLabel: (team, season) => `${team} won the ${season} season's Super Bowl`,
   breakdownRows: [
     ["2022", (b) => b.per_season["2022"]],

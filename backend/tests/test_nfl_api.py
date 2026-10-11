@@ -67,3 +67,14 @@ def test_espn_parse_schema_change_raises():
     del e["competitions"]
     with pytest.raises(espn.SchemaError):
         espn.parse_event(e)
+
+
+def test_live_block_adds_live_wp_with_possession():
+    from app.nfl import live_wp
+    if not live_wp.ARTIFACT.exists():
+        pytest.skip("live model not fitted")
+    g = espn.parse_event(_event())                    # home leads 17-13, Q3, home ball at opp 35
+    wp = nfl_api.live_block(g, 0.5)["live_wp"]["home_win_prob"]
+    g_away = {**g, "possession": "away"}
+    assert wp > nfl_api.live_block(g_away, 0.5)["live_wp"]["home_win_prob"]
+    assert 0.6 < wp < 0.95
