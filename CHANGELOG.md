@@ -2,6 +2,12 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-10 — NBA methodology v0.1-draft (pre-code)
+
+New `methodology/NBA.md`, written before any NBA ingest or model code and pending author approval. Highlights: ESPN public API as the single source (official NBA endpoints blocked scripted access during the probe); coverage rule (season enters only if regular-season count is within 1% of schedule; verified 1993-94 onward on samples); split warm-up 1993-94 → 2017-18, validation 2018-19 → 2023-24, test 2024-25 + 2025-26; Elo with home-court bump and a FiveThirtyEight-style margin-of-victory multiplier (on/off in a 1,200-cell grid); neutral sites via ESPN `neutralSite` + Lake Buena Vista city rule for the 2020 bubble (ESPN doesn't flag it); lineage keyed on ESPN team ids (roster continuity); new home-rate baseline; every breakdown emitted in the single test pass; v1.1 live WP as a three-term logistic model. Seven **[DECISION]** items await the author. Includes a contamination disclosure of exactly what NBA data was seen before drafting.
+
+Correction to the Phase 0 entry below: the suite is **162** tests (+4 API tests), not 167 / +5 as written there and in commit `2d3a1f2`.
+
 ## 2026-10-10 — Phase 0: multi-sport platform shell
 
 First step of expanding Tilt from NHL-only to NHL / NBA / NFL / MLB, one sport at a time. **No NHL model change**: v2 validation metrics reproduce exactly after the refactor (n = 5,599, LL 0.66219, Brier 0.23495, ECE 0.01531), checked against the pre-refactor commit in a separate worktree.
