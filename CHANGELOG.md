@@ -2,6 +2,19 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-10 — NBA N1: ingest + lineage (methodology/NBA.md v1.1)
+
+Author approved `methodology/NBA.md` with all seven decisions as recommended (v1.0).
+
+New `backend/app/nba/` package:
+- `espn.py`: per-day ESPN scoreboard client, strict parser (`SchemaError` on missing fields), retries, §3 neutral-site rule (ESPN flag or Lake Buena Vista for the bubble). Skips empty `{}` events.
+- `teams.py`: 30 franchises keyed on ESPN team id (lineage = id), conventional abbreviations, ESPN-published colors.
+- `pipeline.py`: one parquet per season at `data_cache/nba/raw/`, season window Sep 1 → Oct 31 filtered by ESPN season label, coverage check vs schedule (lockout/COVID overrides), `clean_rows()` validity rules, `first_model_season()` enforcing the no-bridging rule, CLI `ingest / status / recheck`.
+
+Data: 34 seasons ingested (1993-94 → 2026-27 to date). Coverage PASS for every season except **1999-2000 (0.981, FAIL)**, so the warm-up starts in **2000-01**. Dropped on read: 85 phantom 0-0 finals, 6 same-day duplicates.
+
+Methodology v1.1: validity rules, coverage outcome, §13 entries (phantom/duplicate rows, lost 1990s history, 2012-13 cancelled game). +13 tests (175 total). No rating code yet; no NBA metric computed.
+
 ## 2026-10-10 — NBA methodology v0.1-draft (pre-code)
 
 New `methodology/NBA.md`, written before any NBA ingest or model code and pending author approval. Highlights: ESPN public API as the single source (official NBA endpoints blocked scripted access during the probe); coverage rule (season enters only if regular-season count is within 1% of schedule; verified 1993-94 onward on samples); split warm-up 1993-94 → 2017-18, validation 2018-19 → 2023-24, test 2024-25 + 2025-26; Elo with home-court bump and a FiveThirtyEight-style margin-of-victory multiplier (on/off in a 1,200-cell grid); neutral sites via ESPN `neutralSite` + Lake Buena Vista city rule for the 2020 bubble (ESPN doesn't flag it); lineage keyed on ESPN team ids (roster continuity); new home-rate baseline; every breakdown emitted in the single test pass; v1.1 live WP as a three-term logistic model. Seven **[DECISION]** items await the author. Includes a contamination disclosure of exactly what NBA data was seen before drafting.

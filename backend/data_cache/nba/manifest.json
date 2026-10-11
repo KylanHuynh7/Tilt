@@ -1,0 +1,444 @@
+{
+  "19931994": {
+    "coverage": {
+      "dropped_duplicates": 0,
+      "dropped_zero_zero": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_games": 1107,
+      "scheduled": 1107
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:33:09.810580+00:00",
+    "rows": 1185
+  },
+  "19941995": {
+    "coverage": {
+      "dropped_duplicates": 0,
+      "dropped_zero_zero": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_games": 1107,
+      "scheduled": 1107
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:33:17.834635+00:00",
+    "rows": 1181
+  },
+  "19951996": {
+    "coverage": {
+      "dropped_duplicates": 0,
+      "dropped_zero_zero": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_games": 1189,
+      "scheduled": 1189
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:33:21.559677+00:00",
+    "rows": 1257
+  },
+  "19961997": {
+    "coverage": {
+      "dropped_duplicates": 0,
+      "dropped_zero_zero": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_games": 1189,
+      "scheduled": 1189
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:33:25.404157+00:00",
+    "rows": 1263
+  },
+  "19971998": {
+    "coverage": {
+      "dropped_duplicates": 0,
+      "dropped_zero_zero": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_games": 1189,
+      "scheduled": 1189
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:33:33.567097+00:00",
+    "rows": 1261
+  },
+  "19981999": {
+    "coverage": {
+      "dropped_duplicates": 0,
+      "dropped_zero_zero": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_games": 725,
+      "scheduled": 725
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:33:39.362311+00:00",
+    "rows": 792
+  },
+  "19992000": {
+    "coverage": {
+      "dropped_duplicates": 0,
+      "dropped_zero_zero": 82,
+      "passes": false,
+      "ratio": 0.9807,
+      "regular_games": 1166,
+      "scheduled": 1189
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:33:45.660566+00:00",
+    "rows": 1327
+  },
+  "20002001": {
+    "coverage": {
+      "dropped_duplicates": 0,
+      "dropped_zero_zero": 1,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_games": 1189,
+      "scheduled": 1189
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:33:52.652891+00:00",
+    "rows": 1361
+  },
+  "20012002": {
+    "coverage": {
+      "dropped_duplicates": 0,
+      "dropped_zero_zero": 1,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_games": 1189,
+      "scheduled": 1189
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:33:57.195196+00:00",
+    "rows": 1372
+  },
+  "20022003": {
+    "coverage": {
+      "dropped_duplicates": 1,
+      "dropped_zero_zero": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_games": 1189,
+      "scheduled": 1189
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:34:03.417597+00:00",
+    "rows": 1391
+  },
+  "20032004": {
+    "coverage": {
+      "dropped_duplicates": 0,
+      "dropped_zero_zero": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_games": 1189,
+      "scheduled": 1189
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:34:10.265300+00:00",
+    "rows": 1385
+  },
+  "20042005": {
+    "coverage": {
+      "dropped_duplicates": 0,
+      "dropped_zero_zero": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_games": 1230,
+      "scheduled": 1230
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:34:16.396834+00:00",
+    "rows": 1432
+  },
+  "20052006": {
+    "coverage": {
+      "dropped_duplicates": 1,
+      "dropped_zero_zero": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_games": 1230,
+      "scheduled": 1230
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:34:23.779202+00:00",
+    "rows": 1439
+  },
+  "20062007": {
+    "coverage": {
+      "dropped_duplicates": 0,
+      "dropped_zero_zero": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_games": 1230,
+      "scheduled": 1230
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:35:59.132093+00:00",
+    "rows": 1420
+  },
+  "20072008": {
+    "coverage": {
+      "dropped_duplicates": 2,
+      "dropped_zero_zero": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_games": 1230,
+      "scheduled": 1230
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:36:06.035720+00:00",
+    "rows": 1437
+  },
+  "20082009": {
+    "coverage": {
+      "dropped_duplicates": 0,
+      "dropped_zero_zero": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_games": 1230,
+      "scheduled": 1230
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:36:12.272716+00:00",
+    "rows": 1431
+  },
+  "20092010": {
+    "coverage": {
+      "dropped_duplicates": 0,
+      "dropped_zero_zero": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_games": 1230,
+      "scheduled": 1230
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:36:18.218094+00:00",
+    "rows": 1433
+  },
+  "20102011": {
+    "coverage": {
+      "dropped_duplicates": 0,
+      "dropped_zero_zero": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_games": 1230,
+      "scheduled": 1230
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:36:25.442755+00:00",
+    "rows": 1434
+  },
+  "20112012": {
+    "coverage": {
+      "dropped_duplicates": 0,
+      "dropped_zero_zero": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_games": 990,
+      "scheduled": 990
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:36:31.792118+00:00",
+    "rows": 1105
+  },
+  "20122013": {
+    "coverage": {
+      "dropped_duplicates": 0,
+      "dropped_zero_zero": 0,
+      "passes": true,
+      "ratio": 0.9992,
+      "regular_games": 1229,
+      "scheduled": 1230
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:36:38.378551+00:00",
+    "rows": 1434
+  },
+  "20132014": {
+    "coverage": {
+      "dropped_duplicates": 0,
+      "dropped_zero_zero": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_games": 1230,
+      "scheduled": 1230
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:36:44.526751+00:00",
+    "rows": 1438
+  },
+  "20142015": {
+    "coverage": {
+      "dropped_duplicates": 0,
+      "dropped_zero_zero": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_games": 1230,
+      "scheduled": 1230
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:36:50.799204+00:00",
+    "rows": 1432
+  },
+  "20152016": {
+    "coverage": {
+      "dropped_duplicates": 0,
+      "dropped_zero_zero": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_games": 1230,
+      "scheduled": 1230
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:36:55.541193+00:00",
+    "rows": 1428
+  },
+  "20162017": {
+    "coverage": {
+      "dropped_duplicates": 0,
+      "dropped_zero_zero": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_games": 1230,
+      "scheduled": 1230
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:36:59.393716+00:00",
+    "rows": 1415
+  },
+  "20172018": {
+    "coverage": {
+      "dropped_duplicates": 0,
+      "dropped_zero_zero": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_games": 1230,
+      "scheduled": 1230
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:37:03.471144+00:00",
+    "rows": 1393
+  },
+  "20182019": {
+    "coverage": {
+      "dropped_duplicates": 0,
+      "dropped_zero_zero": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_games": 1230,
+      "scheduled": 1230
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:37:07.437781+00:00",
+    "rows": 1393
+  },
+  "20192020": {
+    "coverage": {
+      "dropped_duplicates": 0,
+      "dropped_zero_zero": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_games": 1059,
+      "scheduled": 1059
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:37:10.869907+00:00",
+    "rows": 1236
+  },
+  "20202021": {
+    "coverage": {
+      "dropped_duplicates": 0,
+      "dropped_zero_zero": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_games": 1080,
+      "scheduled": 1080
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:37:14.430191+00:00",
+    "rows": 1253
+  },
+  "20212022": {
+    "coverage": {
+      "dropped_duplicates": 0,
+      "dropped_zero_zero": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_games": 1230,
+      "scheduled": 1230
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:37:17.808793+00:00",
+    "rows": 1401
+  },
+  "20222023": {
+    "coverage": {
+      "dropped_duplicates": 0,
+      "dropped_zero_zero": 0,
+      "passes": true,
+      "ratio": 1.0,
+      "regular_games": 1230,
+      "scheduled": 1230
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:37:46.092087+00:00",
+    "rows": 1392
+  },
+  "20232024": {
+    "coverage": {
+      "dropped_duplicates": 0,
+      "dropped_zero_zero": 0,
+      "passes": true,
+      "ratio": 1.0008,
+      "regular_games": 1231,
+      "scheduled": 1230
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:37:49.841534+00:00",
+    "rows": 1395
+  },
+  "20242025": {
+    "coverage": {
+      "dropped_duplicates": 0,
+      "dropped_zero_zero": 0,
+      "passes": true,
+      "ratio": 1.0008,
+      "regular_games": 1231,
+      "scheduled": 1230
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:32:54.462934+00:00",
+    "rows": 1403
+  },
+  "20252026": {
+    "coverage": {
+      "dropped_duplicates": 1,
+      "dropped_zero_zero": 0,
+      "passes": true,
+      "ratio": 1.0008,
+      "regular_games": 1231,
+      "scheduled": 1230
+    },
+    "in_progress": false,
+    "pulled_at": "2026-10-11T04:37:53.480109+00:00",
+    "rows": 1401
+  },
+  "20262027": {
+    "coverage": {
+      "dropped_duplicates": 0,
+      "dropped_zero_zero": 0,
+      "passes": false,
+      "ratio": 0.0,
+      "regular_games": 0,
+      "scheduled": 1230
+    },
+    "in_progress": true,
+    "pulled_at": "2026-10-11T04:37:53.755989+00:00",
+    "rows": 32
+  }
+}

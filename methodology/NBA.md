@@ -1,11 +1,13 @@
 # NBA Rating System — Methodology Document
-## Version 0.1-draft
+## Version 1.1
 **Author:** Kylan Huynh
-**Status:** DRAFT — pre-code. **No NBA model code may be written until the author approves this document** (same rule as NHL `METHODOLOGY.md` §11). Items marked **[DECISION]** need an explicit author ruling; each carries a recommendation.
+**Status:** APPROVED 2026-10-10 — all seven **[DECISION]** items resolved as recommended. Implementation may begin. Any later change to §§3–6 or §12 is a version-tagged amendment.
 **Last updated:** 2026-10-10
 
 **Amendment log:**
 - *v0.1-draft (2026-10-10):* First draft. Written after a data-availability probe and before any NBA ingest, rating code, or metric computation.
+- *v1.0 (2026-10-10):* Author approved the draft with every [DECISION] resolved as recommended: (1) first season 1993-94, (2) test 2024-25 + 2025-26, (3) Charlotte lineage by roster continuity / ESPN ids, (4) MOV on/off in the grid, (5) no K_playoff ≥ K_regular constraint, (6) thresholds LL < 0.640, Brier 0.200–0.225, ECE < 0.04, must beat home-rate baseline, (7) three-term logistic live WP. No text below changed except this header.
+- *v1.1 (2026-10-10):* Ingest-phase clarifications, made after ingest and before any rating code or metric. (a) **Data-validity rules** (§3): completed 0-0 games are dropped as impossible, and rows sharing (date, home, away) collapse to one game, keeping a valid score and then the lowest ESPN id. Raw parquets are untouched; the rules run on read and the manifest records every drop. (b) **Coverage outcome:** 1999-2000 fails the 1% rule (1,166 / 1,189 after cleaning), so under DECISION 1 the warm-up **starts in 2000-01**, not 1993-94. Every season from 2000-01 through 2025-26 passes. (c) Empty `{}` events in ESPN payloads are skipped; any other malformed event still raises. See §13.
 
 ---
 
@@ -110,11 +112,13 @@ NBA Cup knockout games are treated as regular-season games for rating purposes, 
 **Between-season regression:** `R_new = 1500 + carry × (R − 1500)`, carry tuned (§5).
 
 **Expansion and relocation:**
-- Expansion franchises start at exactly 1500 with no regression in their first season (inherits NHL §4 v1.1). In-window expansions: Toronto Raptors and Vancouver Grizzlies (1995-96), Charlotte Bobcats (2004-05).
+- Expansion franchises start at exactly 1500 with no regression in their first season (inherits NHL §4 v1.1). In-window expansions: Charlotte Bobcats (2004-05). (Toronto and Vancouver, 1995-96, fall before the v1.1 start.)
 - Franchise identity follows **roster continuity**, keyed on ESPN's stable team id. ESPN already encodes this: the 1990s Charlotte Hornets share id 3 with New Orleans, the 2004 Bobcats/current Hornets are id 30, Vancouver and Memphis share id 29, Seattle and Oklahoma City share id 25.
 - Relocations and renames inherit rating with no reset: Vancouver → Memphis (2001), Charlotte → New Orleans (2002, incl. the 2005-07 New Orleans/Oklahoma City interim), Seattle → Oklahoma City (2008), New Jersey → Brooklyn (2012), Bullets → Wizards (1997), Bobcats → Hornets (2014), New Orleans Hornets → Pelicans (2013).
 
 **[DECISION 3] Charlotte lineage.** In 2014 the NBA officially reassigned the 1988–2002 Charlotte Hornets history to the current Charlotte franchise. Recommendation: **ignore the official reassignment and follow roster continuity** (ESPN's ids), for the same reason NHL §4 treats relocations by franchise continuity: the rating tracks the team on the floor, not the record book.
+
+**First modeled season (resolved in v1.1): 2000-01.** Warm-up is 2000-01 → 2017-18 (18 seasons). The 1993-94 → 1999-2000 parquets stay on disk for audit but are never read by the model. The code enforces this (`pipeline.first_model_season()` derives it from the manifest).
 
 **Shortened seasons:** 1998-99 (50 games, lockout), 2011-12 (66, lockout), 2019-20 (suspended, then bubble), 2020-21 (72). All included, no K adjustment, documented in §13 (inherits NHL §7 COVID handling).
 
@@ -271,11 +275,14 @@ Written before any results exist; extended at every phase.
 - **Bubble detection depends on venue city.** If ESPN ever back-fills a different city for those games, the neutral flag silently breaks; a test pins the expected count of bubble games.
 - **NBA Cup knockout games are rated as regular-season games** even though the final doesn't count in standings.
 - **Charlotte lineage follows ESPN team ids,** not the NBA's official 2014 record reassignment (DECISION 3).
+- **ESPN carries phantom and duplicate rows** (found at ingest). 1999-2000 has 82 completed 0-0 "finals", 76 of them regular-season Chicago games, each shadowing a real game under a 400-series id. Single 0-0 phantoms appear in 2000-01 and 2001-02, and exact same-day duplicates in 2002-03, 2005-06, 2007-08 (×2) and 2025-26. Handled by the v1.1 validity rules. A phantom with a *non-zero* fake score, on a different date from the real game, would not be caught; per-team game counts (82 for every team in every passing season, except NBA Cup finalists at 83) are the evidence that none exist.
+- **1990s history is unavailable.** 1999-2000 is missing 23 real regular-season games in ESPN's data, which fails the coverage rule and moves the start to 2000-01. Six otherwise-complete seasons (1993-94 → 1998-99) are discarded rather than bridged, per DECISION 1. Expansion rules for the 1995 Raptors and Grizzlies therefore never apply. All 29 franchises existing in 2000-01 start at 1500 together, and only the 2004-05 Bobcats are a true in-window expansion.
+- **2012-13 has 1,229 regular-season games, not 1,230.** The Celtics–Pacers game cancelled after the Boston Marathon bombing was never played. Within the 1% rule; noted so the count isn't mistaken for a gap.
 - **No logos.** Team identity uses colored badges, inheriting NHL §13.I trademark reasoning.
 
 ---
 
-## Decisions needed before implementation
+## Decisions (resolved 2026-10-10 — all as recommended)
 
 | # | Decision | Recommendation |
 |---|---|---|
