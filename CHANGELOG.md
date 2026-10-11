@@ -2,6 +2,14 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-11 — NFL N4: one-shot test evaluation (PASS ×4, playoff flag)
+
+`scripts/nfl_evaluate.py` (§10 #1 guardrails, every §6 breakdown in the single pass). Ran once on 2022–2025 (n = 1,139): **LL 0.63440, Brier 0.22135, ECE 0.02870, beats home-rate baseline 0.68768: all PASS.**
+- **Playoff ECE 0.1701 (n = 52) fired the 0.08 flag**, shown prominently in the README.
+- Late/mid ECE ratio 1.71: no flag.
+- Observed test home rate 55.3%, so the freeze-time drift worry didn't become a test miss.
+- Documented in NFL §13 and the README. +3 tests (250).
+
 ## 2026-10-11 — NFL N3: validation grid + freeze
 
 - `app/nfl/tuner.py` (1,440-cell §5 grid on 2015–2021; test seasons cut before loading) and `scripts/nfl_freeze.py` (≈33 s, writes `artifacts/nfl/frozen_params.json`, refuses to overwrite).

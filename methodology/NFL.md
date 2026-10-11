@@ -1,7 +1,7 @@
 # NFL Rating System — Methodology Document
 ## Version 1.0
 **Author:** Kylan Huynh
-**Status:** APPROVED 2026-10-11 — all six **[DECISION]** items resolved as recommended. Any later change to §§3–6 or §12 is a version-tagged amendment.
+**Status:** v1 frozen and evaluated 2026-10-11 — **all four §6 criteria PASS** on 2022–2025 (playoff ECE flag fired; see §13). APPROVED 2026-10-11 — all six **[DECISION]** items resolved as recommended. Any later change to §§3–6 or §12 is a version-tagged amendment.
 **Last updated:** 2026-10-11
 
 **Amendment log:**
@@ -217,6 +217,13 @@ Reading: the pre-game edge fades with time, a lead matters more as time runs out
   - *MOV helps:* LL 0.63402 vs 0.63952 for the best MOV-off cell.
   - *K_playoff < K_regular again,* as in NHL and NBA. K_playoff = 10 is the grid floor. The best cell with K_playoff ≥ K_regular is 0.00014 LL worse.
 - **§8 home-advantage drift flag — FIRED before freezing.** Home win rate (non-neutral games, ties as 0.5) by validation season: 2015 54.0%, 2016 58.6%, 2017 57.5%, 2018 60.1%, 2019 52.3%, 2020 50.4%, 2021 51.4%. That's a drop of roughly 7–9 points between the first and second halves of the window, the same shape that sank NHL v2 (NHL §13.C). Per §8 the response is to document it, not to add a time-varying term mid-cycle. The single frozen H = 35 (about 55% for equal teams) sits between the two regimes. If the 2022–25 home rate stays near 51%, expect the test calibration to show home teams over-predicted.
+- **Test evaluation (N4, run once 2026-10-11, `results/nfl/test_evaluation.json`):** 2022–2025, n = 1,139. Model **LL 0.63440 (PASS < 0.660), Brier 0.22135 (PASS 0.200–0.235), ECE 0.02870 (PASS < 0.05)**, and it beats the home-rate baseline (LL 0.68768). **All four §6 criteria pass.** Naive LL 0.69315; static rating LL 0.72076. Locked per §10 #2.
+  - ***Playoff flag fired:*** playoff ECE **0.1701** (n = 52) exceeds the inherited 0.08 threshold. Fifty-two games across ten buckets is very thin, so much of this is noise, but the flag is reported prominently as the rule requires. Playoff LL (0.586) is actually lower than regular-season LL (0.637).
+  - *Late-season flag did not fire:* late/mid ECE ratio 1.71 (late 0.0721, mid 0.0421).
+  - *Early season is weaker:* weeks 1–4 ECE 0.0590 and LL 0.661, as §2 expected.
+  - *Per season:* 2022 ECE 0.0347, **2023 0.0629**, 2024 0.0488, 2025 0.0397. Two of four seasons sit near or over the target on their own.
+  - *The home-advantage collapse did not persist.* The observed test home rate is 55.3%, close to what H = 35 implies, so the §8 drift risk flagged at freeze did not materialize as a test miss.
+  - *Neutral-site games:* n = 28, ECE 0.258 — noise at that size.
 - **No logos:** inherits NHL §13.I.
 
 ---

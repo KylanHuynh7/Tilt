@@ -6,7 +6,7 @@ Interpretable rating systems that produce calibrated, game-by-game win probabili
 |---|---|---|
 | **NHL** | Live — v2 (evaluated, see below) | [`METHODOLOGY.md`](./METHODOLOGY.md) |
 | **NBA** | Live — v1.1: pre-game model (all §6 targets PASS on test) + live in-game win probability | [`methodology/NBA.md`](./methodology/NBA.md) |
-| **NFL** | Methodology draft under review (college football possibly later) | [`methodology/NFL.md`](./methodology/NFL.md) |
+| **NFL** | Model frozen + evaluated — all §6 targets PASS; dashboard in progress (college football possibly later) | [`methodology/NFL.md`](./methodology/NFL.md) |
 | MLB | Planned | — |
 
 Everything below this table describes the NHL model unless stated otherwise. Each sport gets its own methodology document, written and approved before that sport's model code, with its own train/validation/test split and §13-style limitations.
@@ -43,6 +43,20 @@ Key methodology commitments (unchanged from v1):
 - **No silent exclusion** of seasons or game subsets to improve numbers (§10 #4).
 
 `METHODOLOGY.md` §13 consolidates every known limitation across the model, data, lineage choices, Cup-sim approximations, and live-polling layer.
+
+## NFL v1 results — held-out test set (2022–2025)
+
+Frozen on validation 2015–2021 (`K_regular 20, K_playoff 10, carry 0.60, home bump 35, margin-of-victory on`), evaluated once on 2026-10-11.
+
+| | log-loss | Brier | ECE | n | §6 verdict |
+|---|---:|---:|---:|---:|:---:|
+| **NFL model** | **0.63440** | **0.22135** | **0.02870** | 1,139 | log-loss **PASS**, Brier **PASS**, ECE **PASS** |
+| Home-rate baseline | 0.68768 | 0.24661 | 0.00620 | 1,139 | beaten on log-loss (**PASS**) |
+| Naive 50% | 0.69315 | 0.24934 | 0.05360 | 1,139 | beaten |
+| Static rating | 0.72076 | 0.25866 | 0.11050 | 1,139 | beaten |
+| §6 target | < 0.660 | 0.200–0.235 | < 0.05 | — | — |
+
+> **⚠ Playoff calibration flag:** playoff ECE is **0.170** (n = 52), above the 0.08 threshold. The sample is tiny, but per the pre-registered rule it is reported here rather than buried. Other caveats: 2023 alone has ECE 0.063, and early-season (weeks 1–4) ECE is 0.059.
 
 ## NBA v1 results — held-out test set (2024-25 + 2025-26)
 
