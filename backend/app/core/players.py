@@ -13,7 +13,7 @@ import time
 import httpx
 
 URL = "https://site.web.api.espn.com/apis/common/v3/sports/{path}/athletes/{athlete_id}/stats"
-SPORT_PATHS = {"nba": "basketball/nba", "nfl": "football/nfl", "nhl": "hockey/nhl"}
+SPORT_PATHS = {"nba": "basketball/nba", "nfl": "football/nfl", "nhl": "hockey/nhl", "cfb": "football/college-football"}
 TTL_S = 60 * 60
 _cache: dict[tuple[str, str], tuple[float, dict]] = {}
 
@@ -57,6 +57,12 @@ async def fetch(sport: str, athlete_id: str) -> dict:
         return hit[1]
     async with httpx.AsyncClient(headers={"User-Agent": "tilt"}) as client:
         r = await client.get(URL.format(path=path, athlete_id=athlete_id), timeout=20)
+        if r.status_code == 404:
+            # ESPN's answer for players with no recorded stats (e.g. freshmen):
+            # an empty card, not an error.
+            out = {"sport": sport, "athlete_id": athlete_id, "categories": [], "source": "ESPN"}
+            _cache[key] = (time.time(), out)
+            return out
         r.raise_for_status()
         out = {"sport": sport, "athlete_id": athlete_id, **normalize(r.json()), "source": "ESPN"}
     _cache[key] = (time.time(), out)

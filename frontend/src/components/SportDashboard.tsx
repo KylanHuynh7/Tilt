@@ -22,7 +22,8 @@ export type SportCalibration = CalibrationResponse & {
 };
 
 export type SportConfig = {
-  league: string;
+  league: string;                     // display label ("NBA", "FBS")
+  sport?: string;                     // route id when it differs from the label ("cfb")
   subhead: ReactNode;
   todayLabel: string;                 // "Today's games" / "This week"
   periodLabel: (p: number) => string;
@@ -188,7 +189,7 @@ export function SportDashboard({ cfg }: { cfg: SportConfig }) {
             <TodaysGames
               data={today}
               league={cfg.league}
-              sport={cfg.league.toLowerCase()}
+              sport={cfg.sport ?? cfg.league.toLowerCase()}
               colorFor={fallbackColor}
               periodLabel={cfg.periodLabel}
               emptyNote={cfg.emptyNote}

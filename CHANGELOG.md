@@ -2,6 +2,18 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-11 — College football N5: API + dashboard (five sports live)
+
+- Backend `app/cfb/api.py` under `/cfb`:
+  - seasons, ratings (with the pooled FCS rating), history (top 25 + champion, ESPN team colors);
+  - this week's FBS games (FCS opponents on the pooled rating, neutral-aware);
+  - game detail (rosters with injury status; no college depth charts, so position groups), calibration, refresh;
+  - `/cfb/players/{id}` via ESPN college stats.
+- `/sports` lists CFB.
+- **Fix (all sports):** ESPN's 404 "Statistics not found" now yields an empty player card instead of a 502.
+- Frontend: new **"Saturday" world** (maroon + gold, pennant stripes) with a pennant glyph; `CfbDashboard` config. `SportConfig.sport` separates the route id from the display label (fixes `/fbs/…` card links). The phone switcher gives the fifth pill a full row.
+- +5 tests (320). No horizontal overflow at 360 / 390 px.
+
 ## 2026-10-11 — College football N4: one-shot test (PASS ×4, postseason flagged)
 
 `scripts/cfb_evaluate.py` (FBS-vs-FBS metrics only; FCS games reported separately). Ran once on 2022–2025 (n = 3,174): **LL 0.57072, Brier 0.19461, ECE 0.02450, beats home-rate (0.67842): all PASS.**

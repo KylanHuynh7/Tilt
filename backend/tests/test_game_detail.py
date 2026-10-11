@@ -112,3 +112,24 @@ def test_roster_player_carries_id_and_headshot():
     r = rosters.parse({"athletes": [{"id": "1966", "displayName": "X", "headshot": {"href": "https://h/x.png"}}]})
     p = r["available"][0]["players"][0]
     assert p["id"] == "1966" and p["headshot"] == "https://h/x.png"
+
+
+def test_player_without_stats_is_an_empty_card_not_an_error(monkeypatch):
+    import httpx
+    from app.core import players
+
+    class Resp:
+        status_code = 404
+        def raise_for_status(self):
+            raise httpx.HTTPStatusError("404", request=None, response=None)
+
+    class Client:
+        def __init__(self, *a, **k): pass
+        async def __aenter__(self): return self
+        async def __aexit__(self, *a): return False
+        async def get(self, *a, **k): return Resp()
+
+    monkeypatch.setattr(players.httpx, "AsyncClient", Client)
+    players._cache.clear()
+    out = asyncio.run(players.fetch("cfb", "123"))
+    assert out["categories"] == []

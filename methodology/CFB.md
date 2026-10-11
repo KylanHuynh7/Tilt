@@ -174,6 +174,14 @@ Inherits the NFL §12 five-term form (pre-game edge fading over time, score marg
   - *Per season:* ECE 0.037 / 0.035 / **0.040 / 0.043** (2022–2025). The two expanded-playoff seasons sit at or just over the target individually.
   - *Conference vs non-conference:* ECE 0.022 vs 0.036.
   - *FBS-vs-FCS games, reported separately as agreed (never pooled):* n = 485, FBS teams won 95.5%, LL 0.169.
+- **Dashboard / API (N5):**
+  - *Trajectory chart shows only each season's top 25 at season's end plus the champion,* because 130+ lines are unreadable. Teams outside the top 25 are still rated and served; they just aren't drawn.
+  - *Champion = winner of the season's last postseason game* (BCS / CFP final). Reproduces Alabama 2020, Georgia 2021–22, Michigan 2023, Ohio State 2024.
+  - *Team colors* are ESPN's, with near-black primaries swapped for the alternate (or a neutral grey) on the dark UI.
+  - *Game pages* use ESPN rosters with injury status. ESPN publishes **no college depth charts**, so players are grouped by position with a note.
+  - *Player cards* use ESPN college stats. Players with none recorded (often freshmen) show an empty card rather than an error.
+  - *FCS opponents* show the pooled FCS rating, and their games carry no track-record figure (those games were excluded from evaluation).
+  - *No live win probability yet* (v1.1).
 - **No logos:** inherits NHL §13.I. Headshots follow the author's ESPN-headshot decision (§13.I).
 
 ---

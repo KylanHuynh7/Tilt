@@ -20,6 +20,7 @@
   --c-nba: #ff7a1a;
   --c-nfl: #2fd36b;
   --c-mlb: #ff3b55;
+  --c-cfb: #ffb81c;
 
   /* Default world = NHL black ice. */
   --bg: #06080b;
@@ -130,6 +131,30 @@
   --motif:
     repeating-linear-gradient(60deg, transparent 0 22px, rgba(255, 59, 85, 0.05) 22px 24px, transparent 24px 46px),
     repeating-linear-gradient(-60deg, transparent 0 22px, rgba(255, 59, 85, 0.05) 22px 24px, transparent 24px 46px);
+}
+
+/* CFB — Saturday: deep maroon + gold, pennant stripes. */
+:root[data-sport="cfb"] {
+  --bg: #12060a;
+  --bg-2: #210a12;
+  --surface: rgba(255, 190, 120, 0.05);
+  --surface-2: rgba(255, 190, 120, 0.09);
+  --edge: rgba(255, 184, 28, 0.16);
+  --edge-strong: rgba(255, 184, 28, 0.34);
+  --text: #fff6e8;
+  --text-dim: #c9a98f;
+  --text-faint: #7d5f55;
+  --accent: #ffb81c;
+  --accent-2: #ffe08a;
+  --accent-3: #9e1b32;
+  --accent-ink: #2a0610;
+  --glow-a: rgba(255, 184, 28, 0.20);
+  --glow-b: rgba(158, 27, 50, 0.30);
+  --grid: rgba(255, 190, 120, 0.09);
+  --panel: #1c0911;
+  --motif:
+    repeating-linear-gradient(135deg, transparent 0 34px, rgba(255, 184, 28, 0.035) 34px 36px, transparent 36px 72px),
+    repeating-linear-gradient(135deg, transparent 0 70px, rgba(158, 27, 50, 0.10) 70px 72px);
 }
 
 /* ---- Base ------------------------------------------------------------------ */
@@ -862,6 +887,7 @@ table.metrics td:first-child { white-space: nowrap; }
   .tab .badge { display: none; }
   /* Sport switcher: a tidy 2×2 grid. */
   .sport-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .sport-nav .sport-pill:last-child:nth-child(odd) { grid-column: 1 / -1; }
   .sport-pill { justify-content: center; padding: 9px 8px; }
   .sport-status { display: none; }
   .header .tag { order: -1; }

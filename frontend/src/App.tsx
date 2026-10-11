@@ -3,6 +3,7 @@ import { NhlDashboard } from "./sports/nhl/NhlDashboard";
 import { NbaDashboard } from "./sports/nba/NbaDashboard";
 import { NflDashboard } from "./sports/nfl/NflDashboard";
 import { MlbDashboard } from "./sports/mlb/MlbDashboard";
+import { CfbDashboard } from "./sports/cfb/CfbDashboard";
 import { GameDetail } from "./components/GameDetail";
 import { colorFor as nhlColorFor } from "./sports/nhl/teamColors";
 import { navigate, parseRoute } from "./router";
@@ -12,9 +13,10 @@ const PERIOD_LABELS: Record<string, (p: number) => string> = {
   nba: (p) => (p <= 4 ? `Q${p}` : p === 5 ? "OT" : `${p - 4}OT`),
   nfl: (p) => (p <= 4 ? `Q${p}` : "OT"),
   mlb: (p) => `Inn ${p}`,
+  cfb: (p) => (p <= 4 ? `Q${p}` : "OT"),
 };
 
-type SportId = "nhl" | "nba" | "nfl" | "mlb";
+type SportId = "nhl" | "nba" | "nfl" | "mlb" | "cfb";
 type Sport = {
   id: SportId;
   name: string;
@@ -30,6 +32,7 @@ const SPORTS: Sport[] = [
   { id: "nba", name: "NBA", status: "live", version: "v1.1", color: "var(--c-nba)" },
   { id: "nfl", name: "NFL", status: "live", version: "v1.1", color: "var(--c-nfl)" },
   { id: "mlb", name: "MLB", status: "live", version: "v1.1", color: "var(--c-mlb)" },
+  { id: "cfb", name: "CFB", status: "live", version: "v1", color: "var(--c-cfb)" },
 ];
 
 const STATUS_LABEL: Record<Sport["status"], string> = {
@@ -62,6 +65,14 @@ function SportGlyph({ id }: { id: SportId }) {
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M4.5 19.5c-1.7-5.6 1-11.8 6.3-14.2 3-1.3 6.1-1.3 8.7-.3 1.7 5.6-1 11.8-6.3 14.2-3 1.3-6.1 1.3-8.7.3z" {...common} />
           <path d="M9 15l6-6M10.5 10.5l1.5 1.5M12 9l1.5 1.5M9 12l1.5 1.5" {...common} />
+        </svg>
+      );
+    case "cfb": // pennant
+      return (
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 3v18" {...common} />
+          <path d="M5 4l15 5-15 5" {...common} />
+          <path d="M9 7.6v2.8M12 8.6v1" {...common} />
         </svg>
       );
     case "mlb": // baseball
@@ -143,6 +154,8 @@ export default function App() {
         <NflDashboard />
       ) : sportId === "mlb" ? (
         <MlbDashboard />
+      ) : sportId === "cfb" ? (
+        <CfbDashboard />
       ) : (
         <section className="panel">
           <div className="panel-title">

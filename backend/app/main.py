@@ -33,6 +33,7 @@ from .franchises import franchise_for
 from .nba import api as nba_api
 from .nfl import api as nfl_api
 from .mlb import api as mlb_api
+from .cfb import api as cfb_api
 from .franchises import current_code
 from .seasons import parse as parse_season
 from .teams import TEAMS
@@ -119,6 +120,7 @@ SPORTS = [
     {"id": "nba", "name": "NBA", "status": "live"},
     {"id": "nfl", "name": "NFL", "status": "live"},
     {"id": "mlb", "name": "MLB", "status": "live"},
+    {"id": "cfb", "name": "CFB", "status": "live"},
 ]
 
 
@@ -478,3 +480,4 @@ app.include_router(nhl, prefix="/nhl")
 app.include_router(nba_api.router)
 app.include_router(nfl_api.router)
 app.include_router(mlb_api.router)
+app.include_router(cfb_api.router)
