@@ -893,3 +893,24 @@ table.metrics td:first-child { white-space: nowrap; }
 .pitch-stats b { display: block; font-family: var(--font-display); font-size: 22px; }
 .pitch-stats b.pos { color: var(--pos); }
 .pitch-stats b.neg { color: var(--neg); }
+
+/* ---- Lineups / depth charts ------------------------------------------------- */
+.formation { margin-left: 8px; font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: var(--text-dim); letter-spacing: 0.02em; text-transform: none; }
+.lineup-unit + .lineup-unit { margin-top: 10px; }
+.lineup-slots { display: flex; flex-direction: column; }
+.lineup-slot { display: grid; grid-template-columns: 64px 1fr; gap: 10px; align-items: start; padding: 7px 0; border-bottom: 1px solid var(--grid); }
+.lineup-slot.pool { grid-template-columns: 1fr; }
+.slot-tag { display: flex; flex-direction: column; gap: 1px; padding-top: 3px; }
+.slot-name { font-family: var(--font-display); font-weight: 800; font-size: 16px; color: var(--team); line-height: 1; }
+.slot-label { font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); }
+.slot-players { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; min-width: 0; }
+.starter { display: inline-flex; align-items: center; gap: 7px; min-width: 0; max-width: 100%; font-size: 13px; font-weight: 600; }
+.starter.flagged .pname-btn { color: var(--warn); }
+.starter .pname-btn { flex: initial; }
+.depth { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+.depth-chip { background: var(--surface-2); border: 1px solid var(--edge); color: var(--text-dim); border-radius: 999px; padding: 2px 8px; font-size: 11px; cursor: pointer; }
+.depth-chip:hover { color: var(--accent); border-color: var(--accent); }
+.lineup-note { font-size: 12px; color: var(--text-dim); margin: 8px 0 4px; }
+details.others { margin-top: 10px; }
+details.others summary { cursor: pointer; font-size: 12px; color: var(--text-dim); margin-bottom: 6px; }
+@media (max-width: 520px) { .lineup-slot { grid-template-columns: 48px 1fr; } }

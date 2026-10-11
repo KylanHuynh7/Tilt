@@ -559,6 +559,14 @@ Introduced 2026-10-10 when the codebase began hosting more than one sport. None 
   - *Availability comes from ESPN's roster and injury report,* cached 30 min per team. "Ruled out" means Out, Injured Reserve or Suspended (plus the NFL IR/suspended groups). Questionable, Doubtful and Day-To-Day stay "available" as tagged game-time decisions, and practice squads are hidden. Starting lineups are not published pre-game, so there is no starters/bench split.
   - *No player projections.* Every Tilt model is team-level (§13.A). Player stat projections would need a separate, pre-registered model per sport and are not built.
   - *The NHL detail page is slow on first load* (≈5–8 s): it fetches the live NHL slate and two ESPN rosters per request.
+- **Lineups and depth charts on game pages (2026-10-11, user request).**
+  - *Sources:* NFL, NBA and NHL use ESPN's published depth charts (ranked players per slot; starters per slot from the formation, e.g. "3WR 1TE" → 3 WR). MLB uses the club's posted batting order, or the box score once a game starts.
+  - *Accuracy:* depth charts are maintained by ESPN and can lag real decisions (a benched starter, a late scratch). They're shown as published, not verified.
+  - *MLB lineups appear only once posted,* usually a few hours before first pitch; until then the page says so and groups the roster by role.
+  - *ESPN's NHL charts are often near-empty* (one player listed). Any chart placing fewer than a full lineup (NFL 22, NBA 5, NHL 18 players) falls back to the position-grouped roster with a note.
+  - *College football* has no ESPN depth charts and always uses the roster view.
+  - *Injured starters stay visible* in their slot with their status chip, so the depth chart's intent and the injury report can disagree on screen.
+  - *No Tilt model uses lineups;* probabilities are unaffected.
 - **One backend process serves every sport.** Render's free tier gives 512 MB; each sport's historical cache will be built lazily on first request rather than at startup, so the first request to a sport after a cold start is slower.
 
 ---

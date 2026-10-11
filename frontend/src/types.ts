@@ -119,6 +119,14 @@ export type Roster = {
   available: { group: string; players: RosterPlayer[] }[];     // healthy + game-time decisions
   ruled_out: (RosterPlayer & { reason: string })[];           // out, IR, suspended
   source: string;
+  lineup?: Lineup | null;     // depth chart / batting order when published
+  lineup_note?: string | null;
+};
+export type LineupSlot = { slot: string; label: string | null; starters: RosterPlayer[]; depth: RosterPlayer[] };
+export type Lineup = {
+  source: string;
+  units: { unit: string; formation: string; slots: LineupSlot[] }[];
+  others: RosterPlayer[];
 };
 export type DetailSide = {
   code: string; name: string; color: string | null;

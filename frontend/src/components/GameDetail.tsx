@@ -13,7 +13,7 @@ import {
 } from "recharts";
 import { getJson } from "../http";
 import { navigate } from "../router";
-import type { DetailSide, FormGame, GameDetailResponse, RosterPlayer } from "../types";
+import type { DetailSide, FormGame, GameDetailResponse, Lineup, RosterPlayer } from "../types";
 import { PlayerAvatar, PlayerCard } from "./PlayerCard";
 
 type Props = {
@@ -43,9 +43,68 @@ function FormStrip({ form }: { form: FormGame[] }) {
   );
 }
 
+function LineupView({ lineup, color, onPick }: { lineup: Lineup; color: string; onPick: (p: RosterPlayer) => void }) {
+  return (
+    <>
+      {lineup.units.map((u) => (
+        <div key={u.unit + u.formation} className="lineup-unit">
+          <div className="roster-section-title">
+            {u.unit}
+            {u.formation && <span className="formation">{u.formation}</span>}
+          </div>
+          <div className="lineup-slots">
+            {u.slots.map((s, i) => (
+              <div key={i} className={`lineup-slot ${s.slot ? "" : "pool"}`}>
+                {s.slot && (
+                  <div className="slot-tag">
+                    <span className="slot-name">{s.slot}</span>
+                    {s.label && <span className="slot-label">{s.label}</span>}
+                  </div>
+                )}
+                <div className="slot-players">
+                  {s.starters.map((p, j) => (
+                    <span key={j} className={`starter ${p.status ? "flagged" : ""}`}>
+                      <PlayerAvatar p={p} color={color} size={26} />
+                      <PlayerName p={p} onPick={onPick} />
+                      {p.status && <span className="status-chip">{p.status}</span>}
+                    </span>
+                  ))}
+                  {s.depth.length > 0 && (
+                    <span className="depth">
+                      {s.depth.map((p, j) => (
+                        <button key={j} className="depth-chip" onClick={() => p.id && onPick(p)} title={`Depth ${j + 2}${p.status ? ` · ${p.status}` : ""}`}>
+                          {p.name}{p.status ? " ⚠" : ""}
+                        </button>
+                      ))}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+      {lineup.others.length > 0 && (
+        <details className="others">
+          <summary>Other available players ({lineup.others.length})</summary>
+          <div className="slot-players">
+            {lineup.others.map((p, j) => (
+              <span key={j} className="starter">
+                <PlayerAvatar p={p} color={color} size={22} />
+                <PlayerName p={p} onPick={onPick} />
+              </span>
+            ))}
+          </div>
+        </details>
+      )}
+    </>
+  );
+}
+
 function RosterList({ side, color, onPick }: { side: DetailSide; color: string; onPick: (p: RosterPlayer) => void }) {
   if (!side.roster.loaded) return <div className="empty">Roster unavailable right now.</div>;
   const r = side.roster;
+  const lineup = r.lineup;
   const gtd = r.available.flatMap((g) => g.players).filter((p) => p.status).length;
   const nAvail = r.available.reduce((n, g) => n + g.players.length, 0);
   return (
@@ -57,6 +116,11 @@ function RosterList({ side, color, onPick }: { side: DetailSide; color: string; 
         </span>
       </div>
 
+      {lineup ? (
+        <LineupView lineup={lineup} color={color} onPick={onPick} />
+      ) : (
+        <>
+      {r.lineup_note && <div className="lineup-note">{r.lineup_note}</div>}
       <div className="roster-section-title">Available</div>
       {r.available.map((g) => (
         <div key={g.group} className="roster-group">
@@ -73,6 +137,9 @@ function RosterList({ side, color, onPick }: { side: DetailSide; color: string; 
           </ul>
         </div>
       ))}
+
+        </>
+      )}
 
       <div className="roster-section-title out">Ruled out {r.ruled_out.length ? `(${r.ruled_out.length})` : ""}</div>
       {r.ruled_out.length ? (
@@ -356,8 +423,8 @@ export function GameDetail({ sport, gameId, colorFor, periodLabel }: Props) {
           <RosterList side={d.home} color={homeColor} onPick={(p) => setPicked({ p, team: d.home.code, color: homeColor })} />
         </div>
         <div className="disclaimer ok">
-          Starting lineups aren't published before the game, so this lists everyone available
-          rather than starters vs bench. Tilt's models are team-level: they don't see who plays
+          Lineups come from each team's published depth chart (ESPN) or posted batting order (MLB);
+          backups are listed behind each starter. Tilt's models are team-level: they don't see who plays
           and don't project player stats — that would be a separate, pre-registered model.
           Click a player for season and career stats. {d.attribution ?? "Photos and stats: ESPN."}
         </div>

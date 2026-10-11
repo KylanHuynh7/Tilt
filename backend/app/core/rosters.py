@@ -74,7 +74,9 @@ async def fetch(client: httpx.AsyncClient, sport_path: str, team: str) -> dict:
     try:
         r = await client.get(BASE.format(path=sport_path, team=team), timeout=20)
         r.raise_for_status()
-        out = {"loaded": True, **parse(r.json()), "source": "ESPN"}
+        payload = r.json()
+        out = {"loaded": True, **parse(payload), "source": "ESPN",
+               "team_id": str((payload.get("team") or {}).get("id") or "")}
     except Exception:  # noqa: BLE001 — a missing roster never breaks the page
         out = {"loaded": False, "available": [], "ruled_out": [], "source": "ESPN"}
     _cache[key] = (time.time(), out)

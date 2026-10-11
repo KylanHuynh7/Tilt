@@ -20,7 +20,7 @@ from zoneinfo import ZoneInfo
 import httpx
 from fastapi import APIRouter, HTTPException
 
-from ..core import detail as core_detail, live_history, rosters
+from ..core import detail as core_detail, lineups, live_history, rosters
 from . import backtest, espn, live_wp, pipeline, ratings
 from .teams import DISPLAY_COLORS, TEAMS, display_abbr, is_franchise
 
@@ -263,6 +263,8 @@ async def game_detail(game_id: int):
     async with httpx.AsyncClient(headers={"User-Agent": "tilt-nba"}) as client:
         home_roster = await rosters.fetch(client, "basketball/nba", str(h_id))
         away_roster = await rosters.fetch(client, "basketball/nba", str(a_id))
+        home_roster = lineups.attach(home_roster, await lineups.fetch(client, "nba", str(h_id)), "nba")
+        away_roster = lineups.attach(away_roster, await lineups.fetch(client, "nba", str(a_id)), "nba")
     return {
         "sport": "nba", "game": m,
         "probability": core_detail.probability_breakdown(

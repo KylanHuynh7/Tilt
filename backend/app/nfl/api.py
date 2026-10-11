@@ -13,7 +13,7 @@ from pathlib import Path
 import httpx
 from fastapi import APIRouter, HTTPException
 
-from ..core import detail as core_detail, live_history, rosters
+from ..core import detail as core_detail, lineups, live_history, rosters
 from . import backtest, espn, pipeline, ratings
 from .teams import TEAMS, franchise
 
@@ -202,6 +202,8 @@ async def game_detail(game_id: str):
     async with httpx.AsyncClient(headers={"User-Agent": "tilt-nfl"}) as client:
         rh = await rosters.fetch(client, "football/nfl", ESPN_ROSTER_CODES.get(m["home"], m["home"].lower()))
         ra = await rosters.fetch(client, "football/nfl", ESPN_ROSTER_CODES.get(m["away"], m["away"].lower()))
+        rh = lineups.attach(rh, await lineups.fetch(client, "nfl", rh.get("team_id")), "nfl")
+        ra = lineups.attach(ra, await lineups.fetch(client, "nfl", ra.get("team_id")), "nfl")
     side = lambda code, color, roster: {  # noqa: E731
         "code": code, "name": TEAMS[code].name, "color": color, "roster": roster,
         "form": core_detail.team_form(code, games),

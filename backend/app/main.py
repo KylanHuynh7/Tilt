@@ -28,7 +28,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from dataclasses import asdict
 
 from . import cup_simulator, engine, historical, live_wp, pipeline, standings
-from .core import detail as core_detail, live_history, players as core_players, rosters
+from .core import detail as core_detail, lineups, live_history, players as core_players, rosters
 from .franchises import franchise_for
 from .nba import api as nba_api
 from .nfl import api as nfl_api
@@ -314,6 +314,8 @@ async def game_detail(game_id: int):
     async with httpx.AsyncClient(headers={"User-Agent": "tilt-nhl"}) as client:
         rh = await rosters.fetch(client, "hockey/nhl", ESPN_NHL_ROSTER_CODES.get(m["home"], m["home"].lower()))
         ra = await rosters.fetch(client, "hockey/nhl", ESPN_NHL_ROSTER_CODES.get(m["away"], m["away"].lower()))
+        rh = lineups.attach(rh, await lineups.fetch(client, "nhl", rh.get("team_id")), "nhl")
+        ra = lineups.attach(ra, await lineups.fetch(client, "nhl", ra.get("team_id")), "nhl")
     side = lambda code, roster: {  # noqa: E731
         "code": code, "name": TEAMS.get(code, code), "color": None, "roster": roster,
         "form": core_detail.team_form(code, games),

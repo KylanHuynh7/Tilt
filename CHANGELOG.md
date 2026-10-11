@@ -2,6 +2,15 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-11 — Lineups and depth charts on game pages
+
+User request: show players the way teams take the field, not grouped by position.
+- `app/core/lineups.py`: ESPN depth charts (NFL / NBA / NHL) parsed into units → slots → starters + backups (formation-aware starter counts), joined onto the roster (names, headshots, injury status). 30-min cache. Incomplete charts fall back with a note (NHL charts are often near-empty).
+- MLB (`mlb_lineup`): batting order 1–9 with fielding positions from the posted lineup or the box score, starting pitcher, bench, bullpen. "Not posted yet" note before lineups are announced.
+- Frontend: `LineupView` (unit header + formation, slot tag, starter with headshot and status, depth chips, collapsible "other available"); ruled-out section unchanged.
+- Verified: CHI @ GB offense / defense / special teams; MLB batting order on a played LAD game; NBA Lakers starting five; NHL fallback notes; no overflow at 360 / 390 px.
+- +5 tests. METHODOLOGY §13.K documents sources and caveats.
+
 ## 2026-10-11 — College football N2 + N3: engine with pooled FCS rating, freeze
 
 - Methodology v1.2: the FCS pool regresses toward `fcs_init` with the same carry; leavers drop to the pool.

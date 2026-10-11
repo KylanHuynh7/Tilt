@@ -237,6 +237,55 @@ async def roster(client: httpx.AsyncClient, team_id: int) -> dict:
     return {"loaded": True, "available": available, "ruled_out": ruled_out, "source": "MLB"}
 
 
+async def mlb_lineup(client: httpx.AsyncClient, game_pk: int, side: str, roster_payload: dict,
+                     probable: dict | None) -> dict | None:
+    """Batting order 1–9 (MLB posted lineup, or the boxscore once the game
+    has started), starting pitcher, bench and bullpen, in the shared
+    `lineup` shape. None if no lineup is posted yet.
+    """
+    order_ids: list[int] = []
+    positions: dict[int, str] = {}
+    try:
+        r = await client.get(f"{API}/schedule", params={"sportId": 1, "gamePk": game_pk, "hydrate": "lineups"}, timeout=20)
+        g = next((x for d in r.json().get("dates", []) for x in d["games"]), {})
+        people = (g.get("lineups") or {}).get(f"{side}Players") or []
+        order_ids = [int(p["id"]) for p in people]
+        positions = {int(p["id"]): (p.get("primaryPosition") or {}).get("abbreviation", "") for p in people}
+        if not order_ids:
+            b = (await client.get(f"{API}/game/{game_pk}/boxscore", timeout=20)).json()["teams"][side]
+            order_ids = [int(x) for x in (b.get("battingOrder") or [])]
+            for pid in order_ids:
+                pl = b["players"].get(f"ID{pid}", {})
+                positions[pid] = (pl.get("position") or {}).get("abbreviation", "")
+    except Exception:  # noqa: BLE001
+        order_ids = []
+    if not order_ids:
+        return None
+    players = {int(p["id"]): p for grp in roster_payload.get("available", []) for p in grp["players"]}
+
+    def pl(pid, fallback_name=None):
+        return players.get(pid) or {"id": str(pid), "name": fallback_name or f"#{pid}", "position": positions.get(pid),
+                                    "jersey": None, "headshot": HEADSHOT.format(pid=pid), "status": None}
+
+    batting = [{"slot": str(i + 1), "label": positions.get(pid) or None, "starters": [pl(pid)], "depth": []}
+               for i, pid in enumerate(order_ids[:9])]
+    sp_id = (probable or {}).get("id")
+    used = set(order_ids[:9]) | ({sp_id} if sp_id else set())
+    pitchers = [p for grp in roster_payload.get("available", []) if grp["group"] == "Pitchers" for p in grp["players"]]
+    hitters = [p for grp in roster_payload.get("available", []) if grp["group"] != "Pitchers" for p in grp["players"]]
+    units = [{"unit": "Batting order", "formation": "", "slots": batting}]
+    if sp_id:
+        units.append({"unit": "Starting pitcher", "formation": "",
+                      "slots": [{"slot": "SP", "label": None, "starters": [pl(sp_id, (probable or {}).get("fullName"))], "depth": []}]})
+    bench = [p for p in hitters if int(p["id"]) not in used]
+    bullpen = [p for p in pitchers if int(p["id"]) not in used]
+    if bench:
+        units.append({"unit": "Bench", "formation": "", "slots": [{"slot": "", "label": None, "starters": bench, "depth": []}]})
+    if bullpen:
+        units.append({"unit": "Bullpen", "formation": "", "slots": [{"slot": "", "label": None, "starters": bullpen, "depth": []}]})
+    return {"source": "MLB posted lineup", "units": units, "others": []}
+
+
 HITTING = [("G", "gamesPlayed"), ("AB", "atBats"), ("R", "runs"), ("H", "hits"), ("2B", "doubles"),
            ("3B", "triples"), ("HR", "homeRuns"), ("RBI", "rbi"), ("BB", "baseOnBalls"), ("SO", "strikeOuts"),
            ("SB", "stolenBases"), ("AVG", "avg"), ("OBP", "obp"), ("SLG", "slg"), ("OPS", "ops")]
@@ -302,6 +351,10 @@ async def game_detail(game_id: int):
     buckets = json.loads(RESULTS.read_text())["overall"]["calibration_buckets"] if RESULTS.exists() else []
     async with httpx.AsyncClient(headers={"User-Agent": "tilt-mlb (non-commercial)"}) as client:
         rh, ra = await roster(client, h_id), await roster(client, a_id)
+        rh["lineup"] = await mlb_lineup(client, game_id, "home", rh, m["pitching"]["home"])
+        ra["lineup"] = await mlb_lineup(client, game_id, "away", ra, m["pitching"]["away"])
+        for r_ in (rh, ra):
+            r_["lineup_note"] = None if r_["lineup"] else "Lineups are usually posted a few hours before first pitch."
     side = lambda code, tid, r: {  # noqa: E731
         "code": code, "name": TEAMS[tid].name, "color": TEAMS[tid].color, "roster": r,
         "form": core_detail.team_form(code, games), "trend": core_detail.trend(pts(tid), str(latest))}
