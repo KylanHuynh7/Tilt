@@ -35,10 +35,15 @@ function GameCard({ m, colorFor, periodLabel }: {
   const awayPct = m.away_win_prob * 100;
   const homePct = m.home_win_prob * 100;
   const isLive = !!m.live_state;
+  const isFinal = !isLive && m.home_score != null && ["OFF", "FINAL"].includes(m.state);
+  const awayColor = m.away_color ?? colorFor(m.away);
+  const homeColor = m.home_color ?? colorFor(m.home);
+  // Card, edge stripe, and probability bars are painted in the teams' colors.
+  const teamVars = { "--away": awayColor, "--home": homeColor } as React.CSSProperties;
   return (
-    <div className={`game ${isLive ? "live" : ""}`}>
+    <div className={`game ${isLive ? "live" : ""}`} style={teamVars}>
       <div className="team">
-        <TeamBadge team={m.away} color={m.away_color ?? colorFor(m.away)} />
+        <TeamBadge team={m.away} color={awayColor} />
         <span className="abbr">{m.away}</span>
         <span className="rating">{m.away_rating.toFixed(0)}</span>
       </div>
@@ -48,13 +53,22 @@ function GameCard({ m, colorFor, periodLabel }: {
             {periodLabel(m.live_state!.period)} · {clockLabel(m.live_state!.time_remaining_s)}
           </span>
         )}
-        {!isLive && <span>@</span>}
+        {isFinal && <span className="final-tag">Final</span>}
+        {!isLive && !isFinal && <span>@</span>}
       </div>
       <div className="team right">
-        <TeamBadge team={m.home} color={m.home_color ?? colorFor(m.home)} />
+        <TeamBadge team={m.home} color={homeColor} />
         <span className="abbr">{m.home}</span>
         <span className="rating">{m.home_rating.toFixed(0)}</span>
       </div>
+
+      {isFinal && (
+        <div className="live-score final">
+          <span>{m.away_score}</span>
+          <span className="dash">—</span>
+          <span>{m.home_score}</span>
+        </div>
+      )}
 
       {isLive && (
         <div className="live-score">

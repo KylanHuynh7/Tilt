@@ -2,6 +2,18 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-11 — UI: per-sport "worlds" redesign
+
+User request: the single dark theme was "very boring". Wanted more color and innovation, with sport colors (basketball orange, football green, hockey black, baseball red + blue).
+- `styles.css` rewritten around per-sport tokens on `[data-sport]`: **NHL** black ice (frost cyan, rink lines), **NBA** hardwood (orange, court arcs), **NFL** turf (green, yard lines), **MLB** ballpark night (red + blue, stitches). Background glows and motif layers fade down the page.
+- **Hero header:** italic gradient "TILT" wordmark + sport name, tagline, model-version chip. Fonts: Barlow Condensed / Inter / JetBrains Mono.
+- **Sport switcher:** each pill always wears its own sport color, with a line-art glyph (puck + stick, basketball, football, baseball).
+- **Tabs:** a segmented control. **Panels:** glass with an accent hairline. **Pass/fail list:** check/cross chips.
+- **Game cards:** painted in the two teams' colors (corner glows, split top stripe, team-colored probability bars), tilted badges, a pulsing live dot. **Finished games now show the final score** (previously only live games showed a score).
+- Phone layout: tabs scroll horizontally, ratings hidden on narrow cards.
+- NFL pill status → "in development" with corrected copy (methodology approved).
+- METHODOLOGY §13.I documents the theme change and team-color bar contrast. Correction: the NFL N1 entry below says 226 tests; the actual count is **227**.
+
 ## 2026-10-11 — NFL N1: ingest + lineage (methodology/NFL.md v1.0 approved)
 
 Author approved `methodology/NFL.md` with all six decisions as recommended.

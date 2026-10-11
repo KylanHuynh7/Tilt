@@ -159,7 +159,7 @@ export function NbaDashboard() {
           {!history && !err.history && <div className="loading">Loading…</div>}
           {history && <TrajectoryChart data={history} colorFor={fallbackColor} />}
           {history?.cup_winner && (
-            <div className="meta">👑&nbsp;{history.cup_winner} won the {history.label} NBA Finals.</div>
+            <div className="champion-note">👑 {history.cup_winner} won the {history.label} NBA Finals</div>
           )}
         </section>
       )}
