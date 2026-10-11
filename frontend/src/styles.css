@@ -568,7 +568,8 @@ table.metrics { width: 100%; border-collapse: collapse; font-size: 13px; }
 table.metrics th, table.metrics td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--grid); }
 table.metrics th { color: var(--text-dim); font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; }
 table.metrics td.num, table.metrics th.num { text-align: right; font-family: var(--font-mono); font-size: 12px; }
-table.metrics tbody tr:first-child td { color: var(--accent); font-weight: 700; }
+/* Highlight the model row of the main §6 table only (not breakdowns or player stats). */
+.cal-grid table.metrics tbody tr:first-child td { color: var(--accent); font-weight: 700; }
 table.metrics .dim { color: var(--text-dim); }
 table.metrics tr.target td { color: var(--text-dim); font-size: 11px; font-style: italic; border-bottom: none; }
 table.metrics td.tag.pass { color: var(--pos); font-weight: 700; font-size: 10px; letter-spacing: 0.06em; }
@@ -839,8 +840,45 @@ table.metrics td.warn { color: var(--warn); }
 .pc-table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--edge); }
 .pc-table { font-size: 12px; white-space: nowrap; }
 .pc-table th, .pc-table td { padding: 7px 10px; }
-.pc-table tbody tr:first-child td { color: inherit; font-weight: 400; }
 .pc-table tr.current td { background: color-mix(in srgb, var(--team) 16%, transparent); font-weight: 700; }
 .pc-table tr.career td { border-top: 2px solid var(--edge-strong); font-weight: 800; color: var(--accent); }
 .pc-now { margin-left: 6px; font-size: 9px; text-transform: uppercase; letter-spacing: 0.06em; padding: 1px 5px; border-radius: 5px; background: var(--team); color: #fff; }
 .pc-foot { margin-top: 12px; font-size: 11px; color: var(--text-faint); }
+
+/* ---- Phone pass (audited at 360 / 390 px) ---------------------------------- */
+/* Season column stays put while the stats scroll sideways. */
+.pc-table th:first-child, .pc-table td:first-child {
+  position: sticky; left: 0; z-index: 1;
+  background: var(--panel);
+  box-shadow: 1px 0 0 var(--edge);
+}
+.pc-table tr.current td:first-child { background: color-mix(in srgb, var(--team) 16%, var(--panel)); }
+table.metrics td:first-child { white-space: nowrap; }
+
+@media (max-width: 520px) {
+  /* Tabs: three equal columns that always fit — no hidden "Calibration". */
+  .tabs { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; width: 100%; overflow: visible; }
+  .tab { justify-content: center; text-align: center; padding: 8px 4px; font-size: 13px; letter-spacing: 0.04em; white-space: normal; line-height: 1.1; }
+  .tab .badge { display: none; }
+  /* Sport switcher: a tidy 2×2 grid. */
+  .sport-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .sport-pill { justify-content: center; padding: 9px 8px; }
+  .sport-status { display: none; }
+  .header .tag { order: -1; }
+  .chart-wrap { height: 360px; }
+  .cal-chart, .detail-chart { height: 230px; }
+  table.metrics th, table.metrics td { padding: 8px 6px; }
+  .panel-title h2 { font-size: 19px; }
+  .why-value { font-size: 28px; }
+  .player-card { padding: 16px; border-radius: 18px; }
+  .pc-head { gap: 12px; }
+  .pc-head .avatar { width: 64px !important; height: 64px !important; }
+  .modal-backdrop { padding: 8px; align-items: end; }
+}
+@media (max-width: 520px) {
+  /* Breakdown/metric tables fit without sideways scrolling: labels may wrap
+     between words (seasons use a non-breaking hyphen), numbers shrink a bit. */
+  .cal table.metrics td:first-child { white-space: normal; min-width: 6.2em; }
+  .cal table.metrics td.num, .cal table.metrics th.num { font-size: 11px; }
+  .cal table.metrics th { font-size: 9px; letter-spacing: 0.04em; }
+}

@@ -2,6 +2,19 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-11 — Mobile formatting pass
+
+User request: make sure the site fits on phones. Audited with an automated overflow check plus screenshots at **360 px and 390 px** across every page state: NHL / NBA / NFL trajectories, today/this-week, calibration, a game-detail page, a player card, and the MLB placeholder. No page scrolls sideways at either width.
+
+Fixes:
+- **Tabs:** three equal columns on phones, so "Calibration" was no longer hidden off-screen; the count badge is hidden.
+- **Sport switcher:** a tidy 2×2 grid (it used to leave MLB alone on a row); the status labels are hidden.
+- **Calibration and breakdown tables** fit without sideways scroll: smaller numerals, labels wrap between words, seasons use a non-breaking hyphen. Fixed a styling leak that highlighted the first row of every metrics table; now only the §6 model row is highlighted.
+- **Player card:** sticky season column while stats scroll sideways; bottom-sheet layout on phones; smaller header.
+- **Charts:** chart heights reduced on phones.
+
+Correction: the headshots entry below says 274 tests; the actual count is 273.
+
 ## 2026-10-11 — Player headshots + clickable player stats cards
 
 User request: headshots, and clicking a player shows this season, past seasons and career totals.

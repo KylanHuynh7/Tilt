@@ -13,8 +13,8 @@ const cfg: SportConfig = {
     "Pre-game probabilities from the frozen NBA v1 model; live probabilities from the v1.1 in-game model (score margin, time left, and pre-game edge), refreshed every 60 s.",
   championLabel: (team, season) => `${team} won the ${season} NBA Finals`,
   breakdownRows: [
-    ["2024-25", (b) => b.per_season["20242025"]],
-    ["2025-26", (b) => b.per_season["20252026"]],
+    ["2024‑25", (b) => b.per_season["20242025"]],
+    ["2025‑26", (b) => b.per_season["20252026"]],
     ["Regular season", (b) => b.regular_season],
     ["Play-in + playoffs", (b) => b.postseason_play_in_and_playoffs],
     ["Early season", (b) => b.segments.early],
