@@ -182,6 +182,22 @@ Inherits the NFL §12 five-term form (pre-game edge fading over time, score marg
   - *Per season:* ECE 0.037 / 0.035 / **0.040 / 0.043** (2022–2025). The two expanded-playoff seasons sit at or just over the target individually.
   - *Conference vs non-conference:* ECE 0.022 vs 0.036.
   - *FBS-vs-FCS games, reported separately as agreed (never pooled):* n = 485, FBS teams won 95.5%, LL 0.169.
+- **v1.1 live win probability (fitted + evaluated once, 2026-10-11):**
+  - *Data.* ESPN college play-by-play, FBS-vs-FBS games.
+    - **2004 yielded no usable games:** 219 had no plays, and 417 failed the half-valid-plays check because ESPN's 2004 field-position values are mostly zeros.
+    - Training 2005–2013: 5,751 games, 965,197 plays. Per season, 1–11% of games were dropped for final-score mismatches and 1–15% for missing plays (the early seasons worst).
+    - Test 2022–2025: 2,931 games, 497,988 plays.
+    - A resume bug double-counted 2010's drops in the manifest. It is corrected there and in the code; the data itself was unaffected.
+  - *Fit:* β0 +0.074, β1 +1.266, β2 +0.761, β3 +2.594, β4 −0.472 (`artifacts/cfb/live_wp_v1.json`). Having the ball is roughly neutral at your own 18 and worth more the closer you get.
+  - *Pre-registered targets (inherited NFL DECISION 6): 4 of 5 PASS.*
+    - Beats the pre-game-held baseline every quarter: LL 0.545 / 0.452 / 0.372 / 0.254 vs 0.574 / 0.572 / 0.573 / 0.592.
+    - Overall ECE 0.0123 < 0.05 (LL 0.405 vs 0.578 held).
+    - Monotone in d.
+    - 17-point lead with 2 min left ≥ 0.97 (worst case 0.997).
+    - **Kickoff within 0.02: FAIL** (gap 0.063), the same mechanism as NBA and NFL (β1 > 1).
+  - ***Overtime is badly wrong:*** college OT (n = 1,083 plays) has live LL **0.982**, far worse than both the coin flip and the held baseline (0.744), with ECE 0.273. OT was not a pre-registered target. With τ = 0 the time terms vanish and the model leans on the score, but in alternating-possession OT a 7-point lead is routinely answered. Not fixed after seeing test results (§10). Instead the live feed flags every OT probability `unreliable`, and the UI shows a warning.
+  - *Q1 calibration* (ECE 0.035) is worse than the held baseline (0.020) while LL is better, as with NBA.
+  - *Live inputs come from ESPN's scoreboard `situation`* (possession, yards to the end zone). If absent, the possession terms are zero.
 - **Dashboard / API (N5):**
   - *Trajectory chart shows only each season's top 25 at season's end plus the champion,* because 130+ lines are unreadable. Teams outside the top 25 are still rated and served; they just aren't drawn.
   - *Champion = winner of the season's last postseason game* (BCS / CFP final). Reproduces Alabama 2020, Georgia 2021–22, Michigan 2023, Ohio State 2024.
@@ -189,7 +205,6 @@ Inherits the NFL §12 five-term form (pre-game edge fading over time, score marg
   - *Game pages* use ESPN rosters with injury status. ESPN publishes **no college depth charts**, so players are grouped by position with a note.
   - *Player cards* use ESPN college stats. Players with none recorded (often freshmen) show an empty card rather than an error.
   - *FCS opponents* show the pooled FCS rating, and their games carry no track-record figure (those games were excluded from evaluation).
-  - *No live win probability yet* (v1.1).
 - **No logos:** inherits NHL §13.I. Headshots follow the author's ESPN-headshot decision (§13.I).
 
 ---

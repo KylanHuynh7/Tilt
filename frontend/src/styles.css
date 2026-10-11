@@ -940,3 +940,4 @@ table.metrics td:first-child { white-space: nowrap; }
 details.others { margin-top: 10px; }
 details.others summary { cursor: pointer; font-size: 12px; color: var(--text-dim); margin-bottom: 6px; }
 @media (max-width: 520px) { .lineup-slot { grid-template-columns: 48px 1fr; } }
+.warn-text { color: var(--warn); font-size: 12px; margin-top: 4px; text-transform: none; letter-spacing: 0; font-family: var(--font-body); font-weight: 500; }

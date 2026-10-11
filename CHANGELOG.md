@@ -2,6 +2,15 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-11 — College football v1.1: live win probability (4 of 5 targets PASS)
+
+- **Download:** ESPN college play-by-play (FBS vs FBS), 3.9 MB of samples. 2004 had no usable games; training 2005–2013 has 5,751 games. A resume bug double-counted 2010's drops; fixed and corrected.
+- `app/cfb/live_wp.py` reuses the NFL feature definitions (untimed OT → τ = 0). Fit β0 +0.074, β1 +1.266, β2 +0.761, β3 +2.594, β4 −0.472.
+- **One-shot test 2022–2025:** live LL 0.405 vs 0.578 held, ECE 0.0123, better every quarter. Kickoff check FAILS (0.063).
+- **Overtime is badly overconfident** (LL 0.982, not a target). Not fixed post-test (§10); the live feed flags OT as `unreliable` and the UI warns.
+- `/cfb/games/today` attaches `live_wp` from ESPN situation data. CFB tag → v1.1.
+- +7 tests (325).
+
 ## 2026-10-11 — College football N5: API + dashboard (five sports live)
 
 - Backend `app/cfb/api.py` under `/cfb`:

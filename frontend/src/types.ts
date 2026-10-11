@@ -31,6 +31,7 @@ export type LiveStateBlock = {
   away_score: number;
 };
 export type LiveWPBlock = {
+  unreliable?: boolean;    // model known to be poorly calibrated in this state (CFB overtime)
   home_win_prob: number;
   n_samples: number;
   smoothed: boolean;

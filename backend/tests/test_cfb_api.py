@@ -35,3 +35,16 @@ def test_current_ratings_include_fcs_pool(client):
 def test_calibration_shape(client):
     body = client.get("/cfb/calibration/current").json()
     assert body["test_seasons"] == [2022, 2023, 2024, 2025] and "fbs_vs_fcs" in body
+
+
+def test_live_block_possession_and_overtime_flag():
+    from app.cfb import live_wp
+    if not live_wp.ARTIFACT.exists():
+        pytest.skip("live model not fitted")
+    g = {"status": {"period": 4, "clock": 120}, "_home": {"score": "24", "team": {"id": "1"}},
+         "_away": {"score": "21", "team": {"id": "2"}}}
+    home_ball = cfb_api.live_block(g, 0.5, {"possession": "1", "yardsToEndzone": 20})["live_wp"]
+    away_ball = cfb_api.live_block(g, 0.5, {"possession": "2", "yardsToEndzone": 20})["live_wp"]
+    assert home_ball["home_win_prob"] > away_ball["home_win_prob"] and not home_ball["unreliable"]
+    ot = cfb_api.live_block({**g, "status": {"period": 5, "clock": 0}}, 0.5, {})["live_wp"]
+    assert ot["unreliable"]

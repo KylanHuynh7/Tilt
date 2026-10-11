@@ -82,8 +82,11 @@ async def ingest_season(season: int) -> dict:
     games = [g for g in pipeline.completed_games(rows_all) if g["home_id"] in fbs and g["away_id"] in fbs]
     path = PBP_DIR / f"{season}.parquet"
     rows = pq.read_table(path).to_pylist() if path.exists() else []
+    m0 = json.loads(MANIFEST.read_text()) if MANIFEST.exists() else {}
+    dropped = set(m0.get(str(season), {}).get("dropped_ids", []))
     have = {r["game_id"] for r in rows}
-    todo = [g for g in games if g["game_id"] not in have]
+    # Resume skips kept AND previously dropped games, so drops aren't recounted.
+    todo = [g for g in games if g["game_id"] not in have and g["game_id"] not in dropped]
     stats = {"no_plays": 0, "final_mismatch": 0, "too_few_valid": 0}
     sem = asyncio.Semaphore(CONCURRENCY)
 
@@ -92,14 +95,17 @@ async def ingest_season(season: int) -> dict:
             plays = await _fetch(client, g["game_id"])
         if not plays:
             stats["no_plays"] += 1
+            dropped.add(g["game_id"])
             return []
         last = plays[-1]
         if (int(last.get("homeScore") or -1), int(last.get("awayScore") or -1)) != (g["home_score"], g["away_score"]):
             stats["final_mismatch"] += 1
+            dropped.add(g["game_id"])
             return []
         samples, total = samples_from_plays(plays, str(g["home_id"]), str(g["away_id"]))
         if len(samples) < 0.5 * total:
             stats["too_few_valid"] += 1
+            dropped.add(g["game_id"])
             return []
         return [{"game_id": g["game_id"], **s} for s in samples]
 
@@ -112,7 +118,7 @@ async def ingest_season(season: int) -> dict:
     m = json.loads(MANIFEST.read_text()) if MANIFEST.exists() else {}
     prev = m.get(str(season), {})
     m[str(season)] = {"fbs_vs_fbs_games": len(games), "kept": len({r["game_id"] for r in rows}), "plays": len(rows),
-                      **{k: prev.get(k, 0) + v for k, v in stats.items()}}
+                      **{k: prev.get(k, 0) + v for k, v in stats.items()}, "dropped_ids": sorted(dropped)}
     MANIFEST.write_text(json.dumps(m, indent=2, sort_keys=True))
     return {"season": season, **m[str(season)]}
 

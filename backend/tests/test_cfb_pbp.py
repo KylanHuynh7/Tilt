@@ -18,3 +18,16 @@ def test_only_valid_plays_become_samples():
 
 def test_clock_parsing():
     assert pbp.parse_clock("14:47") == 887 and pbp.parse_clock("0:58") == 58 and pbp.parse_clock(None) == 0
+
+
+def test_untimed_overtime_is_tau_zero():
+    from app.cfb import live_wp
+    assert live_wp.tau_for(1, 900) == 3600 and live_wp.tau_for(4, 60) == 60 and live_wp.tau_for(5, 0) == 0.0
+
+
+def test_live_evaluator_guardrails(tmp_path):
+    from scripts import cfb_live_wp_evaluate
+    assert cfb_live_wp_evaluate.main(["--out", str(tmp_path / "x.json")]) == 2
+    f = tmp_path / "r.json"
+    f.write_text("{}")
+    assert cfb_live_wp_evaluate.main(["--confirm", "--out", str(f)]) == 3

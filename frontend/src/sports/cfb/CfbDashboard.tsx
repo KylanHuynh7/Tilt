@@ -11,7 +11,7 @@ const cfg: SportConfig = {
   periodLabel: (p) => (p <= 4 ? `Q${p}` : "OT"),
   emptyNote: "No FBS games this week.",
   footnote:
-    "Pre-game probabilities from the frozen CFB v1 model. Games against FCS opponents use the pooled FCS rating and were excluded from the model's evaluation. Bowl and playoff calibration was weak in testing.",
+    "Pre-game probabilities from the frozen CFB v1 model; live probabilities from the v1.1 in-game model (score, time, possession, field position). FCS opponents use the pooled FCS rating. Bowl/playoff pre-game calibration and overtime live probabilities were weak in testing.",
   championLabel: (team, season) => `${team} won the ${season} national championship`,
   breakdownRows: [
     ["2022", (b) => b.per_season["2022"]],

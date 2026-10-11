@@ -150,11 +150,28 @@ async def ratings_history(season: int):
     }
 
 
-def live_block(g: dict) -> dict:
+def live_block(g: dict, p_home: float | None = None, situation: dict | None = None) -> dict:
+    """Live score/clock plus the v1.1 live WP (§12). College OT is untimed and
+    the model was badly overconfident there in testing (§13), so OT carries
+    an `unreliable` flag the UI surfaces.
+    """
+    from . import live_wp  # lazy: live_wp imports this module
+
     st = g["status"]
-    return {"live_state": {"game_state": "LIVE", "period": int(st.get("period") or 1),
-                           "time_remaining_s": int(float(st.get("clock") or 0)),
-                           "home_score": int(g["_home"].get("score") or 0), "away_score": int(g["_away"].get("score") or 0)}}
+    period = int(st.get("period") or 1)
+    clock = int(float(st.get("clock") or 0))
+    home, away = int(g["_home"].get("score") or 0), int(g["_away"].get("score") or 0)
+    out = {"live_state": {"game_state": "LIVE", "period": period, "time_remaining_s": clock,
+                          "home_score": home, "away_score": away}}
+    if p_home is not None and live_wp.ARTIFACT.exists():
+        sit = situation or {}
+        poss = str(sit.get("possession") or "")
+        s = 1 if poss == str(g["_home"]["team"]["id"]) else (-1 if poss == str(g["_away"]["team"]["id"]) else 0)
+        y = sit.get("yardsToEndzone") if isinstance(sit.get("yardsToEndzone"), int) else 50
+        wp = live_wp.predict(live_wp.load(), pre_game_p=p_home, qtr=period, clock_s=clock, d=home - away, s=s, y=y)
+        out["live_wp"] = {"home_win_prob": round(wp, 4), "n_samples": 0, "smoothed": False,
+                          "unreliable": period > 4}
+    return out
 
 
 async def _week_raw() -> tuple[int | None, list[dict]]:
@@ -200,7 +217,7 @@ async def _week_raw() -> tuple[int | None, list[dict]]:
             "_ids": (hid, aid),
         }
         if state == "LIVE":
-            m.update(live_block({"status": comp["status"], "_home": h, "_away": a}))
+            m.update(live_block({"status": comp["status"], "_home": h, "_away": a}, p, comp.get("situation")))
         out.append(m)
     live_history.record_matchups("cfb", out)
     return week, out
@@ -249,7 +266,7 @@ async def game_detail(game_id: int):
         "probability": core_detail.probability_breakdown(m["home_rating"], m["away_rating"], home_bump=c.params.home_bump,
                                                          neutral=m["neutral"], p_home=m["home_win_prob"]),
         "model": {"name": "CFB v1 Elo (pooled FCS)", "home_bump": c.params.home_bump, "k_regular": c.params.k_regular,
-                  "mov": c.params.mov, "live": "not yet (CFB v1.1)"},
+                  "mov": c.params.mov, "live": "CFB v1.1 in-game model (unreliable in overtime)"},
         "calibration_context": None if m["fcs_opponent"] else core_detail.calibration_context(
             m["home_win_prob"], buckets, "CFB one-shot test (2022–2025, FBS vs FBS)"),
         "home": side(m["home"], m["home_name"], m["home_color"], hid, rh),
