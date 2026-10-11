@@ -1,7 +1,10 @@
 # NHL Player Projections — Methodology Document
-## Version 0.1-draft
+## Version 0.2
 **Author:** Kylan Huynh
-**Status:** PRE-CODE DRAFT, pending author approval. No ingest, model or evaluation code has been written. Seven **[DECISION]** items below need the author's answer before code begins.
+**Status:** Approved 2026-10-11, all seven decisions as recommended (P-1 NHL, P-3 test 2023-24 → 2025-26 and P-7 hide-unless-pass explicitly; P-2, P-4, P-5 and P-6 as written).
+
+**Amendment log:**
+- *v0.2 (2026-10-11, during the first trial ingest, before any model code or bulk download):* The §3 coverage threshold is lowered from 16 to **12 skaters per team**. The trial season contained a genuine 15-skater game (New Jersey on 2010-10-11, under the salary cap), so 16 would have rejected real lineups. 12 still catches truncated box scores. Games below 16 are counted in the manifest.
 **Last updated:** 2026-10-11
 
 Same project rules as the team models:
@@ -47,7 +50,7 @@ These are predictions, not pass criteria. The pass criteria are in §6.
 
 - **Source:** `api-web.nhle.com/v1/gamecenter/{id}/boxscore`, the regular season and playoffs.
 - **Fields read per skater-game:** player id, team, position (F/D), time on ice, goals, assists, points, shots on goal.
-- **Coverage rule:** a season is used only if every completed game has a box score with ≥ 16 skaters per team.
+- **Coverage rule:** a season is used only if every completed game has a box score with ≥ 12 skaters per team (v0.2; was 16).
 - **Shared ingest:** the same box-score ingest serves NHL v3 (METHODOLOGY.md §20, DECISION V3-1). It is built once.
 - **Never read:** odds or betting lines of any kind, and no third-party projections.
 
