@@ -21,6 +21,9 @@ from . import projections as pj
 
 ARTIFACT = Path(__file__).resolve().parent.parent / "artifacts" / "nhl_players_v1.json"
 RESULTS = Path(__file__).resolve().parent.parent / "results" / "nhl_players_test_evaluation.json"
+# Precomputed replay state, so a cold Cloud Run instance (which gets CPU only
+# during requests) serves projections immediately. Rebuilt by `build_and_save`.
+STATE = Path(__file__).resolve().parent.parent / "artifacts" / "nhl_projection_state.json"
 FIRST = 19981999
 
 _lock = threading.Lock()
@@ -53,8 +56,42 @@ def _build() -> dict:
     return out
 
 
+def _dump(c: dict) -> dict:
+    pr = c["priors"]
+    return {"priors": {"rate60": {f"{e}|{p}": v for (e, p), v in pr.rate60.items()},
+                       "base": {f"{e}|{p}": v for (e, p), v in pr.base.items()},
+                       "debut_toi": pr.debut_toi, "league_ga": pr.league_ga},
+            "params": c["params"],
+            "state": {e: {k: {str(i): v for i, v in d.items()} for k, d in st.items()}
+                      for e, st in c["state"].items()}}
+
+
+def _load(d: dict) -> dict:
+    p = d["priors"]
+    pr = pj.SeasonPriors(rate60={tuple(k.split("|")): v for k, v in p["rate60"].items()},
+                         base={tuple(k.split("|")): v for k, v in p["base"].items()},
+                         debut_toi=p["debut_toi"], league_ga=p["league_ga"])
+    state = {e: {k: ({int(i): v for i, v in dd.items()} if k in ("sx", "st", "tt", "tw") else dict(dd))
+                 for k, dd in st.items()} for e, st in d["state"].items()}
+    return {"priors": pr, "params": d["params"], "state": state}
+
+
+def build_and_save() -> dict:
+    """Rebuild from box scores on disk and persist (used at refresh and locally)."""
+    global _cache
+    c = _build()
+    STATE.write_text(json.dumps(_dump(c)))
+    _cache = c
+    return c
+
+
 def get() -> dict | None:
-    """The built state, or None while the background build runs (~15-40 s)."""
+    """The state: in memory, else the precomputed file, else None (building)."""
+    global _cache
+    if _cache is None and STATE.exists() and available():
+        with _lock:
+            if _cache is None:
+                _cache = _load(json.loads(STATE.read_text()))
     return _cache
 
 

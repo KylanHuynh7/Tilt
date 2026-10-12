@@ -42,7 +42,11 @@ async def refresh_current_season(today: date | None = None) -> dict:
         print(f"[refresh] box scores for {current_sid} failed: {exc!r}")
     cache = historical.refresh()
     from . import nhl_projections
-    nhl_projections.start_build()
+    if nhl_projections.available():
+        try:
+            nhl_projections.build_and_save()   # in-request: Cloud Run gives CPU only during requests
+        except Exception as exc:  # noqa: BLE001
+            print(f"[refresh] projections rebuild failed: {exc!r}")
     return {
         "current_season": current_sid,
         "seasons_replayed": len(cache.seasons_replayed),

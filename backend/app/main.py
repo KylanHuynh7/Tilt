@@ -79,7 +79,8 @@ async def lifespan(app: FastAPI):
     # Build the cache at startup. Cheap (~1-2s) and avoids per-request hits.
     try:
         historical.initialize()
-        nhl_projections.start_build()   # background; game pages show projections once ready
+        if nhl_projections.get() is None:   # precomputed state normally ships with the image
+            nhl_projections.start_build()
     except FileNotFoundError as exc:
         # No frozen artifact yet — surface a clear error in the logs but let
         # the app start so error responses can guide the operator.

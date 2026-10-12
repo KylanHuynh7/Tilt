@@ -80,3 +80,19 @@ def test_projections_hidden_unless_test_passed(tmp_path, monkeypatch):
     assert not nhl_projections.available()
     res.write_text('{"all_pass": true}')
     assert nhl_projections.available()
+
+
+def test_projection_state_roundtrips_through_json():
+    import json
+
+    from app import nhl_projections as n
+    rows = _rows()
+    pri = pj.priors_for(rows)
+    params = dict(H=40, m=1, H_toi=10, gamma=0.5, home=1.06)
+    st = {}
+    pj.replay(rows, "points", params, pri, set(), state_out=st)
+    c = {"priors": pri[20102011], "params": {"points": params}, "state": {"points": st}}
+    back = n._load(json.loads(json.dumps(n._dump(c))))
+    kw = dict(player_id=1, pos="F", opponent="BBB", is_home=True)
+    assert pj.predict_live(back["state"]["points"], "points", params, back["priors"], **kw) == \
+        pytest.approx(pj.predict_live(st, "points", params, pri[20102011], **kw))
