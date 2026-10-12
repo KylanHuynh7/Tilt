@@ -14,7 +14,7 @@ export type {
   MetricBlock,
   CalibrationResponse,
 } from "../../types";
-import type { CalibrationResponse, RatingsHistoryResponse, SeasonsResponse, TodayResponse } from "../../types";
+import type { CalibrationResponse, RatingsHistoryResponse, ScorerRow, SeasonsResponse, TodayResponse } from "../../types";
 
 export type CupTeam = {
   team: string;
@@ -42,3 +42,5 @@ export const fetchHistory = (season: number) =>
 export const fetchToday = () => getJson<TodayResponse>("/games/today");
 export const fetchCalibration = () => getJson<CalibrationResponse>("/calibration/current");
 export const fetchCup = () => getJson<CupResponse>("/simulation/cup");
+export type ScorersResponse = { available: boolean; ready: boolean; date?: string; players: ScorerRow[]; note?: string };
+export const fetchScorers = () => getJson<ScorersResponse>("/projections/today");

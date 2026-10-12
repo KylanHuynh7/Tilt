@@ -55,3 +55,28 @@ def test_evaluator_guardrails(tmp_path):
     f = tmp_path / "r.json"
     f.write_text("{}")
     assert players_evaluate.main(["--confirm", "--out", str(f)]) == 3
+
+
+def test_live_prediction_matches_replay_formula():
+    rows = _rows()
+    pri = pj.priors_for(rows)
+    params = dict(H=40, m=1, H_toi=10, gamma=0.5, home=1.06)
+    st = {}
+    pj.replay(rows, "points", params, pri, set(), state_out=st)
+    # Append one more game for player 1; its recorded prediction must equal predict_live on the prior state.
+    extra = pj.Row(20102011, 2010029999, 1, "AAA", "BBB", True, "F", 15.0, 0, 0)
+    pred = pj.replay(rows + [extra], "points", params, pri, {20102011})[-1].p
+    live = pj.predict_live(st, "points", params, pri[20102011], player_id=1, pos="F", opponent="BBB", is_home=True)
+    assert live == pytest.approx(pred)
+
+
+def test_projections_hidden_unless_test_passed(tmp_path, monkeypatch):
+    from app import nhl_projections
+    art, res = tmp_path / "a.json", tmp_path / "r.json"
+    art.write_text("{}")
+    monkeypatch.setattr(nhl_projections, "ARTIFACT", art)
+    monkeypatch.setattr(nhl_projections, "RESULTS", res)
+    res.write_text('{"all_pass": false}')
+    assert not nhl_projections.available()
+    res.write_text('{"all_pass": true}')
+    assert nhl_projections.available()

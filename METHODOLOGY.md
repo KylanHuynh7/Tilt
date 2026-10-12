@@ -1,7 +1,7 @@
 # NHL Rating System — Methodology Document
 ## Version 3.0-draft
 **Author:** Kylan Huynh
-**Status:** v1 shipped and locked (commit `f7548f6`). v2 shipped and evaluated once on 2025-26 (2026-10-10) — failed all three §6 targets; locked per §10 #2. v1 and v2 models and evaluations are immutable. v3 in PRE-CODE DRAFT (§17–§20), pending author approval; no v3 code written.
+**Status:** v1 shipped and locked (commit `f7548f6`). v2 shipped and evaluated once on 2025-26 (2026-10-10) — failed all three §6 targets; locked per §10 #2. v1 and v2 models and evaluations are immutable. v3 approved, **frozen 2026-10-11 and live**; its one-shot test on 2026-27 runs after the 2027 Stanley Cup Final (§20).
 **Last updated:** October 2026
 
 **Amendment log:**
@@ -916,9 +916,9 @@ If any of these are promoted to v3 scope, they get their own numbered section (�
 
 ---
 
-## Section 20 — v3 pre-code resolutions (proposed 2026-10-11, pending approval)
+## Section 20 — v3 pre-code resolutions (approved 2026-10-11) and freeze results
 
-**STATUS: DRAFT.** §17–§18 were drafted on 2026-05-19, before the v2 test ran. This section answers their open questions with facts checked on 2026-10-11 and lists what still needs the author's decision. §17–§18 above are kept verbatim; where this section differs, this section governs. Section numbering for promoted §19 ideas continues from §21.
+**STATUS: APPROVED** by the author on 2026-10-11, all seven decisions as recommended. §17–§18 were drafted on 2026-05-19, before the v2 test ran. This section answers their open questions with facts checked on 2026-10-11 and lists what still needs the author's decision. §17–§18 above are kept verbatim; where this section differs, this section governs. Section numbering for promoted §19 ideas continues from §21.
 
 ### Facts established before drafting (contamination disclosure)
 
@@ -986,3 +986,39 @@ If any of these are promoted to v3 scope, they get their own numbered section (�
 - The pre-registered expectations.
 - The §5 constraint.
 - The "does NOT do" lists.
+
+### Freeze results (2026-10-11)
+
+**Inputs:**
+- Box scores for 1967-68 → 2025-26: 58 seasons, every game covered.
+- 4,810 roster-move events.
+- The 2019-20 bubble games restored (§13.L).
+
+**Run:** 9,600 distinct v3.0 cells plus 24 v3.1 cells, 16,509 s of wall time (the machine slept for part of it). Artifact: `artifacts/frozen_params_v3.json`. The completed seasons' events are cached in `artifacts/nhl_roster_events.json`, verified identical to the freeze's.
+
+| | K reg / K playoff | carry | home | boost window × amount | round / elim | Validation LL |
+| --- | --- | --- | --- | --- | --- | --- |
+| v2 params, v3 validation | 10 / 10 | 0.85 | 40 | — | — | 0.66843 |
+| Best no-boost cell | 10 / 10 | 0.75 | 20 | 0 | — | 0.66761 |
+| **v3.0 winner** | 10 / 10 | 0.75 | 20 | 5 games × 0.25 | — | **0.66761** |
+| **v3.1 winner (frozen)** | 10 / 10 | 0.75 | 20 | 5 × 0.25 | **0 / 0** | **0.66761** |
+
+**Pre-registered expectations:**
+- **v3.0 improves validation LL by ≥ 0.002 over v2: FAIL** (0.0008).
+- BOOST_WINDOW in [5, 15]: ✓ (5).
+- BOOST_AMOUNT in [0.25, 0.75]: ✓ (0.25).
+- **v3.1 improves by ≥ 0.0005: FAIL** (0).
+- ROUND_WEIGHTS_SCALE in [0.05, 0.15]: ✗ (0).
+- ELIMINATION_BUMP in [0.10, 0.30]: ✗ (0).
+
+**What it means:**
+- **Roster moves carry no usable signal at team level.**
+  - The boost improves LL by 0.000005 over the best no-boost cell; larger boosts are monotonically worse.
+  - The 0.25 boost is kept only because the pre-registered selection rule picks it.
+  - §17 named this outcome: the next step is the player-level "Interpretation P" (v4).
+  - The NHL skater projections (`methodology/NHL_PLAYERS.md`, which passed their test) are that foundation.
+- **Series context carries no signal either.** The tuner set both terms to zero, which §18 pre-registered as "v3.1 isn't pulling its weight". As in v1 and v2, the unconstrained grid again prefers K_playoff (6) < K_regular (10).
+- **The whole 0.0008 gain comes from re-tuning v2's own parameters** on the longer validation window that now includes 2025-26:
+  - slower carryover (0.85 → 0.75);
+  - a smaller home edge (40 → 20). That is below v2's pre-registered [30, 70] range, consistent with §13.C's finding that home advantage fell in 2025-26.
+- **Live (V3-6):** v3 replaced v2 on the dashboard on 2026-10-11, labelled "test pending". v1 and v2 remain locked records (`frozen_params_v1.json`, `frozen_params_v2.json`). `scripts/evaluate_v3.py` refuses to run until the 2027 Cup Final is decided in the ingested data.

@@ -986,5 +986,13 @@
     "rows": 55758,
     "short_game_ids": [],
     "under_16_skater_game_ids": []
+  },
+  "20262027": {
+    "covered": true,
+    "games": 86,
+    "kept": 86,
+    "rows": 3440,
+    "short_game_ids": [],
+    "under_16_skater_game_ids": []
   }
 }

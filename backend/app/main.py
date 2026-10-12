@@ -27,7 +27,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from dataclasses import asdict
 
-from . import cup_simulator, engine, historical, live_wp, pipeline, standings
+from . import cup_simulator, engine, historical, live_wp, nhl_projections, pipeline, standings
 from .core import detail as core_detail, lineups, live_history, players as core_players, rosters
 from .franchises import franchise_for
 from .nba import api as nba_api
@@ -79,6 +79,7 @@ async def lifespan(app: FastAPI):
     # Build the cache at startup. Cheap (~1-2s) and avoids per-request hits.
     try:
         historical.initialize()
+        nhl_projections.start_build()   # background; game pages show projections once ready
     except FileNotFoundError as exc:
         # No frozen artifact yet — surface a clear error in the logs but let
         # the app start so error responses can guide the operator.
@@ -322,6 +323,14 @@ async def game_detail(game_id: int):
         ra = await rosters.fetch(client, "hockey/nhl", ESPN_NHL_ROSTER_CODES.get(m["away"], m["away"].lower()))
         rh = lineups.attach(rh, await lineups.fetch(client, "nhl", rh.get("team_id")), "nhl")
         ra = lineups.attach(ra, await lineups.fetch(client, "nhl", ra.get("team_id")), "nhl")
+        projections = None
+        if nhl_projections.available():
+            try:
+                out = {m["home"]: {nhl_projections.norm(p["name"]) for p in rh.get("ruled_out", [])},
+                       m["away"]: {nhl_projections.norm(p["name"]) for p in ra.get("ruled_out", [])}}
+                projections = await nhl_projections.for_game(client, m["home"], m["away"], out)
+            except Exception as exc:  # noqa: BLE001 — projections are optional on the page
+                print(f"[projections] {game_id}: {exc!r}")
     side = lambda code, roster: {  # noqa: E731
         "code": code, "name": TEAMS.get(code, code), "color": None, "roster": roster,
         "form": core_detail.team_form(code, games),
@@ -332,16 +341,62 @@ async def game_detail(game_id: int):
         "probability": core_detail.probability_breakdown(
             m["home_rating"], m["away_rating"], home_bump=cache.params.home_bump,
             neutral=False, p_home=m["home_win_prob"]),
-        "model": {"name": "NHL v2 Elo", "home_bump": cache.params.home_bump,
+        "model": {"name": f"NHL v{(cache.params.methodology_version or '2').split('.')[0]} Elo", "home_bump": cache.params.home_bump,
                   "k_regular": cache.params.k_regular, "mov": False, "live": "NHL v2.2 in-game lookup"},
         "calibration_context": core_detail.calibration_context(
-            m["home_win_prob"], buckets, "NHL v2 one-shot test (2025-26)"),
+            m["home_win_prob"], buckets, "NHL v2 one-shot test (2025-26); v3 test pending (after the 2027 Cup Final)"),
         "home": side(m["home"], rh),
         "away": side(m["away"], ra),
         "head_to_head": core_detail.head_to_head(m["home"], m["away"], games),
         "live_history": live_history.get("nhl", game_id),
-        "projections": None,  # no player model (METHODOLOGY §13.A)
+        "projections": projections,  # methodology/NHL_PLAYERS.md; None while building or if unavailable
     }
+
+
+_scorers_cache: dict = {}
+
+
+@nhl.get("/projections/today")
+async def projections_today(limit: int = 10):
+    """Likeliest goal scorers across today's NHL slate (methodology/NHL_PLAYERS.md §7).
+    Cached 10 minutes. `ready: false` while the model state is still building."""
+    import time
+
+    import httpx
+
+    if not nhl_projections.available():
+        return {"available": False, "ready": False, "players": []}
+    if nhl_projections.get() is None:
+        return {"available": True, "ready": False, "players": []}
+    key = date.today().isoformat()
+    hit = _scorers_cache.get(key)
+    if hit and time.time() - hit[0] < 600:
+        players = hit[1]
+    else:
+        matchups = await engine.todays_matchups()
+        players = []
+        async with httpx.AsyncClient(headers={"User-Agent": "tilt-nhl"}) as client:
+            for m in matchups:
+                try:
+                    out = {}
+                    for code in (m["home"], m["away"]):
+                        r = await rosters.fetch(client, "hockey/nhl", ESPN_NHL_ROSTER_CODES.get(code, code.lower()))
+                        out[code] = {nhl_projections.norm(p["name"]) for p in r.get("ruled_out", [])}
+                    g = await nhl_projections.for_game(client, m["home"], m["away"], out)
+                except Exception as exc:  # noqa: BLE001
+                    print(f"[projections] {m.get('game_id')}: {exc!r}")
+                    continue
+                if g is None:
+                    continue
+                for side, team, opp in (("home", m["home"], m["away"]), ("away", m["away"], m["home"])):
+                    for p in g[side]:
+                        players.append({**p, "team": team, "opponent": opp, "is_home": side == "home",
+                                        "game_id": m["game_id"]})
+        players.sort(key=lambda p: -p["p_goal"])
+        _scorers_cache.clear()
+        _scorers_cache[key] = (time.time(), players)
+    return {"available": True, "ready": True, "date": key, "players": players[:limit],
+            "note": "Rostered skaters not ruled out; scratches are announced near puck drop."}
 
 
 @nhl.get("/calibration/current")

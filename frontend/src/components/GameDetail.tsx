@@ -416,6 +416,32 @@ export function GameDetail({ sport, gameId, colorFor, periodLabel }: Props) {
         </section>
       </div>
 
+      {d.projections && (
+        <section className="panel">
+          <div className="panel-title"><h2>Scoring chances</h2><span className="meta">{d.projections.model}</span></div>
+          <div className="roster-grid">
+            {([["away", d.away.code, awayColor], ["home", d.home.code, homeColor]] as const).map(([side, code, color]) => (
+              <div key={side} className="proj-team">
+                <h3 className="cal-h" style={{ color }}>{code}</h3>
+                <div className="proj-head"><span>Skater</span><span>Point</span><span>Goal</span></div>
+                <ul className="proj-list">
+                  {d.projections![side].slice(0, 12).map((p) => (
+                    <li key={p.player_id} className="proj-row">
+                      <span className="proj-name">{p.name} <small>{p.pos}</small></span>
+                      <span className="proj-cell"><i style={{ width: `${Math.max(2, Math.round(p.p_point * 36))}px`, background: color }} />{Math.round(p.p_point * 100)}%</span>
+                      <span className="proj-cell"><i style={{ width: `${Math.max(2, Math.round(p.p_goal * 36))}px`, background: color }} />{Math.round(p.p_goal * 100)}%</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <div className="disclaimer ok">
+            Chance each skater records at least one point / one goal tonight. {d.projections.note}
+          </div>
+        </section>
+      )}
+
       {/* Rosters */}
       <section className="panel">
         <div className="panel-title"><h2>Players &amp; availability</h2><span className="meta">rosters + injury report from ESPN</span></div>
@@ -425,8 +451,9 @@ export function GameDetail({ sport, gameId, colorFor, periodLabel }: Props) {
         </div>
         <div className="disclaimer ok">
           Lineups come from each team's published depth chart (ESPN) or posted batting order (MLB);
-          backups are listed behind each starter. Tilt's models are team-level: they don't see who plays
-          and don't project player stats — that would be a separate, pre-registered model.
+          backups are listed behind each starter. {d.projections
+            ? "The win probability is team-level; the scoring chances above come from the separate, pre-registered skater model."
+            : "Tilt's win models are team-level: they don't see who plays."}
           Click a player for season and career stats. {d.attribution ?? "Photos and stats: ESPN."}
         </div>
       </section>

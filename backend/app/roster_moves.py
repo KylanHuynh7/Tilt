@@ -12,9 +12,11 @@ into one event (V3-3).
 
 from __future__ import annotations
 
+import json
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import date
+from pathlib import Path
 from typing import Iterable
 
 from . import boxscores
@@ -76,4 +78,27 @@ def all_events(season_ids: Iterable[int]) -> set[tuple[int, str]]:
     out: set[tuple[int, str]] = set()
     for s in season_ids:
         out |= season_events(s)
+    return out
+
+
+# Completed seasons' events never change: cached once (same `detect` as the
+# freeze) so the live dashboard doesn't re-read 2M box-score rows at startup.
+CACHE = Path(__file__).resolve().parent.parent / "artifacts" / "nhl_roster_events.json"
+
+
+def write_cache(season_ids: Iterable[int]) -> int:
+    data = {str(s): sorted([list(e) for e in season_events(s)]) for s in season_ids}
+    CACHE.write_text(json.dumps(data))
+    return sum(len(v) for v in data.values())
+
+
+def events_for(season_ids: Iterable[int]) -> set[tuple[int, str]]:
+    """Cached events for completed seasons, detected live for the rest."""
+    cached = json.loads(CACHE.read_text()) if CACHE.exists() else {}
+    out: set[tuple[int, str]] = set()
+    for s in season_ids:
+        if str(s) in cached:
+            out |= {(int(g), t) for g, t in cached[str(s)]}
+        elif (boxscores.BOX_DIR / f"{s}.parquet").exists():
+            out |= season_events(s)
     return out

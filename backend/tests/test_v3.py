@@ -87,3 +87,18 @@ def test_freeze_refuses_test_season_and_existing_artifact(tmp_path, monkeypatch)
 def test_grid_sizes_match_methodology():
     from app import tuner_v3
     assert len(tuner_v3.V30_GRID) == 12_000 and len(tuner_v3.V31_SUBGRID) == 24
+
+
+def test_v3_evaluator_guards(tmp_path):
+    from scripts import evaluate_v3
+    assert evaluate_v3.main(["--out", str(tmp_path / "x.json")]) == 2
+    f = tmp_path / "r.json"
+    f.write_text("{}")
+    assert evaluate_v3.main(["--confirm", "--out", str(f)]) == 3
+    # 2026-27 is in progress: the Cup Final cannot be decided yet.
+    assert evaluate_v3.main(["--confirm", "--out", str(tmp_path / "new.json")]) == 4
+
+
+def test_cached_events_match_detection_for_a_season():
+    from app import roster_moves
+    assert roster_moves.events_for([19721973]) == roster_moves.season_events(19721973)

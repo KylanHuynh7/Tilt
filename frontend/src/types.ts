@@ -152,5 +152,14 @@ export type GameDetailResponse = {
   live_history: { t: string; period: number; time_remaining_s: number; home_score: number; away_score: number; home_wp: number }[];
   pitching?: { home: PitcherSide; away: PitcherSide };
   attribution?: string;
-  projections: null;
+  projections: GameProjections | null;
 };
+
+export type SkaterProjection = {
+  player_id: number; name: string; pos: "F" | "D"; headshot?: string | null;
+  p_point: number; p_goal: number;
+};
+
+export type GameProjections = { home: SkaterProjection[]; away: SkaterProjection[]; note: string; model: string };
+
+export type ScorerRow = SkaterProjection & { team: string; opponent: string; is_home: boolean; game_id: number };

@@ -126,8 +126,7 @@ def _build_cache(params: FrozenParams) -> HistoricalCache:
     if params.boost_amount > 0:
         # v3 roster moves from every season with box scores on disk, including
         # the live current season (§20 V3-6). Seasons without box scores get none.
-        events = roster_moves.all_events(
-            [s for s in season_ids if (boxscores.BOX_DIR / f"{s}.parquet").exists()])
+        events = roster_moves.events_for(season_ids)
     result = backtest.run(
         season_ids,
         params=params.to_backtest_params(),

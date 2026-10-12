@@ -28,7 +28,7 @@ type Sport = {
 // Mirrors GET /sports. Kept client-side so the switcher renders even when the
 // backend is asleep or on an older build.
 const SPORTS: Sport[] = [
-  { id: "nhl", name: "NHL", status: "live", version: "v2", color: "var(--c-nhl)" },
+  { id: "nhl", name: "NHL", status: "live", version: "v3", color: "var(--c-nhl)" },
   { id: "nba", name: "NBA", status: "live", version: "v1.1", color: "var(--c-nba)" },
   { id: "nfl", name: "NFL", status: "live", version: "v1.1", color: "var(--c-nfl)" },
   { id: "mlb", name: "MLB", status: "live", version: "v1.1", color: "var(--c-mlb)" },

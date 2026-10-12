@@ -13,6 +13,7 @@ import {
 } from "./api";
 import { TrajectoryChart } from "../../components/TrajectoryChart";
 import { TodaysGames } from "../../components/TodaysGames";
+import { TopScorers } from "./components/TopScorers";
 import { CalibrationPanel } from "../../components/CalibrationPanel";
 import { CupOdds } from "./components/CupOdds";
 import { colorFor } from "./teamColors";
@@ -238,17 +239,18 @@ export function NhlDashboard() {
               sport="nhl"
               colorFor={colorFor}
               periodLabel={nhlPeriod}
-              footnote="Pre-game probabilities from the frozen v2 rating model; live probabilities from the v2.2 in-game model, refreshed every 60 s."
+              footnote="Pre-game probabilities from the frozen v3 rating model (test pending until after the 2027 Cup Final); live probabilities from the v2.2 in-game model, refreshed every 60 s."
             />
           )}
         </section>
       )}
+      {tab === "today" && <TopScorers colorFor={colorFor} />}
 
       {tab === "calibration" && (
         <section className="panel" role="tabpanel">
           <div className="panel-title">
             <h2>Calibration</h2>
-            <span className="meta">held-out test set</span>
+            <span className="meta">v2 held-out test (2025-26) · v3 test pending</span>
           </div>
           {calErr && <div className="error">Couldn't load calibration: {calErr}</div>}
           {!cal && !calErr && <div className="loading">Loading…</div>}

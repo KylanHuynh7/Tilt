@@ -2,6 +2,35 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-11 — NHL v3 frozen and live (roster boost and series context find no signal)
+
+- **Freeze** (`scripts/freeze_v3.py`; 9,624 cells over 4,810 roster events), validation 2021-22 → 2025-26:
+  - v3.0 winner: K 10/10, carry 0.75, home 20, boost 5 games × 0.25. LL 0.66761, against 0.66843 for v2's params (expectation of ≥ 0.002: FAIL).
+  - The boost itself contributes 0.000005; the gain comes from re-tuning carry and home on the newer seasons.
+  - v3.1 picked round/elimination = 0/0 (no signal; expectation FAIL).
+  - METHODOLOGY §20 records the results. §17's pre-registered next step is the player-level v4.
+- **Live:**
+  - `frozen_params.json` is now v3, labelled "test pending" (v1/v2 snapshots untouched).
+  - Completed seasons' roster events are cached (`artifacts/nhl_roster_events.json`), so startup stays about 2 s.
+  - The refresh also pulls the current season's box scores.
+- `scripts/evaluate_v3.py` refuses to run until the 2027 Cup Final is decided. The v2 evaluator now refuses non-v1/v2 artifacts. +2 tests (343).
+- **Ops note:** during the freeze, building the projection state segfaulted intermittently inside CPython's garbage collector, only under full machine load (0 of 10 runs crashed when idle). Watch Cloud Run logs.
+
+## 2026-10-11 — NHL skater projections: one-shot test PASS 8/8, live on the site
+
+- **Data:** NHL box scores for 1967-68 → 2025-26 (58 seasons, every game covered; 505 genuine sub-16-skater games), plus the live 2026-27 season.
+- **Freeze:** H 80, H_toi 10, γ 0.5, home 1.06 (grid edge); m 2 (point), m 8 (goal). Validation LL 0.585 / 0.376.
+- **One-shot test, 2023-24 → 2025-26:**
+  - Point LL 0.592, against 0.639 (position rate) and 0.604 (last-82 heuristic). ECE 0.012.
+  - Goal LL 0.390, against 0.410 and 0.421. ECE 0.008.
+  - All eight criteria PASS.
+  - Flag: players in their first 20 career games are over-projected (point ECE 0.044).
+- **Live:**
+  - "Scoring chances" panel on NHL game pages: every rostered skater not ruled out, with P(point) and P(goal).
+  - "Likeliest scorers tonight" on the NHL Today tab (top 10 by P(goal); `GET /projections/today`, cached 10 minutes).
+  - The state builds in the background at startup and rebuilds after `/admin/refresh`.
+- `app/projections.py` (model + `predict_live`), `app/nhl_projections.py` (rosters, injury filter, caching). +2 tests (341).
+
 ## 2026-10-11 — NHL v3 draft merged + resolutions; player-projection methodology draft (pre-code)
 
 - **NHL v3 draft merged to `main`.** METHODOLOGY.md §17–§19 come from the `v3-draft` branch (2026-05-19), unchanged. The header and amendment log were reconciled with the v2 evaluation record.

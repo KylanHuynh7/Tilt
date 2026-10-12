@@ -1,7 +1,7 @@
 # NHL Player Projections — Methodology Document
 ## Version 0.3
 **Author:** Kylan Huynh
-**Status:** Approved 2026-10-11, all seven decisions as recommended (P-1 NHL, P-3 test 2023-24 → 2025-26 and P-7 hide-unless-pass explicitly; P-2, P-4, P-5 and P-6 as written).
+**Status:** v1 frozen, tested once and **PASSED 8/8** (2026-10-11); live on NHL game pages and the dashboard. Approved 2026-10-11, all seven decisions as recommended (P-1 NHL, P-3 test 2023-24 → 2025-26 and P-7 hide-unless-pass explicitly; P-2, P-4, P-5 and P-6 as written).
 
 **Amendment log:**
 - *v0.2 (2026-10-11, during the first trial ingest, before any model code or bulk download):* The §3 coverage threshold is lowered from 16 to **12 skaters per team**. The trial season contained a genuine 15-skater game (New Jersey on 2010-10-11, under the salary cap), so 16 would have rejected real lineups. 12 still catches truncated box scores. Games below 16 are counted in the manifest.
@@ -148,9 +148,37 @@ On the test seasons, separately for **point** and **goal**:
 - Change the model after seeing test results.
 - Project goalies in v1.
 
+## 12. Results (2026-10-11)
+
+**Freeze** (`artifacts/nhl_players_v1.json`, 1,080 cells, validation 2010-11 → 2022-23):
+
+| Event | H | m | H_toi | γ | home | Val. LL | Baseline A | Baseline B |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Point | 80 | 2 | 10 | 0.5 | 1.06 | **0.5854** | 0.6272 | 0.6001 |
+| Goal | 80 | 8 | 10 | 0.5 | 1.06 | **0.3763** | 0.3937 | 0.4136 |
+
+**§2 expectations:**
+- Optimal H in [40, 160] ✓ (80).
+- γ > 0 ✓ (0.5).
+- Point LL 0.58–0.60 ✓.
+- Goal LL 0.34–0.36 ✗. The test landed at 0.39 because the actual goal base rate is about 0.15, not the 0.12 I assumed.
+
+**One-shot test** (`results/nhl_players_test_evaluation.json`, 2023-24 → 2025-26, n = 150,893 skater-games): **all eight criteria PASS.**
+
+| Event | Model LL | Baseline A | Baseline B | ECE | Top-decile gap |
+| --- | --- | --- | --- | --- | --- |
+| Point | **0.5918** | 0.6386 | 0.6039 | 0.0117 | 0.0249 |
+| Goal | **0.3903** | 0.4096 | 0.4208 | 0.0084 | 0.0196 |
+
+- **Stable across groups:** each test season, F and D, and regular season vs playoffs all have ECE ≤ 0.023. Playoffs are not worse.
+- **Flag (pre-registered weakest group):** players in their first 20 career games, for points. ECE 0.0437; predicted 26.8%, observed 22.6% (n = 5,703). Goals for the same group: ECE 0.0215, predicted 11.7%, observed 9.6%. Newcomers are over-projected: the debut-TOI prior and the position rate are too generous for call-ups. Not fixed after the test (§10). The UI says so.
+
 ## 13. Known limitations (initial)
 
 - **Lineup uncertainty:** pre-game projections can't know healthy scratches or line changes announced at warm-ups.
 - **No linemate or power-play context:** a player promoted to the top line shows up only through their rising TOI, with a lag.
 - **No ice time before 1998-99,** which is why the warm-up starts there.
+- **Newcomers over-projected** (§12 flag): about 4 points too high on P(point) in a player's first 20 games.
+- **The home factor sits at the grid edge** (1.06). The true home effect on scoring may be a little larger; it wasn't searched further.
+- **Live state** replays every box score on disk from 1998-99 at startup (about 15–40 s, in the background). Game pages show no projections until it's ready, and the current season's box scores update on `/admin/refresh` (same as ratings).
 - **Player identity:** NHL player ids; matching ESPN injury reports to NHL ids is by name and team, so it can occasionally miss.

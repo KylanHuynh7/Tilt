@@ -17,7 +17,7 @@ from __future__ import annotations
 import math
 from collections import defaultdict
 from dataclasses import dataclass, field
-from typing import Iterable, Sequence
+from typing import Iterable, NamedTuple, Sequence
 
 from . import boxscores, metrics
 
@@ -34,8 +34,7 @@ GRID = [dict(H=H, m=m, H_toi=ht, gamma=g, home=h)
         for g in (0.0, 0.5, 1.0) for h in (1.00, 1.03, 1.06)]
 
 
-@dataclass
-class Row:
+class Row(NamedTuple):
     """One skater-game, in chronological order, with the state-free facts."""
 
     season: int
@@ -51,15 +50,23 @@ class Row:
 
 
 def load_sorted(seasons: Sequence[int]) -> list[Row]:
-    """Rows in true date order (game ids are not date-ordered across types)."""
+    """Skater rows in true date order (game ids are not date-ordered across
+    game types). Reads only the needed columns to keep memory low on Cloud Run."""
+    import pyarrow.parquet as pq
+
+    cols = ["game_date", "game_id", "game_type", "player_id", "team", "opponent", "is_home", "pos", "toi_s",
+            "points", "goals"]
     raw: list[tuple] = []
     for s in seasons:
-        for r in boxscores.read_season(s):
-            if r["pos"] == "G" or r["game_type"] not in (2, 3):
+        t = pq.read_table(boxscores.BOX_DIR / f"{s}.parquet", columns=cols)
+        c = {k: t.column(k).to_pylist() for k in cols}
+        for i in range(t.num_rows):
+            if c["pos"][i] == "G" or c["game_type"][i] not in (2, 3):
                 continue
-            raw.append((r["game_date"], r["game_id"], Row(s, r["game_id"], r["player_id"], r["team"], r["opponent"],
-                                                         r["is_home"], r["pos"], (r["toi_s"] or 0) / 60.0,
-                                                         r["points"], r["goals"])))
+            raw.append((c["game_date"][i], c["game_id"][i],
+                        Row(s, c["game_id"][i], c["player_id"][i], c["team"][i], c["opponent"][i], c["is_home"][i],
+                            c["pos"][i], (c["toi_s"][i] or 0) / 60.0, c["points"][i], c["goals"][i])))
+        del t, c
     raw.sort(key=lambda t: (t[0], t[1]))
     return [t[2] for t in raw]
 
@@ -135,8 +142,9 @@ class Prediction:
 
 
 def replay(rows: list[Row], event: str, params: dict, priors: dict[int, SeasonPriors],
-           record: set[int]) -> list[Prediction]:
-    """Walk-forward predictions for one event. Updates happen after each game."""
+           record: set[int], state_out: dict | None = None) -> list[Prediction]:
+    """Walk-forward predictions for one event. Updates happen after each game.
+    `state_out`, if given, receives the end-of-replay state for live use."""
     d = 0.5 ** (1.0 / params["H"])
     dt = 0.5 ** (1.0 / params["H_toi"])
     do = 0.5 ** (1.0 / OPP_HALF_LIFE)
@@ -179,7 +187,24 @@ def replay(rows: list[Row], event: str, params: dict, priors: dict[int, SeasonPr
             ga_s[team] = ga_s.get(team, 0.0) * do + ga.get(team, 0)
             ga_w[team] = ga_w.get(team, 0.0) * do + 1.0
         i = j
+    if state_out is not None:
+        state_out.update(sx=sx, st=st, tt=tt, tw=tw, ga_s=ga_s, ga_w=ga_w)
     return out
+
+
+def predict_live(state: dict, event: str, params: dict, pr: SeasonPriors, *, player_id: int, pos: str,
+                 opponent: str, is_home: bool) -> float:
+    """P(≥1 event) for a player's NEXT game from replay end state (same formula as `replay`)."""
+    pid = player_id
+    debut = pr.debut_toi.get(pos, 15.0)
+    toi_hat = (state["tt"].get(pid, 0.0) + M_TOI * debut) / (state["tw"].get(pid, 0.0) + M_TOI)
+    rate = (state["sx"].get(pid, 0.0) + params["m"] * pr.rate60[(event, pos)]) / (state["st"].get(pid, 0.0) + params["m"])
+    ga_w = state["ga_w"]
+    opp = (state["ga_s"][opponent] / ga_w[opponent] / pr.league_ga
+           if opponent in ga_w and pr.league_ga > 0 else 1.0)
+    home = params["home"]
+    lam = rate * toi_hat / 60.0 * opp ** params["gamma"] * (home if is_home else 1.0 / home)
+    return 1.0 - math.exp(-lam)
 
 
 def baselines(rows: list[Row], event: str, priors: dict[int, SeasonPriors], record: set[int]):

@@ -53,6 +53,10 @@ def _load_frozen_params() -> tuple[backtest.BacktestParams, dict]:
             f"Run `uv run python -m scripts.freeze_params` first."
         )
     artifact = json.loads(ARTIFACT_PATH.read_text())
+    if not str(artifact.get("methodology_version", "")).startswith(("1", "2")):
+        # Since v3 went live (§20 V3-6) the active artifact is v3; this script
+        # evaluates only v1/v2. v3 has its own one-shot script.
+        raise SystemExit("ERROR: active artifact is not v1/v2; use `scripts.evaluate_v3` for v3.")
     w = artifact["winner"]
     # home_bump defaults to 0.0 for v1 artifacts that predate v2.0 (§12).
     params = backtest.BacktestParams(

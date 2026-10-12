@@ -4,7 +4,8 @@ Interpretable rating systems that produce calibrated, game-by-game win probabili
 
 | Sport | Status | Methodology |
 |---|---|---|
-| **NHL** | Live — v2 (evaluated, see below) | [`METHODOLOGY.md`](./METHODOLOGY.md) |
+| **NHL** | Live — v3 (frozen 2026-10-11; test after the 2027 Cup Final). v2 evaluated (see below) | [`METHODOLOGY.md`](./METHODOLOGY.md) |
+| **NHL skater projections** | Live — v1: P(point) and P(goal) per skater; one-shot test PASS 8/8 (newcomers flagged) | [`methodology/NHL_PLAYERS.md`](./methodology/NHL_PLAYERS.md) |
 | **NBA** | Live — v1.1: pre-game model (all §6 targets PASS on test) + live in-game win probability | [`methodology/NBA.md`](./methodology/NBA.md) |
 | **NFL** | Live — v1.1: pre-game model (all §6 targets PASS; playoff ECE flagged) + live win probability (4 of 5 live targets PASS) | [`methodology/NFL.md`](./methodology/NFL.md) |
 | **MLB** | Live — v1.1: pre-game model (all §6 targets PASS; postseason flagged) + live win probability (**5 of 5** live targets PASS) | [`methodology/MLB.md`](./methodology/MLB.md) |

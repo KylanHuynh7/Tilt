@@ -41,6 +41,8 @@ async def refresh_current_season(today: date | None = None) -> dict:
     except Exception as exc:  # noqa: BLE001 — stale lineups must not block a ratings refresh
         print(f"[refresh] box scores for {current_sid} failed: {exc!r}")
     cache = historical.refresh()
+    from . import nhl_projections
+    nhl_projections.start_build()
     return {
         "current_season": current_sid,
         "seasons_replayed": len(cache.seasons_replayed),
