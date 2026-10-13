@@ -327,3 +327,34 @@ async def admin_refresh():
     _cache = None
     c = get_cache()
     return {"ok": True, "season": sid, "rows": result["rows"], "seasons": len(c.seasons)}
+
+
+@router.get("/season/odds")
+async def season_odds():
+    """Season + playoff odds from 5,000 simulations of the rest of the season (NBA.md §14)."""
+    from ..core import season_odds as so
+    from . import season_sim
+
+    c = get_cache()
+    season = pipeline.current_season_id()
+    current = dict(c.current)
+    if season > max(c.seasons):
+        # No game of the new season modelled yet: apply the frozen between-season carry first.
+        current = {t: ratings.regress(r, c.params.carry) for t, r in current.items()}
+    left = await season_sim.remaining_schedule(season)
+
+    def build():
+        r = season_sim.simulate(season, current, c.params, left)
+        for row in r.rows:
+            row["color"] = DISPLAY_COLORS.get(row["team_id"])
+        return so.payload(
+            sport="nba", season=season, n=r.n, games_left=r.games_left, rows=r.rows, label="NBA title",
+            columns=[{"key": "proj_wins", "label": "Proj. wins", "kind": "num"},
+                     {"key": "top6", "label": "Top 6", "kind": "pct"},
+                     {"key": "playoffs", "label": "Playoffs", "kind": "pct"},
+                     {"key": "conference", "label": "Conference", "kind": "pct"},
+                     {"key": "title", "label": "Title", "kind": "pct"}],
+            note="5,000 simulations of the remaining schedule with the frozen v1 ratings (updated inside each "
+                 "simulation), the play-in and best-of-7 rounds. Standings ties are broken at random. NBA Cup "
+                 "knockout games are added to the schedule in December.")
+    return so.cached("nba", (c.built_at, season, len(left)), build)

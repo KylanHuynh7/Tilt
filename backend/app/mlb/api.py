@@ -405,3 +405,33 @@ async def admin_refresh():
     r = await pipeline.ingest_season(pipeline.current_season())
     _cache = None
     return {"ok": True, "season": r["season"], "rows": r["rows"]}
+
+
+@router.get("/season/odds")
+async def season_odds():
+    """Postseason odds from the current series state (MLB.md §15)."""
+    from ..core import season_odds as so
+    from . import season_sim
+
+    c = get_cache()
+    season = max(c.seasons)
+    state = await season_sim.postseason_state(season)
+    version = tuple((g["type"], g["num"], g["home"], g["winner"]) for g in state)
+
+    def build():
+        r = season_sim.simulate(state, c.current, c.params)
+        for row in r["rows"]:
+            row["color"] = TEAMS[row["team_id"]].color
+        if not r["supported"]:
+            return {"sport": "mlb", "season": season, "supported": False, "rows": [], "columns": [],
+                    "note": "MLB odds are simulated from the League Championship Series on; the regular season "
+                            "and earlier rounds are not simulated yet."}
+        return {**so.payload(
+            sport="mlb", season=season, n=r["n"], games_left=r["games_left"], rows=r["rows"], label="World Series",
+            columns=[{"key": "series", "label": "LCS", "kind": "series"},
+                     {"key": "pennant", "label": "Pennant", "kind": "pct"},
+                     {"key": "title", "label": "World Series", "kind": "pct"}],
+            note="10,000 simulations from the current series state with the frozen v1 team ratings and the "
+                 "playoff adjustment; starting pitchers for future games are unknown, so the pitcher term is "
+                 "left out."), "supported": True}
+    return so.cached("mlb", (c.built_at, version), build, ttl=600)

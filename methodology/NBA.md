@@ -322,3 +322,18 @@ Written before any results exist; extended at every phase.
 | 5 | K_playoff ≥ K_regular constraint | Do not impose |
 | 6 | §6 thresholds | LL < 0.640, Brier 0.200–0.225, ECE < 0.04, must beat home-rate baseline |
 | 7 | Live WP form | Three-term logistic using the frozen pre-game probability |
+
+---
+
+## 14. Season and playoff odds (`/nba/season/odds`) (added 2026-10-12)
+
+5,000 simulations of the remaining regular season, then per conference:
+- **Seeding:** top 6 qualify. In the play-in, 7 hosts 8 for the 7th seed; 9 hosts 10 and the loser is out; the 7–8 loser hosts that winner for the 8th seed.
+- **Bracket:** fixed 1v8 / 4v5 / 3v6 / 2v7, every round best-of-7 (2-2-1-1-1, better record at home), and the Finals the same.
+- **Schedule:** the remaining games come from ESPN's scoreboard (cached for a day). NBA Cup knockout games are added in December, so before then projected wins average slightly below 41.
+- **Before opening night,** the frozen between-season carry is applied to the end-of-2025-26 ratings first.
+- **Standings ties** are broken at random.
+
+- **Not a forecast with a track record.** Unlike the game probabilities, these odds have never been tested. They are a forward projection from the frozen ratings (the same status as NHL's Cup simulator, METHODOLOGY.md §14), labelled as such on the page.
+- **In-sim updates:** ratings update inside each simulation (K × (W − P), no margin multiplier, since no margin is simulated), so a hot simulated streak carries forward.
+- **No new parameters,** and nothing is tuned.

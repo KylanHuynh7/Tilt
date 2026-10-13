@@ -54,3 +54,13 @@ def test_mlb_v1_params_reproduce_v1_path():
     from app.mlb import ratings
     p = ratings.Params()
     assert p.pitcher_model == "rgs"     # v1 artifacts load onto the unchanged v1 path
+
+
+def test_nfl_season_sim_invariants():
+    from app.nfl import api, season_sim
+    c = api.get_cache()
+    r = season_sim.simulate(max(c.seasons), c.current, c.params, n=300)
+    assert abs(sum(x["title"] for x in r.rows) - 1) < 1e-9
+    assert abs(sum(x["playoffs"] for x in r.rows) - 14) < 1e-9
+    assert abs(sum(x["division"] for x in r.rows) - 8) < 1e-9
+    assert all(x["proj_wins"] >= x["wins_now"] for x in r.rows)

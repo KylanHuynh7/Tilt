@@ -10,6 +10,7 @@ import type {
 import { TrajectoryChart } from "./TrajectoryChart";
 import { TodaysGames } from "./TodaysGames";
 import { CalibrationPanel } from "./CalibrationPanel";
+import { SeasonOdds } from "./SeasonOdds";
 
 // Shared dashboard for sports whose API follows the NBA/NFL contract
 // (methodology §6 breakdowns + flags ride along on the calibration payload).
@@ -28,6 +29,7 @@ export type SportConfig = {
   todayLabel: string;                 // "Today's games" / "This week"
   periodLabel: (p: number) => string;
   emptyNote?: string;
+  oddsLabel?: string;                 // tab name ("Season odds", "Playoff odds", "Projected records")
   footnote: string;
   championLabel: (team: string, seasonLabel: string) => string;
   breakdownRows: [string, (b: SportCalibration["breakdowns"]) => Breakdown | undefined][];
@@ -40,7 +42,7 @@ export type SportConfig = {
   };
 };
 
-type Tab = "trajectories" | "today" | "calibration";
+type Tab = "trajectories" | "today" | "odds" | "calibration";
 
 // Payloads carry per-team colors; this is only the fallback.
 const fallbackColor = () => "#888888";
@@ -152,6 +154,7 @@ export function SportDashboard({ cfg }: { cfg: SportConfig }) {
       <nav className="tabs" role="tablist">
         {tabButton("trajectories", "Trajectories")}
         {tabButton("today", cfg.todayLabel, today?.matchups.length)}
+        {tabButton("odds", cfg.oddsLabel ?? "Season odds")}
         {tabButton("calibration", "Calibration")}
       </nav>
 
@@ -196,6 +199,13 @@ export function SportDashboard({ cfg }: { cfg: SportConfig }) {
               footnote={cfg.footnote}
             />
           )}
+        </section>
+      )}
+
+      {tab === "odds" && (
+        <section className="panel" role="tabpanel">
+          <div className="panel-title"><h2>{cfg.oddsLabel ?? "Season odds"}</h2><span className="meta">Monte Carlo · frozen ratings</span></div>
+          <SeasonOdds sport={cfg.sport ?? cfg.league.toLowerCase()} colorFor={(_t, r) => r.color ?? "#888"} />
         </section>
       )}
 

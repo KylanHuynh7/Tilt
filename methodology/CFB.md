@@ -219,3 +219,18 @@ Inherits the NFL §12 five-term form (pre-game edge fading over time, score marg
 | 4 | K_post ≥ K_regular | Do not impose |
 | 5 | Thresholds | LL < 0.600, Brier 0.170–0.210, ECE < 0.04, beat home-rate (FBS-vs-FBS only) |
 | 6 | Live targets | Inherit NFL's |
+
+---
+
+## 14. Projected records (`/cfb/season/odds`) (added 2026-10-12)
+
+5,000 simulations of the remaining FBS regular season:
+- **Outputs:** projected wins, bowl eligibility (≥ 6 wins, counting every FCS win; the real one-FCS-win rule is not applied) and an unbeaten regular season.
+- **Not simulated:**
+  - the playoff field, because a committee chooses it;
+  - conference title games, which are scheduled only once their teams are known.
+- **FCS opponents** use the pooled FCS rating, and only FBS-vs-FBS results update ratings in-sim.
+
+- **Not a forecast with a track record.** Unlike the game probabilities, these odds have never been tested. They are a forward projection from the frozen ratings (the same status as NHL's Cup simulator, METHODOLOGY.md §14), labelled as such on the page.
+- **In-sim updates:** ratings update inside each simulation (K × (W − P), no margin multiplier, since no margin is simulated), so a hot simulated streak carries forward.
+- **No new parameters,** and nothing is tuned.

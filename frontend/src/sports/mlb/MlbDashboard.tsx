@@ -5,6 +5,7 @@ import type { SportCalibration } from "../../components/SportDashboard";
 
 const cfg: SportConfig = {
   league: "MLB",
+  oddsLabel: "Playoff odds",
   subhead:
     "Elo ratings with home field, margin of victory, and a starting-pitcher adjustment (rolling game score), frozen on 2015–2021 and evaluated once on 2022–2025. Data: MLB Advanced Media (non-commercial use). See methodology/MLB.md.",
   todayLabel: "Today's games",

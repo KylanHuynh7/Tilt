@@ -5,6 +5,7 @@ import type { RatingsHistoryResponse, SeasonsResponse, TodayResponse } from "../
 const cfg: SportConfig = {
   league: "FBS",
   sport: "cfb",
+  oddsLabel: "Projected records",
   subhead:
     "Elo ratings for FBS teams with home field and margin of victory; FCS opponents share one pooled rating. Frozen on 2014–2021 and evaluated once on 2022–2025 (FBS-vs-FBS games). The trajectory chart shows each season's top 25 plus the champion. See methodology/CFB.md.",
   todayLabel: "This week",

@@ -252,3 +252,29 @@ async def admin_refresh():
     m = pipeline.ingest()
     _cache = None
     return {"ok": True, "rows": m["rows"], "seasons": len(get_cache().seasons)}
+
+
+@router.get("/season/odds")
+async def season_odds():
+    """Season + playoff odds from 10,000 simulations of the rest of the season (NFL.md §14)."""
+    from ..core import season_odds as so
+    from . import season_sim
+
+    c = get_cache()
+    season = max(c.seasons)
+
+    def build():
+        r = season_sim.simulate(season, c.current, c.params)
+        for row in r.rows:
+            row["color"] = TEAMS[row["team"]].color if row["team"] in TEAMS else None
+        return so.payload(
+            sport="nfl", season=season, n=r.n, games_left=r.games_left, rows=r.rows, label="Super Bowl",
+            columns=[{"key": "proj_wins", "label": "Proj. wins", "kind": "num"},
+                     {"key": "playoffs", "label": "Playoffs", "kind": "pct"},
+                     {"key": "division", "label": "Division", "kind": "pct"},
+                     {"key": "top_seed", "label": "No. 1 seed", "kind": "pct"},
+                     {"key": "conference", "label": "Conference", "kind": "pct"},
+                     {"key": "title", "label": "Super Bowl", "kind": "pct"}],
+            note="10,000 simulations of the remaining schedule with the frozen v1 ratings (updated inside each "
+                 "simulation). Ties are broken at random, not by the NFL's tiebreakers.")
+    return so.cached("nfl", c.built_at, build)

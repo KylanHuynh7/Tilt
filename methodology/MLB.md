@@ -309,3 +309,16 @@ m   ∈ {20, 50}                   innings
 - Expectation c in [15, 40]: ✓.
 - **The margin over v1 (0.0003) is below criterion 2's 0.001**, as flagged before the freeze.
 - **v1 stays live until the test.** `scripts/mlb_v2_evaluate.py --confirm` runs once, after the 2026 World Series, and refuses earlier.
+
+---
+
+## 15. Postseason odds (`/mlb/season/odds`) (added 2026-10-12)
+
+10,000 simulations from the current series state, read live from the MLB schedule (series game numbers and scheduled home teams):
+- **Pitchers:** future starters are unknown, so the pitcher term is 0.
+- **Postseason layer:** published probabilities pass through it (λ 0.70, methodology/POSTSEASON.md); ratings update on the raw p.
+- **Coverage:** supported from the League Championship Series onward. Earlier rounds and preseason regular-season projections are not built yet.
+
+- **Not a forecast with a track record.** Unlike the game probabilities, these odds have never been tested. They are a forward projection from the frozen ratings (the same status as NHL's Cup simulator, METHODOLOGY.md §14), labelled as such on the page.
+- **In-sim updates:** ratings update inside each simulation (K × (W − P), no margin multiplier, since no margin is simulated), so a hot simulated streak carries forward.
+- **No new parameters,** and nothing is tuned.

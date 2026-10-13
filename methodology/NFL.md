@@ -264,3 +264,17 @@ Reading: the pre-game edge fades with time, a lead matters more as time runs out
 | 4 | QB adjustment | Defer to NFL v2; pre-registered as the largest expected error |
 | 5 | v1 thresholds | LL < 0.660, Brier 0.200–0.235, ECE < 0.05, beat home-rate baseline |
 | 6 | v1.1 live targets | Pre-register: beat held baseline every quarter, ECE < 0.05, three structural checks |
+
+---
+
+## 14. Season and playoff odds (`/nfl/season/odds`) (added 2026-10-12)
+
+10,000 simulations of the remaining regular season, then the 14-team bracket:
+- **Seeding:** 4 division winners seeded 1–4 by wins, then 3 wild cards.
+- **Bracket:** 2v7, 3v6, 4v5 (1 has a bye), reseeded each round, higher seed at home, neutral Super Bowl.
+- **Ties** are not simulated.
+- **Standings ties are broken at random.** The NFL's tiebreakers (head-to-head, division and conference record, strength of victory) are not modelled, so division and seeding odds for tightly bunched teams are approximate.
+
+- **Not a forecast with a track record.** Unlike the game probabilities, these odds have never been tested. They are a forward projection from the frozen ratings (the same status as NHL's Cup simulator, METHODOLOGY.md §14), labelled as such on the page.
+- **In-sim updates:** ratings update inside each simulation (K × (W − P), no margin multiplier, since no margin is simulated), so a hot simulated streak carries forward.
+- **No new parameters,** and nothing is tuned.

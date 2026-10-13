@@ -301,3 +301,28 @@ async def admin_refresh():
     r = await pipeline.ingest_season(pipeline.current_season())
     _cache = None
     return {"ok": True, **r}
+
+
+@router.get("/season/odds")
+async def season_odds():
+    """Projected regular-season records (CFB.md §14); the CFP field is not simulated."""
+    from ..core import season_odds as so
+    from . import season_sim
+
+    c = get_cache()
+    season = max(c.seasons)
+
+    def build():
+        r = season_sim.simulate(season, c.current, c.params, c.fbs_now, FCS)
+        for row in r["rows"]:
+            row["color"] = c.colors.get(row["team_id"])
+        return so.payload(
+            sport="cfb", season=season, n=r["n"], games_left=r["games_left"], rows=r["rows"], label="",
+            columns=[{"key": "record_now", "label": "Record", "kind": "text"},
+                     {"key": "proj_wins", "label": "Proj. wins", "kind": "num"},
+                     {"key": "bowl", "label": "Bowl eligible", "kind": "pct"},
+                     {"key": "unbeaten", "label": "Unbeaten reg. season", "kind": "pct"}],
+            note="5,000 simulations of the remaining regular season with the frozen v1 ratings; FCS opponents use "
+                 "the pooled FCS rating. The playoff field is chosen by a committee, so it is not simulated; "
+                 "conference title games are not yet scheduled and are excluded. Sorted by current rating.")
+    return so.cached("cfb", c.built_at, build)

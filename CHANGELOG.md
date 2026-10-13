@@ -2,6 +2,20 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-12 — Season and playoff odds for NFL, NBA, MLB and college football
+
+- **New "Season odds" tab** on the NFL and NBA dashboards ("Playoff odds" for MLB, "Projected records" for college football), backed by `/{sport}/season/odds`:
+  - one shared table (`components/SeasonOdds.tsx`) that renders whatever columns the backend describes;
+  - group filters (division, conference, league), heat-shaded percentages in each sport's accent color, and team colors.
+- **Simulators** (`app/{nfl,nba,mlb,cfb}/season_sim.py`, one cache per ratings build):
+  - **NFL:** 10k simulations, the 14-team bracket.
+  - **NBA:** 5k simulations, the play-in plus best-of-7 rounds, with the remaining schedule from ESPN.
+  - **MLB:** 10k simulations from the live LCS/World Series state, with the playoff adjustment.
+  - **College football:** 5k simulations; wins, bowl eligibility, unbeaten.
+- **Sanity checks:** title odds sum to 1; playoff and division slots sum to the field size (NFL 14 / 8; NBA 16 / 12).
+- **Fix before launch:** NBA odds before opening night now apply the between-season carry first. Without it, title odds were overconfident; San Antonio dropped from 16.6% to 12.1%.
+- Documented in NFL.md §14, NBA.md §14, CFB.md §14 and MLB.md §15 as projections with no calibration record. +1 test (351).
+
 ## 2026-10-12 — MLB v2 frozen (FIP pitcher rating); test after the 2026 World Series
 
 - `pitcher_model = "fip"` in `app/mlb/ratings.py` / `backtest.py`: an innings-shrunk, decayed FIP-style rating; the v1 path is unchanged.
