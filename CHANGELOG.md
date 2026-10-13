@@ -2,6 +2,17 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-12 — Nightly data refresh + tests before every deploy
+
+- **New `scripts/refresh_current.py`:** refreshes every sport's current season, plus NHL box scores and the projection state. Each sport is isolated; the script fails only if all five do. Locally: 21 s.
+- **`deploy-backend.yml`:**
+  - nightly schedule (11:00 UTC);
+  - refresh step;
+  - **pytest gate**: a failing test now blocks the deploy.
+  - Fresh data is baked into the image (Cloud Run's disk is ephemeral, so runtime refreshes were lost on scale-to-zero).
+- **Artifact Registry cleanup policy:** keep the 5 newest images. The repository had grown to 3.9 GB, over the 0.5 GB free tier.
+- Data snapshot committed; METHODOLOGY §13.K3.
+
 ## 2026-10-12 — Full-game win-probability charts with labelled swings
 
 - `app/core/wp_curve.py` evaluates each sport's frozen live model at every play:

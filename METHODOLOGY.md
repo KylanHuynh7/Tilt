@@ -573,6 +573,16 @@ Introduced 2026-10-10 when the codebase began hosting more than one sport. None 
 
 ---
 
+### K3. Data freshness (fixed 2026-10-12)
+
+- **The problem:** until 2026-10-12 the live site's data only advanced on a deploy or a manual `POST /admin/refresh`. Even a manual refresh was lost whenever Cloud Run scaled an instance to zero (its filesystem is ephemeral), and with up to two instances it reached only one of them.
+- **Now:** the deploy workflow runs `scripts/refresh_current.py` (the current season for every sport, NHL box scores and the skater-projection state) and the full test suite, then builds. It runs on every backend push and **nightly at 11:00 UTC**, so every instance serves data at most about a day old. Today's games still come from the live APIs on each request.
+- **Refreshed data is baked into the image, not committed;** git keeps the last committed snapshot.
+- **Caveats:**
+  - GitHub disables scheduled workflows after 60 days without repository activity. A quiet stretch would need one push, or a manual run, to restart them.
+  - A sport whose refresh fails keeps its previous data, and the deploy proceeds. The run log shows which sport failed.
+  - Artifact Registry now keeps only the 5 newest images. It held 3.9 GB, over the free tier, before the cleanup policy.
+
 ### K2. Full-game win-probability charts (added 2026-10-12)
 
 - **What it is:** game pages for live and finished games draw the whole game's curve by evaluating each sport's frozen live model at every play, from play-by-play fetched on demand (ESPN for NFL / college / NBA, the MLB and NHL APIs). The three biggest swings are labelled with the play's description.

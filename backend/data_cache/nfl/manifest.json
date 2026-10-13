@@ -205,12 +205,12 @@
     "2026": {
       "complete": false,
       "passes": true,
-      "regular_played": 65,
+      "regular_played": 78,
       "regular_scheduled_rows": 272,
       "scheduled": 272
     }
   },
-  "pulled_at": "2026-10-11T05:18:30.623218+00:00",
+  "pulled_at": "2026-10-13T02:21:44.770338+00:00",
   "rows": 7548,
   "source": "https://github.com/nflverse/nfldata/raw/master/data/games.csv"
 }

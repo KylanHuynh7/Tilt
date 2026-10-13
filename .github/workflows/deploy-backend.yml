@@ -1,5 +1,8 @@
 # Deploy the backend to Google Cloud Run on every push to main that touches
-# it. Auth is keyless (Workload Identity Federation): GitHub's OIDC token is
+# it, and nightly. Every run first refreshes the current season's data for all
+# five sports (Cloud Run's filesystem is ephemeral, so the image's data is the
+# site's data), then runs the test suite, then builds. Refreshed data is baked
+# into the image only; it is not committed. Auth is keyless (Workload Identity Federation): GitHub's OIDC token is
 # exchanged for short-lived Google credentials, and only this repository is
 # allowed to impersonate the deployer service account.
 name: Deploy backend (Cloud Run)
@@ -12,6 +15,8 @@ on:
       - "cloudbuild.yaml"
       - ".github/workflows/deploy-backend.yml"
   workflow_dispatch: {}
+  schedule:
+    - cron: "0 11 * * *"   # 11:00 UTC (4 am PT), after the last West Coast games
 
 permissions:
   contents: read
@@ -26,6 +31,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Refresh current-season data (all sports)
+        working-directory: backend
+        run: uv run python -m scripts.refresh_current
+
+      - name: Tests
+        working-directory: backend
+        run: uv run pytest -q
 
       - uses: google-github-actions/auth@v2
         with:
