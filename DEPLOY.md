@@ -2,7 +2,7 @@
 
 Tilt deploys cleanly as a two-piece app: the FastAPI backend behind a container host and the Vite/React frontend on Vercel. Total managed setup time: ~15 minutes if you already have accounts.
 
-The backend ships with the full parquet cache committed (~2 MB), so cold start is ~1.5 s once the container is awake — no build-time data ingest needed.
+The backend image carries all data and frozen artifacts (about 35 MB), refreshed at build time, so a cold start needs no network ingest.
 
 This guide previously led with **Render**; the backend now runs on **Google Cloud Run** (first section). The Render notes are kept as a fallback. Render was chosen originally because it's truly free, doesn't require a credit card, and supports our `Dockerfile` directly. Alternatives are listed at the bottom.
 
@@ -18,10 +18,17 @@ The backend runs on **Cloud Run** in project `tilt-sports-kylan` (region `us-cen
 - **Billing:** billing account "My Billing Account 1" with **Budget1 = $1/month**, alerting at 50 / 90 / 100%. Budgets alert; they do not cap spend. The instance cap is the hard limit.
 - **Health check path:** use **`/health`**. Cloud Run reserves paths ending in `z`, so `/healthz` returns Google's 404 there.
 - **Frontend:** Vercel's `VITE_API_BASE` points at the Cloud Run URL.
+- **Nightly data refresh (since 2026-10-12):**
+  - The same workflow also runs **every night at 11:00 UTC**. Each run executes `scripts/refresh_current.py` (the current season for all five sports, NHL box scores and the skater-projection state), then the **full test suite**, then builds. A failing test blocks the deploy.
+  - Refreshed data is baked into the image, not committed: Cloud Run's disk is ephemeral, so the image's data *is* the site's data.
+  - GitHub disables scheduled workflows after 60 days without repository activity; a push or a manual run restarts them.
+- **Image cleanup:** Artifact Registry keeps the 5 newest images (cleanup policy), keeping storage inside the free tier.
+- **Admin endpoints are locked:** every `/admin/refresh` returns 403 unless `ADMIN_TOKEN` is set, and production doesn't set it. Large or forced Cup simulations also need the token. This keeps strangers from burning CPU against the budget.
+- **Cost target: ≤ $1/month.** Expected spend is about $0: Cloud Run, Cloud Build and Artifact Registry all sit inside their free tiers.
 
-The Render instructions below are kept for reference; Render was the host until 2026-10-11.
+The Render instructions below are kept for reference only. Render hosted the backend until 2026-10-11 and its service is now suspended.
 
-## Backend — Render (free tier, no credit card)
+## Backend — Render (historical; suspended since 2026-10-12)
 
 1. **Push to GitHub** (already done if you cloned and are following along).
 2. **Create a Render account.**
@@ -113,40 +120,37 @@ Railway killed its free tier in 2023. Still a clean Dockerfile-deploy experience
 
 ## Post-deploy operations
 
-### Refreshing today's data
+### Refreshing data
 
-```bash
-curl -X POST https://YOUR-BACKEND-URL/admin/refresh
-```
+Production refreshes itself every night (above). To refresh **now**, run the **"Deploy backend (Cloud Run)"** workflow from the repository's Actions tab ("Run workflow"): refresh → tests → build → deploy, about 5 minutes.
 
-Re-ingests the current 2025-26 season parquet from the NHL API and rebuilds the historical cache (~10-30 s). The Cup-sim cache is also invalidated.
-
-**Storage caveat:** free-tier container storage is ephemeral on every host listed above. The new parquet from `/admin/refresh` persists within the container's lifetime but disappears on idle-wake / redeploy. If you want updates to survive restarts, the simplest path is to refresh locally and push back to git:
+Locally, either run the refresh script:
 
 ```bash
 cd backend
-uv run python -m app.pipeline ingest --season 20252026 --force
-git add data_cache/raw/20252026.parquet
-git commit -m "data: refresh 20252026 ($(date -I))"
-git push
+uv run python -m scripts.refresh_current
 ```
 
-Render auto-redeploys on push (~3 min), and the next dashboard load shows the fresh data.
-
-### Updating the frozen v2 model
-
-After the 2026 Stanley Cup Final concludes:
+or start the server with a token and call the per-sport endpoints:
 
 ```bash
-cd backend
-uv run python -m app.pipeline ingest --season 20252026 --force
-uv run python -m scripts.evaluate --confirm   # writes results/test_evaluation.json (snapshots v1 to test_evaluation_v1.json)
-git add data_cache/ results/
-git commit -m "v2 test eval — 2025-26"
-git push
+ADMIN_TOKEN=pick-something uv run uvicorn app.main:app
+curl -X POST -H 'X-Admin-Token: pick-something' localhost:8000/admin/refresh        # NHL
+curl -X POST -H 'X-Admin-Token: pick-something' localhost:8000/nba/admin/refresh    # also /nfl, /mlb, /cfb
 ```
 
-The backend host auto-redeploys and serves the v2 test numbers under `/calibration/current`.
+### Pending one-shot test evaluations
+
+Each script runs exactly once (`--confirm`, never `--force`) and refuses to run before its season's final is in the data. Google Calendar reminders exist for each.
+
+| When | Command (from `backend/`) |
+|---|---|
+| After the 2026 World Series | `uv run python -m scripts.mlb_v2_evaluate --confirm` and `uv run python -m scripts.postseason_evaluate --sport mlb --confirm` |
+| After the January 2027 CFP final | `uv run python -m scripts.postseason_evaluate --sport cfb --confirm` |
+| After Super Bowl LXI | `uv run python -m scripts.postseason_evaluate --sport nfl --confirm` (layer off; records n/a) |
+| After the 2027 Stanley Cup Final | `uv run python -m scripts.evaluate_v3 --confirm` |
+
+After each test: document the result in the sport's methodology and CHANGELOG, and remove that season from `QUARANTINE` in `backend/app/core/report_card.py` so the report card shows its totals.
 
 ---
 
@@ -154,7 +158,9 @@ The backend host auto-redeploys and serves the v2 test numbers under `/calibrati
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| First dashboard load hangs ~30-60 s | Render instance was sleeping; cold start | Expected on free tier. Subsequent loads are fast. |
+| First load after idle takes a few seconds | Cloud Run scaled to zero; cold start | Expected (min instances 0 keeps cost at ~$0). Subsequent loads are fast. |
+| Site data looks a day or more stale | Nightly workflow failed or was disabled | Check the Actions tab; a red run shows which sport's refresh or which test failed. Re-run it. |
+| `POST /admin/refresh` returns 403 | Admin endpoints are disabled in production | Intended. Use the Actions workflow (above). |
 | Frontend shows "Couldn't load …" for everything | Browser blocked by CORS | Confirm `CORS_ALLOWED_ORIGINS` on the backend includes the Vercel URL (no trailing slash) |
 | `/games/today` returns 503 | Backend can't reach the NHL public API | Check the host's outbound network policy — Render/Fly/Spaces all allow outbound HTTPS by default |
 | Backend `/healthz` says `seasons_in_cache: 0` | `data_cache/raw/` is missing from the image | Confirm `.dockerignore` doesn't exclude `data_cache`. The default project config ships parquets in the image. |
@@ -168,5 +174,8 @@ The backend host auto-redeploys and serves the v2 test numbers under `/calibrati
 | Var | Where | Default | Notes |
 |---|---|---|---|
 | `CORS_ALLOWED_ORIGINS` | Backend | `http://localhost:5173,http://127.0.0.1:5173` | Comma-separated. Set the Vercel URL here in prod. |
-| `PORT` | Backend | `8000` | Render / HF Spaces / Fly / Railway all inject this. |
+| `PORT` | Backend | `8000` | Cloud Run (and Render / HF Spaces / Fly / Railway) inject this. |
+| `ADMIN_TOKEN` | Backend | unset | Enables the `/admin/refresh` endpoints and large/forced Cup sims; unset in production. |
+| `TILT_SKIP_PROJECTIONS` | Backend | unset | Set to skip the NHL projection-state background build (tests set this automatically). |
+| `TILT_WORKERS` | Scripts | CPU count | Worker processes for the v3 / projection freezes. |
 | `VITE_API_BASE` | Frontend (build-time) | `http://127.0.0.1:8000` | The backend URL. No trailing slash. |

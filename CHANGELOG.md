@@ -14,6 +14,10 @@ All meaningful code and methodology changes are recorded here, per Section 11 of
   - an NBA abbreviation bug in the report card that would have broken it on opening night;
   - swing labels no longer credit "END QUARTER" entries.
 - METHODOLOGY §13.K5. +3 tests (365).
+- **Incident:** the first push went out with one failing test, because the commit didn't wait for pytest. The CI test gate blocked the backend deploy, but Vercel shipped the frontend, so for about 10 minutes the live Play page called endpoints that didn't exist.
+  - The failing test exposed a real flaw: the watch score let team quality outweigh closeness.
+  - Fixed in `aba50c5`: closeness × (1 + 0.5·z), z clipped to [−1, 2].
+  - Commits now happen only after a passing test run.
 
 ## 2026-10-12 — Report card and upset of the night
 
