@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { getJson } from "../http";
-import { navigate } from "../router";
 
 /** Cross-sport report card (backend core/report_card.py). Season totals are
  *  hidden for seasons that are still a pending one-time test (§10). */
@@ -19,11 +18,11 @@ const seasonLabel = (s?: number) => (!s ? "" : s > 9999 ? `${Math.floor(s / 1000
 
 function GameLine({ g }: { g: Game }) {
   return (
-    <button className="rc-game" onClick={() => navigate(`/${g.sport}/game/${g.game_id}`)} title="Open game page">
+    <div className="rc-game">
       <span className={`rc-p ${g.p_winner < 0.35 ? "upset" : g.p_winner < 0.5 ? "mild" : ""}`}>{pct(g.p_winner)}</span>
       <span><b>{g.winner}</b> beat {g.loser}</span>
       <small>{g.date}{g.postseason ? " · postseason" : ""}</small>
-    </button>
+    </div>
   );
 }
 
@@ -46,7 +45,7 @@ export function ReportCard() {
       {u && (
         <section className="panel rc-hero">
           <div className="panel-title"><h2>Upset of the night</h2><span className="meta">{NAMES[u.sport]} · {u.date}</span></div>
-          <div className="rc-hero-body" onClick={() => navigate(`/${u.sport}/game/${u.game_id}`)}>
+          <div className="rc-hero-body">
             <span className="rc-hero-p">{pct(u.p_winner)}</span>
             <span><b>{u.winner}</b> beat {u.loser}. The model gave them a {pct(u.p_winner)} chance.
               {u.p_winner < 0.3 ? " About once in every " + Math.round(1 / u.p_winner) + " tries." : ""}</span>

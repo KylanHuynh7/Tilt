@@ -2,6 +2,19 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-13 — Play page: beat the model, matchup machine, watch tonight / rewatch
+
+- **New "▶ Play" pill → `/play`,** backed by `app/play.py`: `/play/slate`, `/play/results`, `/play/teams`, `/play/matchup`, `/play/rewatch`.
+  - **Beat the model:** browser-only picks that lock before the model's number appears; your record, the model's record on the same games, your record when you went against it, and your streak.
+  - **Watch tonight:** a pre-game pick (good teams × close game); the user's suggestion, after Fox's game of the week.
+  - **Matchup machine:** any two teams, any season, neutral-site option, and cross-era presets.
+  - **Rewatch:** last night's games by total win-probability swing, with sparklines from the winner's side; the top one is "Game of the night".
+- **Fixes:**
+  - report-card links to past games (404);
+  - an NBA abbreviation bug in the report card that would have broken it on opening night;
+  - swing labels no longer credit "END QUARTER" entries.
+- METHODOLOGY §13.K5. +3 tests (365).
+
 ## 2026-10-12 — Report card and upset of the night
 
 - **`GET /report`** (`app/core/report_card.py`, cached 30 minutes): per sport, the last slate (winners with the pre-game chance the model gave them), the season's biggest upsets, and season-to-date totals: favourites' record, log-loss vs the coin flip, and "right when ≥ 65% sure".

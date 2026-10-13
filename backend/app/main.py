@@ -27,6 +27,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from dataclasses import asdict
 
+from . import play
 from . import cup_simulator, engine, historical, live_wp, nhl_projections, pipeline, standings
 from .core.admin import is_admin, require_admin
 from .core import detail as core_detail, lineups, live_history, players as core_players, rosters, wp_curve
@@ -553,4 +554,5 @@ app.include_router(nhl, prefix="/nhl")
 app.include_router(nba_api.router)
 app.include_router(nfl_api.router)
 app.include_router(mlb_api.router)
+app.include_router(play.router)
 app.include_router(cfb_api.router)

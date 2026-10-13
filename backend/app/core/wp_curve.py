@@ -32,8 +32,13 @@ def _clock(display: str | None) -> float:
     return float(display)
 
 
+_ADMIN = ("END ", "Timeout", "Two-Minute", "Two Minute", "Start of", "End of", "Official")
+
+
 def swings(points: list[dict], k: int = 3) -> list[dict]:
-    deltas = [(abs(b["wp"] - a["wp"]), i) for i, (a, b) in enumerate(zip(points, points[1:])) if b.get("text")]
+    """Largest moves attributed to real plays (period ends / timeouts aren't plays)."""
+    deltas = [(abs(b["wp"] - a["wp"]), i) for i, (a, b) in enumerate(zip(points, points[1:]))
+              if b.get("text") and not b["text"].strip().startswith(_ADMIN)]
     out = []
     for _, i in sorted(deltas, reverse=True)[:k]:
         a, b = points[i], points[i + 1]

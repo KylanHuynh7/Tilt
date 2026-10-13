@@ -587,6 +587,18 @@ Introduced 2026-10-10 when the codebase began hosting more than one sport. None 
   - A sport whose refresh fails keeps its previous data, and the deploy proceeds. The run log shows which sport failed.
   - Artifact Registry now keeps only the 5 newest images. It held 3.9 GB, over the free tier, before the cleanup policy.
 
+### K5. Play page (added 2026-10-13)
+
+- **No new models.** `/play` has three for-fun views built on the frozen models, and none is a forecast with a track record.
+- **Beat the model:**
+  - Visitors pick winners of upcoming games. A pick locks before the model's number is shown.
+  - Results are graded from the leagues' live APIs.
+  - Picks live only in the visitor's browser (localStorage); nothing is stored server-side, keeping the $1 hosting ceiling.
+- **Watch tonight:** a Fox-style "game of the week", picked *before* the games: closeness (1 − |2p − 1|) × team quality (the pair's mean rating as a within-sport z-score), on the next day with unplayed games.
+- **Matchup machine:** P(home) for any two current franchises, using current ratings or any season's end-of-season rating. Cross-era results are labelled for fun: Elo ratings are relative to their own league-season, so they measure dominance in that era, not head-to-head strength.
+- **Rewatch:** the last two days' games ranked by total live win-probability movement, using the curves of §13.K2. It also shows how many times the favourite flipped, and the winner's lowest point.
+- **Fix found while building it:** report-card game lines linked to game pages that exist only for today's slate (404 for past games). They are now plain text.
+
 ### K4. Report card and the test-set quarantine (added 2026-10-12)
 
 - **What it shows:** `/report` grades every sport on the probability its frozen model published before each game (walk-forward replay; nothing refitted).

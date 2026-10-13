@@ -43,13 +43,13 @@ def _nhl() -> tuple[int, list[dict]]:
 
 def _nba() -> tuple[int, list[dict]]:
     from ..nba import live_wp, pipeline
-    from ..nba.teams import display_abbr
+    from ..nba.teams import TEAMS
     cur = pipeline.current_season_id()
     try:
         preds = live_wp.pregame_predictions([cur]).values()
     except Exception:  # noqa: BLE001 — before opening night there is nothing to replay
         preds = []
-    return cur, [_row("nba", p.game_date, display_abbr(p.home_team_id, cur), display_abbr(p.away_team_id, cur),
+    return cur, [_row("nba", p.game_date, TEAMS[p.home_team_id].abbr, TEAMS[p.away_team_id].abbr,
                       p.home_win_prob, p.home_won, p.season_type == 3, p.game_id) for p in preds]
 
 

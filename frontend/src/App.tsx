@@ -6,6 +6,7 @@ import { MlbDashboard } from "./sports/mlb/MlbDashboard";
 import { CfbDashboard } from "./sports/cfb/CfbDashboard";
 import { GameDetail } from "./components/GameDetail";
 import { ReportCard } from "./components/ReportCard";
+import { Play } from "./components/Play";
 import { colorFor as nhlColorFor } from "./sports/nhl/teamColors";
 import { navigate, parseRoute } from "./router";
 
@@ -89,13 +90,17 @@ function SportGlyph({ id }: { id: SportId }) {
 export default function App() {
   const ids = SPORTS.map((x) => x.id);
   const [route, setRoute] = useState(() => parseRoute(ids));
-  const isReport = () => window.location.pathname.replace(/\/+$/, "") === "/report";
-  const [report, setReport] = useState(isReport);
+  const pageOf = () => {
+    const p = window.location.pathname.replace(/\/+$/, "");
+    return p === "/report" ? "report" : p === "/play" ? "play" : null;
+  };
+  const [page, setPage] = useState<"report" | "play" | null>(pageOf);
+  const report = page !== null;
   const sportId = route.sport as SportId;
   const sport = SPORTS.find((s) => s.id === sportId)!;
 
   useEffect(() => {
-    const onPop = () => { setRoute(parseRoute(ids)); setReport(isReport()); };
+    const onPop = () => { setRoute(parseRoute(ids)); setPage(pageOf()); };
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -103,9 +108,10 @@ export default function App() {
 
   // Per-sport accent color is driven from CSS via this attribute.
   useEffect(() => {
-    document.documentElement.dataset.sport = report ? "report" : sportId;
-    document.title = report ? "Tilt — Report card" : route.gameId ? `Tilt — ${sport.name} game` : `Tilt — ${sport.name}`;
-  }, [sportId, sport.name, route.gameId, report]);
+    document.documentElement.dataset.sport = page ?? sportId;
+    document.title = page === "report" ? "Tilt — Report card" : page === "play" ? "Tilt — Play"
+      : route.gameId ? `Tilt — ${sport.name} game` : `Tilt — ${sport.name}`;
+  }, [sportId, sport.name, route.gameId, page]);
 
   const go = (id: SportId) => navigate(`/${id}`);
 
@@ -115,7 +121,7 @@ export default function App() {
         <div className="brand">
           <div className="brand-line">
             <span className="wordmark">Tilt</span>
-            <span className="brand-sport">{report ? "Report card" : sport.name}</span>
+            <span className="brand-sport">{page === "report" ? "Report card" : page === "play" ? "Play" : sport.name}</span>
           </div>
           <p className="brand-tagline">
             Pre-registered, honestly calibrated win probabilities — one model per sport.
@@ -139,13 +145,19 @@ export default function App() {
             {s.status !== "live" && <span className="sport-status">{STATUS_LABEL[s.status]}</span>}
           </button>
         ))}
-        <button className={`sport-pill report-pill ${report ? "active" : ""}`} aria-current={report ? "page" : undefined}
+        <button className={`sport-pill report-pill ${page === "play" ? "active" : ""}`} aria-current={page === "play" ? "page" : undefined}
+          style={{ "--pill": "var(--c-report)" } as React.CSSProperties} onClick={() => navigate("/play")}>
+          ▶ Play
+        </button>
+        <button className={`sport-pill ${page === "report" ? "active" : ""}`} aria-current={page === "report" ? "page" : undefined}
           style={{ "--pill": "var(--c-report)" } as React.CSSProperties} onClick={() => navigate("/report")}>
           ✓ Report card
         </button>
       </nav>
 
-      {report ? (
+      {page === "play" ? (
+        <Play />
+      ) : page === "report" ? (
         <ReportCard />
       ) : route.gameId && sport.status === "live" ? (
         <GameDetail
