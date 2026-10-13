@@ -2,6 +2,13 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-12 — Report card and upset of the night
+
+- **`GET /report`** (`app/core/report_card.py`, cached 30 minutes): per sport, the last slate (winners with the pre-game chance the model gave them), the season's biggest upsets, and season-to-date totals: favourites' record, log-loss vs the coin flip, and "right when ≥ 65% sure".
+- **Upset of the night:** the least likely winner across all sports in the latest two days.
+- **Quarantine (author decision):** no totals for NHL 2026-27 or MLB 2026 (pending one-shot tests); postseason games are never totalled. METHODOLOGY §13.K4.
+- **New "✓ Report card" pill** in the sport switcher → `/report`. Game lines link to their game pages.
+
 ## 2026-10-12 — Cost guard: admin endpoints locked, Cup sim capped
 
 - **`app/core/admin.py`:** the `/admin/refresh` endpoints (NHL, NBA, NFL, MLB, CFB) are off unless `ADMIN_TOKEN` is configured, and then require `X-Admin-Token`. Production doesn't set it, since the nightly deploy refreshes data.

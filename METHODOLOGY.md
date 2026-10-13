@@ -587,6 +587,16 @@ Introduced 2026-10-10 when the codebase began hosting more than one sport. None 
   - A sport whose refresh fails keeps its previous data, and the deploy proceeds. The run log shows which sport failed.
   - Artifact Registry now keeps only the 5 newest images. It held 3.9 GB, over the free tier, before the cleanup policy.
 
+### K4. Report card and the test-set quarantine (added 2026-10-12)
+
+- **What it shows:** `/report` grades every sport on the probability its frozen model published before each game (walk-forward replay; nothing refitted).
+- **Author decision (2026-10-12), so §10 holds:** seasons that are still a pending one-shot test show results and upsets only, never aggregate accuracy:
+  - NHL 2026-27 (v3);
+  - MLB 2026 (v2).
+- **Postseason games** are excluded from every season total, since the 2026 MLB and college postseasons are the postseason layer's tests.
+- **Individual results** are already public on the game cards, so listing them reveals nothing new.
+- **Sources:** MLB rows use the published, playoff-adjusted probability. College rows are FBS-vs-FBS, as in its evaluation.
+
 ### K2. Full-game win-probability charts (added 2026-10-12)
 
 - **What it is:** game pages for live and finished games draw the whole game's curve by evaluating each sport's frozen live model at every play, from play-by-play fetched on demand (ESPN for NFL / college / NBA, the MLB and NHL APIs). The three biggest swings are labelled with the play's description.

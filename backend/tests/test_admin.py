@@ -33,3 +33,13 @@ def test_is_admin():
         assert admin.is_admin("t") and not admin.is_admin("x") and not admin.is_admin(None)
     finally:
         os.environ.pop("ADMIN_TOKEN")
+
+
+def test_report_card_quarantines_test_seasons():
+    from app.core import report_card as rc
+    assert rc.QUARANTINE["nhl"][20262027] and rc.QUARANTINE["mlb"][2026]
+    rows = [{"sport": "x", "date": "2026-10-01", "home": "A", "away": "B", "p_home": 0.8, "home_won": False,
+             "postseason": False, "game_id": "1"}]
+    s = rc._summary(rows)
+    assert s["favorites_won"] == 0 and s["favorites_lost"] == 1
+    assert rc._upset(rows[0])["winner"] == "B" and rc._upset(rows[0])["p_winner"] == 0.2

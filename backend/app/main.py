@@ -402,6 +402,13 @@ async def projections_today(limit: int = 10):
             "note": "Rostered skaters not ruled out; scratches are announced near puck drop."}
 
 
+@app.get("/report")
+async def report():
+    """Cross-sport model report card (core.report_card): last slate, upsets, season record."""
+    from .core import report_card
+    return report_card.get()
+
+
 @nhl.get("/calibration/current")
 async def calibration_current():
     if not RESULTS_PATH.exists():

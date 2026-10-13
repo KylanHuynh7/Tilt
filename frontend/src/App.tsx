@@ -5,6 +5,7 @@ import { NflDashboard } from "./sports/nfl/NflDashboard";
 import { MlbDashboard } from "./sports/mlb/MlbDashboard";
 import { CfbDashboard } from "./sports/cfb/CfbDashboard";
 import { GameDetail } from "./components/GameDetail";
+import { ReportCard } from "./components/ReportCard";
 import { colorFor as nhlColorFor } from "./sports/nhl/teamColors";
 import { navigate, parseRoute } from "./router";
 
@@ -88,11 +89,13 @@ function SportGlyph({ id }: { id: SportId }) {
 export default function App() {
   const ids = SPORTS.map((x) => x.id);
   const [route, setRoute] = useState(() => parseRoute(ids));
+  const isReport = () => window.location.pathname.replace(/\/+$/, "") === "/report";
+  const [report, setReport] = useState(isReport);
   const sportId = route.sport as SportId;
   const sport = SPORTS.find((s) => s.id === sportId)!;
 
   useEffect(() => {
-    const onPop = () => setRoute(parseRoute(ids));
+    const onPop = () => { setRoute(parseRoute(ids)); setReport(isReport()); };
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -100,9 +103,9 @@ export default function App() {
 
   // Per-sport accent color is driven from CSS via this attribute.
   useEffect(() => {
-    document.documentElement.dataset.sport = sportId;
-    document.title = route.gameId ? `Tilt — ${sport.name} game` : `Tilt — ${sport.name}`;
-  }, [sportId, sport.name, route.gameId]);
+    document.documentElement.dataset.sport = report ? "report" : sportId;
+    document.title = report ? "Tilt — Report card" : route.gameId ? `Tilt — ${sport.name} game` : `Tilt — ${sport.name}`;
+  }, [sportId, sport.name, route.gameId, report]);
 
   const go = (id: SportId) => navigate(`/${id}`);
 
@@ -112,23 +115,23 @@ export default function App() {
         <div className="brand">
           <div className="brand-line">
             <span className="wordmark">Tilt</span>
-            <span className="brand-sport">{sport.name}</span>
+            <span className="brand-sport">{report ? "Report card" : sport.name}</span>
           </div>
           <p className="brand-tagline">
             Pre-registered, honestly calibrated win probabilities — one model per sport.
           </p>
         </div>
-        {sport.version && <span className="tag">model {sport.version}</span>}
+        {sport.version && !report && <span className="tag">model {sport.version}</span>}
       </header>
 
       <nav className="sport-nav" aria-label="Sport">
         {SPORTS.map((s) => (
           <button
             key={s.id}
-            className={`sport-pill ${s.id === sportId ? "active" : ""}`}
+            className={`sport-pill ${s.id === sportId && !report ? "active" : ""}`}
             data-status={s.status}
             style={{ "--pill": s.color } as React.CSSProperties}
-            aria-current={s.id === sportId ? "page" : undefined}
+            aria-current={s.id === sportId && !report ? "page" : undefined}
             onClick={() => go(s.id)}
           >
             <SportGlyph id={s.id} />
@@ -136,9 +139,15 @@ export default function App() {
             {s.status !== "live" && <span className="sport-status">{STATUS_LABEL[s.status]}</span>}
           </button>
         ))}
+        <button className={`sport-pill report-pill ${report ? "active" : ""}`} aria-current={report ? "page" : undefined}
+          style={{ "--pill": "var(--c-report)" } as React.CSSProperties} onClick={() => navigate("/report")}>
+          ✓ Report card
+        </button>
       </nav>
 
-      {route.gameId && sport.status === "live" ? (
+      {report ? (
+        <ReportCard />
+      ) : route.gameId && sport.status === "live" ? (
         <GameDetail
           key={`${sportId}-${route.gameId}`}
           sport={sportId}
