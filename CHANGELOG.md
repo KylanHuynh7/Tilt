@@ -2,6 +2,15 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-12 — MLB v2 frozen (FIP pitcher rating); test after the 2026 World Series
+
+- `pitcher_model = "fip"` in `app/mlb/ratings.py` / `backtest.py`: an innings-shrunk, decayed FIP-style rating; the v1 path is unchanged.
+- **Bug caught before the freeze:** the code multiplied FIP by 9 twice, giving pitcher spreads of ±3 runs. Fixed, and recorded in MLB.md §14.
+- **Freeze:** c 30, H_p 20, m 50; carry 0.70.
+  - Validation LL 0.67686, against v1 0.67720 and team-only 0.67820.
+  - The pre-registered "beat v1 by 0.001" will likely fail (0.0003 on validation); kept as approved.
+- `scripts/mlb_v2_evaluate.py` (one-shot; refuses until the World Series is decided). v1 stays live. +2 tests (350).
+
 ## 2026-10-12 — Postseason calibration layer fitted and live (MLB λ 0.70, CFB λ 0.80, NFL off)
 
 - Both drafts approved as recommended (PS-1 per-sport λ; MLB v2 split and pass criteria).

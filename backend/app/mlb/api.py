@@ -53,7 +53,8 @@ def load_params() -> ratings.Params:
     if not ARTIFACT.exists():
         raise HTTPException(503, "MLB model not frozen; run `uv run python -m scripts.mlb_freeze`")
     w = json.loads(ARTIFACT.read_text())["winner"]
-    return ratings.Params(**{f.name: w[f.name] for f in dataclasses.fields(ratings.Params)})
+    # v1 artifacts predate the v2 pitcher fields; their defaults reproduce v1.
+    return ratings.Params(**{f.name: w[f.name] for f in dataclasses.fields(ratings.Params) if f.name in w})
 
 
 def _build() -> Cache:

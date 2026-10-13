@@ -39,3 +39,18 @@ def test_evaluator_guards(tmp_path, monkeypatch):
     (tmp_path / "mlb_2026.json").unlink()
     monkeypatch.setattr(ev, "season_complete", lambda s, y: False)
     assert ev.main(["--sport", "mlb", "--confirm"]) == 4
+
+
+def test_mlb_v2_evaluator_guards(tmp_path):
+    from scripts import mlb_v2_evaluate as ev
+    assert ev.main(["--out", str(tmp_path / "x.json")]) == 2
+    f = tmp_path / "r.json"
+    f.write_text("{}")
+    assert ev.main(["--confirm", "--out", str(f)]) == 3
+    assert ev.main(["--confirm", "--out", str(tmp_path / "new.json")]) == 4     # World Series not decided yet
+
+
+def test_mlb_v1_params_reproduce_v1_path():
+    from app.mlb import ratings
+    p = ratings.Params()
+    assert p.pitcher_model == "rgs"     # v1 artifacts load onto the unchanged v1 path

@@ -28,6 +28,15 @@ class Params:
     mov: bool = True
     c: float = 4.7        # pitcher adjustment scale (c = 0 → team-only Elo)
     alpha: float = 0.1    # EWMA weight of the newest start in rGS
+    # MLB v2 (§14): "fip" replaces rGS with an innings-shrunk FIP-style rating.
+    pitcher_model: str = "rgs"
+    h_p: float = 20.0     # half-life in the pitcher's starts
+    m_ip: float = 50.0    # shrinkage toward the league value, in innings
+
+
+def fip_num(k: int, bb: int, hr: int) -> float:
+    """FIP numerator (13·HR + 3·BB − 2·K); divide by innings for per-inning FIP."""
+    return 13 * hr + 3 * bb - 2 * k
 
 
 def game_score(outs: int, k: int, bb: int, h: int, r: int, hr: int) -> float:

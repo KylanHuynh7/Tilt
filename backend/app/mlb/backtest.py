@@ -83,7 +83,30 @@ def run(seasons: list[int], params: ratings.Params, *, data: dict[int, SeasonDat
     preds: list[Prediction] = []
     traj: dict[int, dict[int, list[TrajectoryPoint]]] = {}
 
+    fip = params.pitcher_model == "fip"
+    d_p = 0.5 ** (1.0 / params.h_p)
+    f_num: dict[int, float] = {}            # pitcher → decayed Σ FIP numerator
+    f_ip: dict[int, float] = {}             # pitcher → decayed Σ innings
+    rotation: dict[int, list[int]] = {}     # team → last 5 starters
+    lg_num = lg_ip = 0.0                    # current season league totals
+    f_lg = 0.0                              # league FIP numerator per inning; set each season
+
+    def pitcher_fip(pid: int | None) -> float:
+        if pid is None:
+            return f_lg
+        return (f_num.get(pid, 0.0) + params.m_ip * f_lg) / (f_ip.get(pid, 0.0) + params.m_ip)
+
     for i, season in enumerate(seasons):
+        if fip:
+            # League value = previous season's FIP numerator per inning (first season: its own, warm-up only).
+            if lg_ip > 0:
+                f_lg = lg_num / lg_ip
+            elif i == 0:
+                sd0 = data[season]
+                n0 = sum(ratings.fip_num(x["k"], x["bb"], x["hr"]) for x in sd0.starters.values())
+                ip0 = sum(x["outs"] for x in sd0.starters.values()) / 3.0
+                f_lg = n0 / ip0 if ip0 else 0.0
+            lg_num = lg_ip = 0.0
         if i > 0:
             for t in R:
                 R[t] = ratings.regress(R[t], params.carry)
@@ -107,6 +130,15 @@ def run(seasons: list[int], params: ratings.Params, *, data: dict[int, SeasonDat
                 return line["pitcher_id"] if line else None
 
             def adj(pid: int | None, team: int) -> tuple[float, bool]:
+                if fip:
+                    first = pid is None or pid not in f_ip
+                    if params.c == 0 or pid is None:
+                        return 0.0, first
+                    rot = rotation.get(team) or []
+                    team_val = sum(pitcher_fip(x) for x in rot) / len(rot) if rot else f_lg
+                    # (13·HR + 3·BB − 2·K)/IP is already in runs per nine innings
+                    # (FIP without its constant). Lower is better.
+                    return params.c * (team_val - pitcher_fip(pid)), first
                 if params.c == 0 or pid is None or pid not in p_rgs:
                     return 0.0, pid is None or pid not in p_rgs
                 return params.c * (p_rgs[pid] - t_rgs[team]), False
@@ -135,6 +167,17 @@ def run(seasons: list[int], params: ratings.Params, *, data: dict[int, SeasonDat
             for side, team in (("home", h), ("away", a)):
                 line = sd.starters.get((g["game_pk"], side))
                 if not line:
+                    continue
+                if fip:
+                    pid = line["pitcher_id"]
+                    num, ip = ratings.fip_num(line["k"], line["bb"], line["hr"]), line["outs"] / 3.0
+                    f_num[pid] = f_num.get(pid, 0.0) * d_p + num
+                    f_ip[pid] = f_ip.get(pid, 0.0) * d_p + ip
+                    lg_num += num
+                    lg_ip += ip
+                    rot = rotation.setdefault(team, [])
+                    rot.append(pid)
+                    del rot[:-5]
                     continue
                 gs = ratings.game_score(line["outs"], line["k"], line["bb"], line["h"], line["r"], line["hr"])
                 pid = line["pitcher_id"]

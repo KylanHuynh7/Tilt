@@ -267,6 +267,11 @@ H_p ∈ {10, 20, 40}               starts
 m   ∈ {20, 50}                   innings
 ```
 
+**Implementation clarifications (2026-10-12, before the freeze):**
+- **Stage-2 grid size:** the team-only grid is v1's grid without its pitcher dimensions, K_regular × K_playoff × carry × H × mov = **640 cells**. "5,120" above was v1's full grid including c and α.
+- **No ×9:** (13·HR + 3·BB − 2·K)/IP is already in runs per nine innings (FIP without its constant). A first implementation multiplied by 9 again; it was caught in a pre-freeze check (pitcher spreads of ±3 runs) and fixed before any grid ran.
+- **Pre-freeze sanity numbers on 2015–2025** (v1 team settings): LL with no pitcher term 0.6782, v1 rGS 0.6772, FIP at c = 30 0.6769. **The likely gain over v1 is ≈ 0.0003, below criterion 2's 0.001.** The criterion is kept as approved; v2 will probably fail it.
+
 **[DECISION MLB-v2-1] Split.**
 - Recommended: **validation 2015 → 2025** (v1's test folded in), **test = the 2026 season** (complete regular season, about 2,430 games, plus the 2026 postseason).
 - The test runs once, after the World Series ends (~November 2026).
@@ -285,3 +290,22 @@ m   ∈ {20, 50}                   innings
 - the live (v1.1) model;
 - the data sources;
 - the no-betting-lines rule.
+
+### MLB v2 freeze (2026-10-12, `artifacts/mlb/frozen_params_v2.json`)
+
+**Stage 1** (36 cells, v1 team settings): best c 30, H_p 20 starts, m 50 innings (LL 0.67686).
+
+**Stage 2** (640 team cells): K 4 / 2, carry **0.70** (v1: 0.60), H 25, MOV on.
+
+**Validation 2015–2025** (n ≈ 25,600):
+
+| Model | LL | ECE |
+| --- | --- | --- |
+| MLB v2 | **0.67686** | 0.0067 |
+| v1 | 0.67720 | — |
+| v2's team settings, no pitcher term | 0.67820 | — |
+
+- The pitcher term is worth 0.0013 (v1's: 0.0010).
+- Expectation c in [15, 40]: ✓.
+- **The margin over v1 (0.0003) is below criterion 2's 0.001**, as flagged before the freeze.
+- **v1 stays live until the test.** `scripts/mlb_v2_evaluate.py --confirm` runs once, after the 2026 World Series, and refuses earlier.
