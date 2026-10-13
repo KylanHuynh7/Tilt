@@ -2,6 +2,15 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-12 — Drafts: postseason calibration layer; MLB v2 pitcher rating (pre-code)
+
+- **New `methodology/POSTSEASON.md`:** a one-parameter shrink of postseason probabilities toward 50% for NFL, MLB and college football (σ(λ·logit p), λ ≤ 1).
+  - Fitted on 2014/15–2025 postseasons; ratings are unchanged.
+  - One-shot tests on the 2026 postseasons: MLB in ~November 2026, college football in ~January 2027, NFL in ~February 2027.
+- **MLB.md §14 (MLB v2 draft):** replaces v1's raw rolling game score with a FIP-style pitcher rating, shrunk by innings. v1's test (pitcher term worth only 0.00075 LL) is folded into validation; the test is the 2026 season, after the World Series.
+- **Correction:** a 2026-10-11 conversation suggestion said the MLB model had no starting-pitcher term; it has had one since v1 (DECISION 3).
+- No code written.
+
 ## 2026-10-11 — NHL v3 frozen and live (roster boost and series context find no signal)
 
 - **Freeze** (`scripts/freeze_v3.py`; 9,624 cells over 4,810 roster events), validation 2021-22 → 2025-26:

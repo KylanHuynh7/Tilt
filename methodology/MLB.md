@@ -234,3 +234,54 @@ RE  = run expectancy for the current base-out state, a 24-cell table computed fr
 | 4 | K_playoff ≥ K_regular | Do not impose |
 | 5 | v1 thresholds | LL < 0.685, Brier 0.235–0.248, ECE < 0.03, beat home-rate baseline |
 | 6 | v1.1 live targets | Pre-register as in §12 |
+
+---
+
+## 14. MLB v2 draft: rebuilt starting-pitcher rating (PRE-CODE, pending approval, 2026-10-12)
+
+**Why:** v1's pitcher term works but is weak.
+- On the 2022–2025 test it improved LL by only 0.00075 over team-only, and its ECE was worse (0.0111 vs 0.0086).
+- **Likely cause:** rGS is an EWMA of raw game scores (α 0.1) with no shrinkage. A pitcher's first few starts swing it hard, and game score mixes in defense and luck (hits, runs).
+
+**Contamination disclosure:** motivated by the v1 test result, which is now fitting data (folded into validation, as NHL v2 did with v1's test).
+
+### Model change
+
+The pitcher term is rebuilt on fielding-independent components (outs, K, BB, HR; all already ingested), shrunk toward league average by innings:
+
+```
+FIP-like per start   f = (13·HR + 3·BB − 2·K) / IP
+pitcher rating       P = (Σ w·IP·f + m·f_lg) / (Σ w·IP + m)       w = 0.5^(age / H_p), age in the pitcher's starts
+adjustment           A = c × (P_team_rotation − P_pitcher)         (Elo points; a lower FIP is better)
+```
+
+- `f_lg` is the previous season's league value.
+- `P_team_rotation` is the team's mean P over its last 5 starters.
+- The team Elo, home field, MOV and K values are re-tuned together.
+
+**Tuning grid** (v1's team grid × pitcher terms; 5,120 × 36 is too many, so v1's team settings stay fixed and the pitcher terms are tuned first, then the team terms in a second 5,120-cell pass):
+
+```
+c   ∈ {0, 10, 20, 30, 40, 50}    Elo points per run of FIP
+H_p ∈ {10, 20, 40}               starts
+m   ∈ {20, 50}                   innings
+```
+
+**[DECISION MLB-v2-1] Split.**
+- Recommended: **validation 2015 → 2025** (v1's test folded in), **test = the 2026 season** (complete regular season, about 2,430 games, plus the 2026 postseason).
+- The test runs once, after the World Series ends (~November 2026).
+- No metric has been computed on 2026 games.
+
+**[DECISION MLB-v2-2] Pass criteria on 2026.** Recommended:
+1. v1's §6 thresholds (LL < 0.685, Brier 0.235–0.248, ECE < 0.03, beats home-rate).
+2. **LL at least 0.001 lower than the frozen v1 model on the same 2026 games.**
+3. Pitcher term vs team-only on 2026: LL improves by ≥ 0.002 (v1's was 0.00075).
+
+**Pre-registered expectation:** optimal c in [15, 40]. c = 0 would mean the pitcher term found no signal.
+
+**Postseason:** MLB v2's published postseason probabilities pass through the postseason layer (`methodology/POSTSEASON.md`) if it is approved; the two are reported separately.
+
+**Not changed:**
+- the live (v1.1) model;
+- the data sources;
+- the no-betting-lines rule.
