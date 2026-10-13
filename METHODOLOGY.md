@@ -578,6 +578,10 @@ Introduced 2026-10-10 when the codebase began hosting more than one sport. None 
 - **The problem:** until 2026-10-12 the live site's data only advanced on a deploy or a manual `POST /admin/refresh`. Even a manual refresh was lost whenever Cloud Run scaled an instance to zero (its filesystem is ephemeral), and with up to two instances it reached only one of them.
 - **Now:** the deploy workflow runs `scripts/refresh_current.py` (the current season for every sport, NHL box scores and the skater-projection state) and the full test suite, then builds. It runs on every backend push and **nightly at 11:00 UTC**, so every instance serves data at most about a day old. Today's games still come from the live APIs on each request.
 - **Refreshed data is baked into the image, not committed;** git keeps the last committed snapshot.
+- **Cost guard (2026-10-12):**
+  - The five `/admin/refresh` endpoints are disabled unless `ADMIN_TOKEN` is set, and then need a matching `X-Admin-Token` header. Production leaves it unset.
+  - The public Cup simulation always runs the cached 10,000-run default; larger `n` and `refresh=true` need the token.
+  - Manual refresh in production = run the "Deploy backend" workflow from GitHub Actions.
 - **Caveats:**
   - GitHub disables scheduled workflows after 60 days without repository activity. A quiet stretch would need one push, or a manual run, to restart them.
   - A sport whose refresh fails keeps its previous data, and the deploy proceeds. The run log shows which sport failed.

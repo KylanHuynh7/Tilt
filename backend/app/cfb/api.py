@@ -12,8 +12,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import httpx
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 
+from ..core.admin import require_admin
 from ..core import detail as core_detail, lineups, live_history, rosters, postseason, wp_curve
 from . import backtest, pipeline, ratings
 from .ratings import FCS
@@ -296,7 +297,7 @@ async def calibration_current():
             "fbs_vs_fcs": r["fbs_vs_fcs_reported_separately"]}
 
 
-@router.post("/admin/refresh")
+@router.post("/admin/refresh", dependencies=[Depends(require_admin)])
 async def admin_refresh():
     global _cache
     r = await pipeline.ingest_season(pipeline.current_season())

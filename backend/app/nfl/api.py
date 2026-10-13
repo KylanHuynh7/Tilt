@@ -11,8 +11,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import httpx
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 
+from ..core.admin import require_admin
 from ..core import detail as core_detail, lineups, live_history, rosters, wp_curve
 from . import backtest, espn, pipeline, ratings
 from .teams import TEAMS, franchise
@@ -247,7 +248,7 @@ async def calibration_current():
     }
 
 
-@router.post("/admin/refresh")
+@router.post("/admin/refresh", dependencies=[Depends(require_admin)])
 async def admin_refresh():
     global _cache
     m = pipeline.ingest()

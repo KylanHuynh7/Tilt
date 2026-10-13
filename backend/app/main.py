@@ -22,12 +22,13 @@ from contextlib import asynccontextmanager
 from datetime import date
 from pathlib import Path
 
-from fastapi import APIRouter, FastAPI, HTTPException
+from fastapi import APIRouter, FastAPI, HTTPException, Depends, Header
 from fastapi.middleware.cors import CORSMiddleware
 
 from dataclasses import asdict
 
 from . import cup_simulator, engine, historical, live_wp, nhl_projections, pipeline, standings
+from .core.admin import is_admin, require_admin
 from .core import detail as core_detail, lineups, live_history, players as core_players, rosters, wp_curve
 from .franchises import franchise_for
 from .nba import api as nba_api
@@ -415,7 +416,7 @@ async def calibration_current():
 
 
 @nhl.get("/simulation/cup")
-async def simulation_cup(n: int | None = None, refresh: bool = False):
+async def simulation_cup(n: int | None = None, refresh: bool = False, x_admin_token: str | None = Header(default=None)):
     """Monte Carlo Cup-win probabilities per §14.
 
     Cached across requests. Pass `?refresh=true` to force a fresh run, or
@@ -424,7 +425,11 @@ async def simulation_cup(n: int | None = None, refresh: bool = False):
     global _cup_result
     cache = _cache_or_503()
     season_id = _current_season_id(cache)
-    n_sims = int(n) if n else DEFAULT_CUP_SIMS
+    # Public callers get the cached default run; larger runs and forced
+    # refreshes need the admin token (cost guard, see core.admin).
+    admin = is_admin(x_admin_token)
+    n_sims = max(1_000, min(int(n), 100_000 if admin else DEFAULT_CUP_SIMS)) if n else DEFAULT_CUP_SIMS
+    refresh = refresh and admin
 
     # §14 simulates from an existing bracket; regular-season projection of the
     # playoff field is out of scope. Before the bracket exists there is
@@ -528,7 +533,7 @@ async def wp(period: int, time_remaining_s: int, score_diff: int):
     }
 
 
-@nhl.post("/admin/refresh")
+@nhl.post("/admin/refresh", dependencies=[Depends(require_admin)])
 async def admin_refresh():
     global _cup_result
     status = await engine.refresh_current_season()

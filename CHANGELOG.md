@@ -2,6 +2,12 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-12 — Cost guard: admin endpoints locked, Cup sim capped
+
+- **`app/core/admin.py`:** the `/admin/refresh` endpoints (NHL, NBA, NFL, MLB, CFB) are off unless `ADMIN_TOKEN` is configured, and then require `X-Admin-Token`. Production doesn't set it, since the nightly deploy refreshes data.
+- **`/simulation/cup`:** public calls can no longer force a re-run or raise `n` (previously unbounded); both need the token.
+- **Why:** both were public ways to burn CPU against the $1/month hosting ceiling. +7 tests (361).
+
 ## 2026-10-12 — Nightly data refresh + tests before every deploy
 
 - **New `scripts/refresh_current.py`:** refreshes every sport's current season, plus NHL box scores and the projection state. Each sport is isolated; the script fails only if all five do. Locally: 21 s.

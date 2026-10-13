@@ -16,8 +16,9 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import httpx
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 
+from ..core.admin import require_admin
 from ..core import detail as core_detail, live_history, postseason, wp_curve
 from . import backtest, pipeline, ratings
 from .teams import TEAMS, is_franchise
@@ -400,7 +401,7 @@ async def calibration_current():
     }
 
 
-@router.post("/admin/refresh")
+@router.post("/admin/refresh", dependencies=[Depends(require_admin)])
 async def admin_refresh():
     global _cache
     r = await pipeline.ingest_season(pipeline.current_season())
