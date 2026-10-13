@@ -13,7 +13,7 @@ from pathlib import Path
 import httpx
 from fastapi import APIRouter, HTTPException
 
-from ..core import detail as core_detail, lineups, live_history, rosters
+from ..core import detail as core_detail, lineups, live_history, rosters, wp_curve
 from . import backtest, espn, pipeline, ratings
 from .teams import TEAMS, franchise
 
@@ -222,6 +222,7 @@ async def game_detail(game_id: str):
         "away": side(m["away"], m["away_color"], ra),
         "head_to_head": core_detail.head_to_head(m["home"], m["away"], games),
         "live_history": live_history.get("nfl", game_id),
+        "wp_curve": await wp_curve.for_matchup("nfl", m),
         "projections": None,  # no player model; QB effects aren't modeled (NFL §13)
     }
 

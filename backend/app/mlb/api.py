@@ -18,7 +18,7 @@ from zoneinfo import ZoneInfo
 import httpx
 from fastapi import APIRouter, HTTPException
 
-from ..core import detail as core_detail, live_history, postseason
+from ..core import detail as core_detail, live_history, postseason, wp_curve
 from . import backtest, pipeline, ratings
 from .teams import TEAMS, is_franchise
 
@@ -376,6 +376,7 @@ async def game_detail(game_id: int):
         "home": side(m["home"], h_id, rh), "away": side(m["away"], a_id, ra),
         "head_to_head": core_detail.head_to_head(m["home"], m["away"], games),
         "live_history": live_history.get("mlb", game_id),
+        "wp_curve": await wp_curve.for_matchup("mlb", m),
         "attribution": ATTRIBUTION,
         "projections": None,
     }

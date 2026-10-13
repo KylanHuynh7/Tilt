@@ -973,3 +973,11 @@ details.others summary { cursor: pointer; font-size: 12px; color: var(--text-dim
 .odds-team small { opacity: .55; margin-left: 6px; font-weight: 400; }
 .odds-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; vertical-align: middle; }
 .odds-pct { text-align: center; font-variant-numeric: tabular-nums; }
+
+/* Win-probability swings */
+.swing-list { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 8px; }
+.swing-list li { display: grid; grid-template-columns: 24px auto 1fr; gap: 4px 10px; align-items: baseline; font-size: 13px; }
+.swing-n { grid-row: span 2; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: var(--accent-ink, #000); font-weight: 700; display: grid; place-items: center; font-size: 12px; }
+.swing-move { font-weight: 700; font-variant-numeric: tabular-nums; }
+.swing-when { opacity: .65; font-size: 12px; }
+.swing-text { grid-column: 2 / -1; opacity: .85; overflow-wrap: anywhere; }

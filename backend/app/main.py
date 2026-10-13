@@ -28,7 +28,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from dataclasses import asdict
 
 from . import cup_simulator, engine, historical, live_wp, nhl_projections, pipeline, standings
-from .core import detail as core_detail, lineups, live_history, players as core_players, rosters
+from .core import detail as core_detail, lineups, live_history, players as core_players, rosters, wp_curve
 from .franchises import franchise_for
 from .nba import api as nba_api
 from .nfl import api as nfl_api
@@ -350,6 +350,7 @@ async def game_detail(game_id: int):
         "away": side(m["away"], ra),
         "head_to_head": core_detail.head_to_head(m["home"], m["away"], games),
         "live_history": live_history.get("nhl", game_id),
+        "wp_curve": await wp_curve.for_matchup("nhl", m),
         "projections": projections,  # methodology/NHL_PLAYERS.md; None while building or if unavailable
     }
 

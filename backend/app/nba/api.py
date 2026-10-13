@@ -20,7 +20,7 @@ from zoneinfo import ZoneInfo
 import httpx
 from fastapi import APIRouter, HTTPException
 
-from ..core import detail as core_detail, lineups, live_history, rosters
+from ..core import detail as core_detail, lineups, live_history, rosters, wp_curve
 from . import backtest, espn, live_wp, pipeline, ratings
 from .teams import DISPLAY_COLORS, TEAMS, display_abbr, is_franchise
 
@@ -282,6 +282,7 @@ async def game_detail(game_id: int):
                  "trend": core_detail.trend(pts(a_id), season_label(trend_season))},
         "head_to_head": core_detail.head_to_head(m["home"], m["away"], games),
         "live_history": live_history.get("nba", game_id),
+        "wp_curve": await wp_curve.for_matchup("nba", m),
         "projections": None,  # Tilt has no player model (see methodology/NBA.md §13)
     }
 

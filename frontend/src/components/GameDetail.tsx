@@ -5,6 +5,7 @@ import {
   CartesianGrid,
   Line,
   LineChart,
+  ReferenceDot,
   ReferenceLine,
   ResponsiveContainer,
   Tooltip,
@@ -347,8 +348,52 @@ export function GameDetail({ sport, gameId, colorFor, periodLabel }: Props) {
         </section>
       )}
 
-      {/* Live WP chart */}
-      {d.live_history.length >= 2 && (
+      {/* Full-game WP curve from play-by-play, with the biggest swings */}
+      {d.wp_curve && (
+        <section className="panel">
+          <div className="panel-title"><h2>Win probability</h2><span className="meta">{d.home.code} perspective · every play · live model</span></div>
+          <div className="detail-chart">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={d.wp_curve.points}>
+                <defs>
+                  <linearGradient id="wpfill2" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={homeColor} stopOpacity={0.55} />
+                    <stop offset="100%" stopColor={awayColor} stopOpacity={0.35} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid stroke="var(--grid)" strokeDasharray="3 3" />
+                <XAxis dataKey="x" type="number" domain={[0, 1]} hide />
+                <YAxis domain={[0, 1]} tickFormatter={(v) => `${Math.round(v * 100)}%`} stroke="var(--text-dim)" fontSize={11} width={44} />
+                <ReferenceLine y={0.5} stroke="var(--text-faint)" strokeDasharray="2 4" />
+                <Tooltip formatter={(v: number) => [pct(v), `${d.home.code} win`]}
+                  labelFormatter={(_x, items) => (items?.[0]?.payload as { label?: string } | undefined)?.label ?? ""}
+                  contentStyle={{ background: "var(--panel)", border: "1px solid var(--edge-strong)", borderRadius: 10 }} />
+                <Area type="stepAfter" dataKey="wp" stroke={homeColor} strokeWidth={2} fill="url(#wpfill2)" isAnimationActive={false} />
+                {d.wp_curve.swings.map((s, i) => (
+                  <ReferenceDot key={i} x={s.x} y={s.to} r={6} fill="var(--accent)" stroke="var(--panel)" strokeWidth={2}
+                    label={{ value: String(i + 1), position: "top", fill: "var(--text)", fontSize: 11, fontWeight: 700 }} />
+                ))}
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+          {d.wp_curve.swings.length > 0 && (
+            <ol className="swing-list">
+              {d.wp_curve.swings.map((s, i) => (
+                <li key={i}>
+                  <span className="swing-n">{i + 1}</span>
+                  <span className="swing-move">{d.home.code} {Math.round(s.from * 100)}% → {Math.round(s.to * 100)}%</span>
+                  <span className="swing-when">{s.label}</span>
+                  <span className="swing-text">{s.text}</span>
+                </li>
+              ))}
+            </ol>
+          )}
+          <div className="disclaimer ok">Each point is the frozen live model evaluated at that moment of the game; the numbered dots are the three biggest swings.</div>
+        </section>
+      )}
+
+      {/* Live WP chart (fallback when play-by-play isn't available) */}
+      {!d.wp_curve && d.live_history.length >= 2 && (
         <section className="panel">
           <div className="panel-title"><h2>Live win probability</h2><span className="meta">{d.home.code} perspective · since the server started watching</span></div>
           <div className="detail-chart">

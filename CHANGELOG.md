@@ -2,6 +2,18 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-12 — Full-game win-probability charts with labelled swings
+
+- `app/core/wp_curve.py` evaluates each sport's frozen live model at every play:
+  - NFL and college football: ESPN drives;
+  - NBA: ESPN plays, at scoring changes;
+  - MLB: the MLB playByPlay feed;
+  - NHL: NHL play-by-play goals, on the v2.2 lookup.
+- It returns the curve plus the three largest swings with the play text, cached for 60 s.
+- Game-detail payloads for every sport add `wp_curve` for live and finished games. The page draws it with numbered swing markers and a list; the old "since the server started watching" chart remains the fallback.
+- **Fix during the build:** an MLB third-out play was labelled with the next half-inning.
+- METHODOLOGY §13.K2 records the limitations (curves inherit each live model's weaknesses). +3 tests (354).
+
 ## 2026-10-12 — Season and playoff odds for NFL, NBA, MLB and college football
 
 - **New "Season odds" tab** on the NFL and NBA dashboards ("Playoff odds" for MLB, "Projected records" for college football), backed by `/{sport}/season/odds`:

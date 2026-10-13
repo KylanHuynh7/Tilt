@@ -14,7 +14,7 @@ from pathlib import Path
 import httpx
 from fastapi import APIRouter, HTTPException
 
-from ..core import detail as core_detail, lineups, live_history, rosters, postseason
+from ..core import detail as core_detail, lineups, live_history, rosters, postseason, wp_curve
 from . import backtest, pipeline, ratings
 from .ratings import FCS
 
@@ -275,6 +275,7 @@ async def game_detail(game_id: int):
         "away": side(m["away"], m["away_name"], m["away_color"], aid, ra),
         "head_to_head": core_detail.head_to_head(m["home"], m["away"], games),
         "live_history": live_history.get("cfb", game_id),
+        "wp_curve": await wp_curve.for_matchup("cfb", m),
         "projections": None,
     }
 

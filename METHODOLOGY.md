@@ -573,6 +573,16 @@ Introduced 2026-10-10 when the codebase began hosting more than one sport. None 
 
 ---
 
+### K2. Full-game win-probability charts (added 2026-10-12)
+
+- **What it is:** game pages for live and finished games draw the whole game's curve by evaluating each sport's frozen live model at every play, from play-by-play fetched on demand (ESPN for NFL / college / NBA, the MLB and NHL APIs). The three biggest swings are labelled with the play's description.
+- **No new model:** every point inherits its live model's known weaknesses:
+  - the kickoff/tip-off offset (NBA, NFL and college failed that check);
+  - college overtime is unreliable;
+  - NHL's v2.2 lookup ignores the pre-game probability, so NHL curves start at a flat 50%.
+- **"Biggest swing"** means the largest change between consecutive evaluated points. NBA points are taken only at scoring plays, so a swing there can span a scoreless run.
+- **Play text** is quoted from the data source as is.
+
 ### L. Data gap: the 2020 bubble playoffs were missing (found and fixed 2026-10-11)
 
 - **The gap:** the ingest's season window ended July 31, so the 2019-20 qualifying round and playoffs (130 games, Aug 1 → Sep 28, 2020) were never downloaded.

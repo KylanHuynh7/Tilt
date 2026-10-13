@@ -155,7 +155,11 @@ export type GameDetailResponse = {
   pitching?: { home: PitcherSide; away: PitcherSide };
   attribution?: string;
   projections: GameProjections | null;
+  wp_curve?: WPCurve | null;
 };
+
+export type WPPoint = { x: number; wp: number; label: string; text: string | null };
+export type WPCurve = { points: WPPoint[]; swings: { x: number; from: number; to: number; label: string; text: string }[] };
 
 export type SkaterProjection = {
   player_id: number; name: string; pos: "F" | "D"; headshot?: string | null;
