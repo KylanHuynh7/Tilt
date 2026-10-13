@@ -1,7 +1,7 @@
 # Postseason Calibration Layer — Methodology Document
-## Version 0.1-draft
+## Version 0.1
 **Author:** Kylan Huynh
-**Status:** PRE-CODE DRAFT, pending author approval. Applies to NFL, MLB and college football. No code written.
+**Status:** APPROVED 2026-10-12 (PS-1 one λ per sport; PS-2 pass rule as written). Applies to NFL, MLB and college football.
 **Last updated:** 2026-10-12
 
 ## 1. Why
@@ -69,6 +69,20 @@ p_post = σ(λ · logit(p))        0 < λ ≤ 1
 - Postseason game cards and pages show the shrunk probability, with "playoff-adjusted (λ = …)".
 - The raw Elo probability stays visible in the game-page breakdown.
 - If a sport's test fails, its layer is switched off and the result documented.
+
+## 6. Fit results (2026-10-12, `artifacts/postseason/lambdas.json`)
+
+| Sport | Fitting window | n | λ | LL raw → shrunk | Expectation |
+| --- | --- | --- | --- | --- | --- |
+| NFL | 2015–2025 | 133 | **1.00** (layer off) | 0.62093 → 0.62093 | ✓ (≥ 0.9) |
+| MLB | 2015–2025 | 440 | **0.70** | 0.68863 → 0.68765 | ✓ ([0.5, 0.85]) |
+| College football | 2014–2025 | 480 | **0.80** | 0.66391 → 0.66200 | ✓ ([0.5, 0.85]) |
+
+- **The gains on the fitting window are small** (0.001–0.002 LL).
+- **NFL keeps its raw probabilities.** That supports reading its 2022–2025 playoff flag (n = 52) as noise.
+- **MLB and college football postseason probabilities are now published shrunk**, with "playoff-adjusted" on the game card and the raw Elo value on hover. The live models still take the raw pre-game value they were trained on.
+- **The MLB 2026 test postseason was already under way** when λ was fitted (LCS round). No metric was computed on any 2026 game, and λ was fitted only on 2015–2025.
+- **The one-shot evaluator** (`scripts/postseason_evaluate.py --sport … --confirm`) refuses to run until that sport's final is in the data.
 
 ## 10. What I will not do
 

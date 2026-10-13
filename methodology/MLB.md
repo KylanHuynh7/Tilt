@@ -237,7 +237,7 @@ RE  = run expectancy for the current base-out state, a 24-cell table computed fr
 
 ---
 
-## 14. MLB v2 draft: rebuilt starting-pitcher rating (PRE-CODE, pending approval, 2026-10-12)
+## 14. MLB v2: rebuilt starting-pitcher rating (APPROVED 2026-10-12, both decisions as recommended)
 
 **Why:** v1's pitcher term works but is weak.
 - On the 2022–2025 test it improved LL by only 0.00075 over team-only, and its ECE was worse (0.0111 vs 0.0086).

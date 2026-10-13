@@ -2,6 +2,14 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-12 — Postseason calibration layer fitted and live (MLB λ 0.70, CFB λ 0.80, NFL off)
+
+- Both drafts approved as recommended (PS-1 per-sport λ; MLB v2 split and pass criteria).
+- `app/core/postseason.py`, `scripts/postseason_fit.py` (refuses to overwrite) and `scripts/postseason_evaluate.py` (one-shot; refuses until the sport's final is ingested).
+- **Fit:** NFL λ 1.0 (no change), MLB 0.70 (LL 0.6886 → 0.6877, n = 440), CFB 0.80 (0.6639 → 0.6620, n = 480). All §3 expectations met.
+- MLB and CFB postseason games now publish the shrunk probability (`raw_home_win_prob` kept), and cards show "playoff-adjusted".
+- **Tests pending:** MLB after the 2026 World Series, CFB after the January 2027 CFP final, NFL n/a. +4 tests (348).
+
 ## 2026-10-12 — Drafts: postseason calibration layer; MLB v2 pitcher rating (pre-code)
 
 - **New `methodology/POSTSEASON.md`:** a one-parameter shrink of postseason probabilities toward 50% for NFL, MLB and college football (σ(λ·logit p), λ ≤ 1).

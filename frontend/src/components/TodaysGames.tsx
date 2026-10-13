@@ -99,7 +99,14 @@ function GameCard({ m, sport, colorFor, periodLabel }: {
         <div className="home" style={{ width: `${homePct}%` }} />
       </div>
       <div className="prob-meta">
-        <span>pre-game</span>
+        <span>
+          pre-game
+          {m.postseason_lambda != null && m.raw_home_win_prob != null && (
+            <span className="smoothed-tag" title={`Raw Elo: ${(m.raw_home_win_prob * 100).toFixed(1)}% ${m.home}. Playoff games are pulled toward 50% (λ = ${m.postseason_lambda}) because the ratings were overconfident in past postseasons.`}>
+              {" "}· playoff-adjusted
+            </span>
+          )}
+        </span>
         <span>{pct(m.away_win_prob)}</span>
         <span>{pct(m.home_win_prob)}</span>
       </div>

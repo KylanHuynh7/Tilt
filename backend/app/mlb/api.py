@@ -18,7 +18,7 @@ from zoneinfo import ZoneInfo
 import httpx
 from fastapi import APIRouter, HTTPException
 
-from ..core import detail as core_detail, live_history
+from ..core import detail as core_detail, live_history, postseason
 from . import backtest, pipeline, ratings
 from .teams import TEAMS, is_franchise
 
@@ -189,12 +189,16 @@ async def games_today():
                                     home_bump=c.params.home_bump, neutral=False)
         st = g["status"]["abstractGameState"]
         state = "FINAL" if st == "Final" else ("LIVE" if st == "Live" else "PRE")
+        # Postseason layer (methodology/POSTSEASON.md): published p shrinks toward
+        # 0.5; the live model below still gets the raw p it was trained on.
+        pub, lam = postseason.apply("mlb", p, g.get("gameType") not in ("R", "S", "E", "A"))
         m = {
             "game_id": g["gamePk"], "game_date": g.get("officialDate"), "state": state,
             "home": TEAMS[h].abbr, "away": TEAMS[a].abbr,
             "home_color": TEAMS[h].color, "away_color": TEAMS[a].color, "neutral": False,
             "home_rating": round(rh, 2), "away_rating": round(ra, 2),
-            "home_win_prob": round(p, 4), "away_win_prob": round(1 - p, 4),
+            "home_win_prob": round(pub, 4), "away_win_prob": round(1 - pub, 4),
+            "raw_home_win_prob": round(p, 4), "postseason_lambda": lam,
             "home_score": t["home"].get("score"), "away_score": t["away"].get("score"),
             "series": g.get("seriesDescription") if g.get("gameType") != "R" else None,
             "pitching": {"home": ph, "away": pa},

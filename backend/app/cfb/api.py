@@ -14,7 +14,7 @@ from pathlib import Path
 import httpx
 from fastapi import APIRouter, HTTPException
 
-from ..core import detail as core_detail, lineups, live_history, rosters
+from ..core import detail as core_detail, lineups, live_history, rosters, postseason
 from . import backtest, pipeline, ratings
 from .ratings import FCS
 
@@ -203,6 +203,7 @@ async def _week_raw() -> tuple[int | None, list[dict]]:
         stype = comp["status"]["type"]
         state = "FINAL" if stype.get("completed") else ("LIVE" if stype.get("state") == "in" else "PRE")
         week = week or (e.get("week") or {}).get("number")
+        pub, lam = postseason.apply("cfb", p, (e.get("season") or {}).get("type") == 3)   # POSTSEASON.md
         m = {
             "game_id": int(e["id"]), "game_date": (e.get("date") or "")[:10], "state": state,
             "home": h["team"].get("abbreviation"), "away": a["team"].get("abbreviation"),
@@ -210,7 +211,8 @@ async def _week_raw() -> tuple[int | None, list[dict]]:
             "home_color": display_color(h["team"].get("color"), h["team"].get("alternateColor")),
             "away_color": display_color(a["team"].get("color"), a["team"].get("alternateColor")),
             "neutral": neutral, "home_rating": round(rh, 2), "away_rating": round(ra, 2),
-            "home_win_prob": round(p, 4), "away_win_prob": round(1 - p, 4),
+            "home_win_prob": round(pub, 4), "away_win_prob": round(1 - pub, 4),
+            "raw_home_win_prob": round(p, 4), "postseason_lambda": lam,
             "home_score": int(h["score"]) if h.get("score") not in (None, "") else None,
             "away_score": int(a["score"]) if a.get("score") not in (None, "") else None,
             "fcs_opponent": FCS in (kh, ka),

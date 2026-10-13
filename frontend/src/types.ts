@@ -37,6 +37,8 @@ export type LiveWPBlock = {
   smoothed: boolean;
 };
 export type Matchup = {
+  postseason_lambda?: number | null;   // methodology/POSTSEASON.md: shrink applied to the published p
+  raw_home_win_prob?: number;
   game_id: number;
   game_date: string;
   state: string;
