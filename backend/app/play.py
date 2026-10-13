@@ -170,7 +170,8 @@ def _watch_scores(rows: list[dict]) -> None:
                 continue
             z = ((r["home_rating"] + r["away_rating"]) / 2 - mu) / sd
             closeness = 1 - abs(2 * r["home_win_prob"] - 1)
-            r["watch_score"] = round(closeness * (1 + max(z, -0.9)), 4)
+            # Closeness first; quality scales it by at most ×0.5 to ×2.
+            r["watch_score"] = round(closeness * (1 + 0.5 * min(max(z, -1.0), 2.0)), 4)
             r["watch_strong"] = min(r["home_rating"], r["away_rating"]) > mu
 
 
