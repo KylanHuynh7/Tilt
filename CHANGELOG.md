@@ -2,6 +2,14 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-21 — College football retired; smoother charts and scrolling
+
+- **College football removed** from the site, API, nightly refresh and tests (author decision: professional leagues only). `methodology/CFB.md` is kept, marked retired. The January 2027 CFB postseason test is cancelled. METHODOLOGY §13.K6.
+- **Frame rate** (production build, 4× CPU throttle):
+  - trajectory-chart hover 19–27 fps → 58–60 fps: the team lines render in a static chart and only a light overlay re-renders on hover;
+  - scrolling 57 fps with stutters → steady 60: no `backdrop-filter` on panels/tooltips, and the page glow is a fixed layer instead of a fixed body background.
+- Tests: CFB tests removed; the rest pass.
+
 ## 2026-10-13 — Play page: beat the model, matchup machine, watch tonight / rewatch
 
 - **New "▶ Play" pill → `/play`,** backed by `app/play.py`: `/play/slate`, `/play/results`, `/play/teams`, `/play/matchup`, `/play/rewatch`.

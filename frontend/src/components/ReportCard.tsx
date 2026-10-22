@@ -12,7 +12,7 @@ type SportBlock = { season: number; error?: string; quarantine_note: string | nu
   season_upsets: Game[]; season_summary: Summary | null };
 type Report = { upset_of_the_night: Game | null; sports: Record<string, SportBlock> };
 
-const NAMES: Record<string, string> = { nhl: "NHL", nba: "NBA", nfl: "NFL", mlb: "MLB", cfb: "College football" };
+const NAMES: Record<string, string> = { nhl: "NHL", nba: "NBA", nfl: "NFL", mlb: "MLB" };
 const pct = (v: number) => `${Math.round(v * 100)}%`;
 const seasonLabel = (s?: number) => (!s ? "" : s > 9999 ? `${Math.floor(s / 10000)}-${String(s % 100).padStart(2, "0")}` : String(s));
 

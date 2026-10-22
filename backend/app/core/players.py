@@ -13,7 +13,7 @@ import time
 import httpx
 
 URL = "https://site.web.api.espn.com/apis/common/v3/sports/{path}/athletes/{athlete_id}/stats"
-SPORT_PATHS = {"nba": "basketball/nba", "nfl": "football/nfl", "nhl": "hockey/nhl", "cfb": "football/college-football"}
+SPORT_PATHS = {"nba": "basketball/nba", "nfl": "football/nfl", "nhl": "hockey/nhl"}
 TTL_S = 60 * 60
 _cache: dict[tuple[str, str], tuple[float, dict]] = {}
 

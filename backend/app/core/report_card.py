@@ -17,7 +17,7 @@ QUARANTINE = {
     "nhl": {20262027: "NHL v3's one-time test runs after the 2027 Stanley Cup Final."},
     "mlb": {2026: "MLB v2's one-time test runs after the 2026 World Series."},
 }
-SPORTS = ("nhl", "nba", "nfl", "mlb", "cfb")
+SPORTS = ("nhl", "nba", "nfl", "mlb")
 _cache: dict = {}
 
 
@@ -75,19 +75,7 @@ def _mlb() -> tuple[int, list[dict]]:
     return cur, rows
 
 
-def _cfb() -> tuple[int, list[dict]]:
-    from ..cfb import api, live_wp
-    c = api.get_cache()
-    cur = max(c.seasons)
-    from ..cfb import pipeline
-    preds = live_wp.pregame([cur]).values()
-    dates = {g["game_id"]: g["game_date"] for g in pipeline.read_games(cur)}
-    name = lambda t: c.names.get(t, (str(t), str(t)))[0] if isinstance(t, int) else "FCS"   # noqa: E731
-    return cur, [_row("cfb", dates.get(p.game_id, f"{cur}-W{p.week:02d}"), name(p.home), name(p.away), p.home_win_prob,
-                      None if p.outcome == 0.5 else p.outcome == 1.0, p.postseason, p.game_id) for p in preds]
-
-
-ADAPTERS = {"nhl": _nhl, "nba": _nba, "nfl": _nfl, "mlb": _mlb, "cfb": _cfb}
+ADAPTERS = {"nhl": _nhl, "nba": _nba, "nfl": _nfl, "mlb": _mlb}
 
 
 def _summary(rows: list[dict]) -> dict:

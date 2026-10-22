@@ -16,8 +16,8 @@ from typing import Sequence
 ROOT = Path(__file__).resolve().parents[2]
 ARTIFACT = ROOT / "artifacts" / "postseason" / "lambdas.json"
 GRID = [round(0.50 + 0.05 * i, 2) for i in range(11)]          # 0.50 … 1.00
-FIT_SEASONS = {"nfl": list(range(2015, 2026)), "mlb": list(range(2015, 2026)), "cfb": list(range(2014, 2026))}
-TEST_SEASON = {"nfl": 2026, "mlb": 2026, "cfb": 2026}
+FIT_SEASONS = {"nfl": list(range(2015, 2026)), "mlb": list(range(2015, 2026))}
+TEST_SEASON = {"nfl": 2026, "mlb": 2026}
 
 
 def shrink(p: float, lam: float) -> float:

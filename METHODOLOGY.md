@@ -611,13 +611,21 @@ Introduced 2026-10-10 when the codebase began hosting more than one sport. None 
 
 ### K2. Full-game win-probability charts (added 2026-10-12)
 
-- **What it is:** game pages for live and finished games draw the whole game's curve by evaluating each sport's frozen live model at every play, from play-by-play fetched on demand (ESPN for NFL / college / NBA, the MLB and NHL APIs). The three biggest swings are labelled with the play's description.
+- **What it is:** game pages for live and finished games draw the whole game's curve by evaluating each sport's frozen live model at every play, from play-by-play fetched on demand (ESPN for NFL / NBA, the MLB and NHL APIs). The three biggest swings are labelled with the play's description.
 - **No new model:** every point inherits its live model's known weaknesses:
-  - the kickoff/tip-off offset (NBA, NFL and college failed that check);
-  - college overtime is unreliable;
+  - the kickoff/tip-off offset (NBA and NFL failed that check);
   - NHL's v2.2 lookup ignores the pre-game probability, so NHL curves start at a flat 50%.
 - **"Biggest swing"** means the largest change between consecutive evaluated points. NBA points are taken only at scoring plays, so a swing there can span a scoreless run.
 - **Play text** is quoted from the data source as is.
+
+### K6. College football retired; chart rendering (2026-10-21)
+
+- **College football removed** (author decision: the site covers professional leagues; covering college properly would mean basketball and more). Its model, data, tests and nightly refresh are gone; `methodology/CFB.md` stays as a record.
+  - Its postseason-layer test (planned for January 2027) will never run, so that pre-registered result is lost rather than reported.
+  - The CFB λ remains in the frozen `artifacts/postseason/lambdas.json`, which is not edited after freezing; nothing reads it.
+  - Older CHANGELOG and §13 entries that mention college football describe the site as it was.
+- **Trajectory charts** render as two stacked charts: a static one with the team lines and a transparent one on top that owns the hover and tooltip. Under 4× CPU throttling, hover went from 19–27 fps to 58–60 fps. Trade-off: the per-line dots under the cursor are gone; the tooltip lists every value.
+- **Panels and tooltips no longer use `backdrop-filter`**, and the page glow moved off a fixed `body` background onto a fixed layer. Scrolling is a steady 60 fps; the look is unchanged because panels sit on smooth gradients.
 
 ### L. Data gap: the 2020 bubble playoffs were missing (found and fixed 2026-10-11)
 

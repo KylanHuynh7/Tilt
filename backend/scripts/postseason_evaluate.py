@@ -35,16 +35,12 @@ def season_complete(sport: str, season: int) -> bool:
         from app.nfl import backtest
         rows = backtest.rows_by_season(through=season).get(season, [])
         return any(r.get("game_type") == "SB" and r.get("home_score") is not None for r in rows)
-    from app.cfb import pipeline
-    rows = pipeline.read_games(season)
-    post = [r for r in rows if r.get("season_type") == 3]
-    done = pipeline.completed_games(post)
-    return bool(post) and len(done) == len(post) and max(str(r.get("date", "")) for r in done) >= f"{season + 1}-01-05"
+    raise ValueError(sport)
 
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="scripts.postseason_evaluate")
-    ap.add_argument("--sport", required=True, choices=["nfl", "mlb", "cfb"])
+    ap.add_argument("--sport", required=True, choices=["nfl", "mlb"])
     ap.add_argument("--confirm", action="store_true")
     a = ap.parse_args(argv)
     out = OUT / f"{a.sport}_{ps.TEST_SEASON[a.sport]}.json"

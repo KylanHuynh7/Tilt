@@ -14,7 +14,7 @@ type Team = { code: string; name: string; color: string | null };
 type Rewatch = { date: string | null; note: string; games: (SlateGame & { winner: string; loser: string; p_winner: number;
   swing: number; lead_changes: number; winner_low: number; spark: number[]; top_swing?: { text: string; label: string } | null })[] };
 
-const NAMES: Record<string, string> = { nhl: "NHL", nba: "NBA", nfl: "NFL", mlb: "MLB", cfb: "CFB" };
+const NAMES: Record<string, string> = { nhl: "NHL", nba: "NBA", nfl: "NFL", mlb: "MLB" };
 const pct = (v: number) => `${Math.round(v * 100)}%`;
 const KEY = "tilt-picks-v1";
 

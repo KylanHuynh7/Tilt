@@ -17,7 +17,6 @@ import httpx
 
 ESPN_SUMMARY = {
     "nfl": "https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary",
-    "cfb": "https://site.api.espn.com/apis/site/v2/sports/football/college-football/summary",
     "nba": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary",
 }
 _cache: dict[tuple[str, str], tuple[float, dict]] = {}
@@ -47,14 +46,9 @@ def swings(points: list[dict], k: int = 3) -> list[dict]:
 
 
 def _football(sport: str, payload: dict, pre: float, home_id: str) -> list[dict]:
-    if sport == "nfl":
-        from ..nfl import live_wp as lw
-        beta = lw.load()
-        f = lambda q, c, d, s, y: lw.predict(beta, pre_game_p=pre, qtr=q, qsr=c, d=d, s=s, y=y)  # noqa: E731
-    else:
-        from ..cfb import live_wp as lw
-        beta = lw.load()
-        f = lambda q, c, d, s, y: lw.predict(beta, pre_game_p=pre, qtr=q, clock_s=c, d=d, s=s, y=y)  # noqa: E731
+    from ..nfl import live_wp as lw
+    beta = lw.load()
+    f = lambda q, c, d, s, y: lw.predict(beta, pre_game_p=pre, qtr=q, qsr=c, d=d, s=s, y=y)  # noqa: E731
     plays = [p for d in ((payload.get("drives") or {}).get("previous") or []) for p in (d.get("plays") or [])]
     pts = [{"x": 0.0, "wp": f(1, 900, 0, 0, 50), "label": "Kickoff", "text": None}]
     hs = as_ = 0

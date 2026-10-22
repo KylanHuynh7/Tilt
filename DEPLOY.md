@@ -19,7 +19,7 @@ The backend runs on **Cloud Run** in project `tilt-sports-kylan` (region `us-cen
 - **Health check path:** use **`/health`**. Cloud Run reserves paths ending in `z`, so `/healthz` returns Google's 404 there.
 - **Frontend:** Vercel's `VITE_API_BASE` points at the Cloud Run URL.
 - **Nightly data refresh (since 2026-10-12):**
-  - The same workflow also runs **every night at 11:00 UTC**. Each run executes `scripts/refresh_current.py` (the current season for all five sports, NHL box scores and the skater-projection state), then the **full test suite**, then builds. A failing test blocks the deploy.
+  - The same workflow also runs **every night at 11:00 UTC**. Each run executes `scripts/refresh_current.py` (the current season for all four sports, NHL box scores and the skater-projection state), then the **full test suite**, then builds. A failing test blocks the deploy.
   - Refreshed data is baked into the image, not committed: Cloud Run's disk is ephemeral, so the image's data *is* the site's data.
   - GitHub disables scheduled workflows after 60 days without repository activity; a push or a manual run restarts them.
 - **Image cleanup:** Artifact Registry keeps the 5 newest images (cleanup policy), keeping storage inside the free tier.
@@ -136,7 +136,7 @@ or start the server with a token and call the per-sport endpoints:
 ```bash
 ADMIN_TOKEN=pick-something uv run uvicorn app.main:app
 curl -X POST -H 'X-Admin-Token: pick-something' localhost:8000/admin/refresh        # NHL
-curl -X POST -H 'X-Admin-Token: pick-something' localhost:8000/nba/admin/refresh    # also /nfl, /mlb, /cfb
+curl -X POST -H 'X-Admin-Token: pick-something' localhost:8000/nba/admin/refresh    # also /nfl, /mlb
 ```
 
 ### Pending one-shot test evaluations
@@ -146,7 +146,6 @@ Each script runs exactly once (`--confirm`, never `--force`) and refuses to run 
 | When | Command (from `backend/`) |
 |---|---|
 | After the 2026 World Series | `uv run python -m scripts.mlb_v2_evaluate --confirm` and `uv run python -m scripts.postseason_evaluate --sport mlb --confirm` |
-| After the January 2027 CFP final | `uv run python -m scripts.postseason_evaluate --sport cfb --confirm` |
 | After Super Bowl LXI | `uv run python -m scripts.postseason_evaluate --sport nfl --confirm` (layer off; records n/a) |
 | After the 2027 Stanley Cup Final | `uv run python -m scripts.evaluate_v3 --confirm` |
 

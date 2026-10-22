@@ -131,5 +131,5 @@ def test_player_without_stats_is_an_empty_card_not_an_error(monkeypatch):
 
     monkeypatch.setattr(players.httpx, "AsyncClient", Client)
     players._cache.clear()
-    out = asyncio.run(players.fetch("cfb", "123"))
+    out = asyncio.run(players.fetch("nfl", "123"))
     assert out["categories"] == []

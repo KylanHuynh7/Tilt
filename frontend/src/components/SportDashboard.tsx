@@ -23,8 +23,7 @@ export type SportCalibration = CalibrationResponse & {
 };
 
 export type SportConfig = {
-  league: string;                     // display label ("NBA", "FBS")
-  sport?: string;                     // route id when it differs from the label ("cfb")
+  league: string;                     // display label ("NBA"); lowercased, it is the route id
   subhead: ReactNode;
   todayLabel: string;                 // "Today's games" / "This week"
   periodLabel: (p: number) => string;
@@ -192,7 +191,7 @@ export function SportDashboard({ cfg }: { cfg: SportConfig }) {
             <TodaysGames
               data={today}
               league={cfg.league}
-              sport={cfg.sport ?? cfg.league.toLowerCase()}
+              sport={cfg.league.toLowerCase()}
               colorFor={fallbackColor}
               periodLabel={cfg.periodLabel}
               emptyNote={cfg.emptyNote}
@@ -205,7 +204,7 @@ export function SportDashboard({ cfg }: { cfg: SportConfig }) {
       {tab === "odds" && (
         <section className="panel" role="tabpanel">
           <div className="panel-title"><h2>{cfg.oddsLabel ?? "Season odds"}</h2><span className="meta">Monte Carlo · frozen ratings</span></div>
-          <SeasonOdds sport={cfg.sport ?? cfg.league.toLowerCase()} colorFor={(_t, r) => r.color ?? "#888"} />
+          <SeasonOdds sport={cfg.league.toLowerCase()} colorFor={(_t, r) => r.color ?? "#888"} />
         </section>
       )}
 

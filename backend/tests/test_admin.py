@@ -11,7 +11,7 @@ def client():
 
 
 @pytest.mark.parametrize("path", ["/admin/refresh", "/nba/admin/refresh", "/nfl/admin/refresh",
-                                  "/mlb/admin/refresh", "/cfb/admin/refresh"])
+                                  "/mlb/admin/refresh"])
 def test_refresh_disabled_without_token_config(client, monkeypatch, path):
     monkeypatch.delenv("ADMIN_TOKEN", raising=False)
     assert client.post(path).status_code == 403

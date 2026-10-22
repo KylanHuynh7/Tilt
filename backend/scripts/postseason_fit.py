@@ -20,8 +20,7 @@ def postseason_predictions(sport: str, seasons):
     if sport == "mlb":
         from app.mlb import live_wp
         return [p for p in live_wp.pregame(seasons).values() if p.is_playoff]
-    from app.cfb import live_wp
-    return [p for p in live_wp.pregame(seasons).values() if p.postseason]
+    raise ValueError(sport)
 
 
 def main(argv=None) -> int:

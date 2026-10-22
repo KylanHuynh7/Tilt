@@ -1,7 +1,7 @@
 # Postseason Calibration Layer — Methodology Document
 ## Version 0.1
 **Author:** Kylan Huynh
-**Status:** APPROVED 2026-10-12 (PS-1 one λ per sport; PS-2 pass rule as written). Applies to NFL, MLB and college football.
+**Status:** APPROVED 2026-10-12 (PS-1 one λ per sport; PS-2 pass rule as written). Applies to NFL, MLB and college football. **College football was retired 2026-10-21** before its test; its fitted λ stays in the frozen artifact as a record but is no longer used.
 **Last updated:** 2026-10-12
 
 ## 1. Why

@@ -9,7 +9,6 @@ roster we already fetch (names, headshots, injury status) and return:
 
 Starters per slot come from the formation name ("3WR 1TE" → 3 WR, 1 TE);
 every other slot has one starter. Facts only — no Tilt model involved.
-College football has no ESPN depth charts; callers fall back to the roster.
 """
 
 from __future__ import annotations

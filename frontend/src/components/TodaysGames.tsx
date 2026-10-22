@@ -127,7 +127,6 @@ function GameCard({ m, sport, colorFor, periodLabel }: {
             <span>
               live
               {m.live_wp.smoothed && <span className="smoothed-tag"> (n={m.live_wp.n_samples}, smoothed)</span>}
-              {m.live_wp.unreliable && <span className="smoothed-tag"> (unreliable in overtime)</span>}
             </span>
             <span>{pct(1 - m.live_wp.home_win_prob)}</span>
             <span>{pct(m.live_wp.home_win_prob)}</span>

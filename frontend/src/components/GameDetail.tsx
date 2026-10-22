@@ -280,7 +280,6 @@ export function GameDetail({ sport, gameId, colorFor, periodLabel }: Props) {
           <span className="prob-text">
             {fav.code} to win{liveP != null ? " — live" : ""}
             <small>{liveP != null ? `pre-game was ${pct(p.home_win_prob)} ${d.home.code}` : d.model.name}</small>
-            {g.live_wp?.unreliable && <small className="warn-text">⚠ Overtime: the live model was badly overconfident in college OT during testing — treat this number with caution.</small>}
           </span>
         </div>
         <div className="big-bar">

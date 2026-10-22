@@ -1,7 +1,7 @@
 # College Football (FBS) Rating System — Methodology Document
 ## Version 1.3
 **Author:** Kylan Huynh
-**Status:** v1 frozen and evaluated 2026-10-11 — **all four §6 criteria PASS** on 2022–2025 (postseason flagged). APPROVED 2026-10-11 — all six **[DECISION]** items resolved as recommended. Later changes to §§3–6 or §12 are version-tagged amendments.
+**Status:** **RETIRED 2026-10-21** (author decision: Tilt covers professional leagues only). The model, its data and its code were removed from the site and the repo; they remain in git history before that date. The 2026 postseason test will not run. Previously: v1 frozen and evaluated 2026-10-11 — **all four §6 criteria PASS** on 2022–2025 (postseason flagged). APPROVED 2026-10-11 — all six **[DECISION]** items resolved as recommended. Later changes to §§3–6 or §12 are version-tagged amendments.
 **Last updated:** 2026-10-11
 
 **Amendment log:**

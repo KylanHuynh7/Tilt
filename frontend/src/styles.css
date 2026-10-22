@@ -20,7 +20,6 @@
   --c-nba: #ff7a1a;
   --c-nfl: #2fd36b;
   --c-mlb: #ff3b55;
-  --c-cfb: #ffb81c;
 
   /* Default world = NHL black ice. */
   --bg: #06080b;
@@ -133,30 +132,6 @@
     repeating-linear-gradient(-60deg, transparent 0 22px, rgba(255, 59, 85, 0.05) 22px 24px, transparent 24px 46px);
 }
 
-/* CFB — Saturday: deep maroon + gold, pennant stripes. */
-:root[data-sport="cfb"] {
-  --bg: #12060a;
-  --bg-2: #210a12;
-  --surface: rgba(255, 190, 120, 0.05);
-  --surface-2: rgba(255, 190, 120, 0.09);
-  --edge: rgba(255, 184, 28, 0.16);
-  --edge-strong: rgba(255, 184, 28, 0.34);
-  --text: #fff6e8;
-  --text-dim: #c9a98f;
-  --text-faint: #7d5f55;
-  --accent: #ffb81c;
-  --accent-2: #ffe08a;
-  --accent-3: #9e1b32;
-  --accent-ink: #2a0610;
-  --glow-a: rgba(255, 184, 28, 0.20);
-  --glow-b: rgba(158, 27, 50, 0.30);
-  --grid: rgba(255, 190, 120, 0.09);
-  --panel: #1c0911;
-  --motif:
-    repeating-linear-gradient(135deg, transparent 0 34px, rgba(255, 184, 28, 0.035) 34px 36px, transparent 36px 72px),
-    repeating-linear-gradient(135deg, transparent 0 70px, rgba(158, 27, 50, 0.10) 70px 72px);
-}
-
 /* ---- Base ------------------------------------------------------------------ */
 
 * { box-sizing: border-box; }
@@ -167,12 +142,19 @@ body {
   font-size: 15px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+}
+/* Glow and motif live on fixed layers rather than a fixed body background,
+   which Chrome repaints on every scroll frame. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
   background:
     radial-gradient(900px 520px at 8% -8%, var(--glow-a), transparent 70%),
     radial-gradient(800px 600px at 100% 0%, var(--glow-b), transparent 70%),
     linear-gradient(180deg, var(--bg-2), var(--bg) 640px);
-  background-attachment: fixed;
-  transition: background-color 300ms ease;
+  pointer-events: none;
+  z-index: -1;
 }
 /* Sport motif sits behind everything, fading out down the page. */
 body::before {
@@ -341,8 +323,6 @@ body::before {
   border-radius: 20px;
   padding: 22px 18px;
   margin-bottom: 28px;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
   overflow: hidden;
 }
@@ -394,6 +374,9 @@ body::before {
 .select option { background: var(--panel); }
 
 .chart-wrap { width: 100%; height: 460px; }
+/* Two stacked charts: static lines below, hover/tooltip layer above. */
+.chart-stack { position: relative; }
+.chart-stack > .chart-layer { position: absolute; inset: 0; }
 
 .chart-tooltip {
   background: color-mix(in srgb, var(--panel) 94%, transparent);
@@ -403,7 +386,6 @@ body::before {
   font-size: 12px;
   max-height: 540px;
   overflow-y: auto;
-  backdrop-filter: blur(8px);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
   color: var(--text);
 }
@@ -940,7 +922,6 @@ table.metrics td:first-child { white-space: nowrap; }
 details.others { margin-top: 10px; }
 details.others summary { cursor: pointer; font-size: 12px; color: var(--text-dim); margin-bottom: 6px; }
 @media (max-width: 520px) { .lineup-slot { grid-template-columns: 48px 1fr; } }
-.warn-text { color: var(--warn); font-size: 12px; margin-top: 4px; text-transform: none; letter-spacing: 0; font-family: var(--font-body); font-weight: 500; }
 
 /* NHL skater projections (methodology/NHL_PLAYERS.md) */
 .proj-team { min-width: 0; }

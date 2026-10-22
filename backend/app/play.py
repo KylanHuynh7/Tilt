@@ -14,7 +14,7 @@ import httpx
 from fastapi import APIRouter, HTTPException
 
 router = APIRouter(prefix="/play", tags=["play"])
-SPORTS = ("nhl", "nba", "nfl", "mlb", "cfb")
+SPORTS = ("nhl", "nba", "nfl", "mlb")
 
 
 # ---- Matchup machine ----------------------------------------------------------------
@@ -82,19 +82,6 @@ def _teams_and_seasons(sport: str) -> dict:
             return pts[-1].rating if pts else None
         return {"teams": teams, "seasons": sorted(c.trajectories), "rating": rating,
                 "p": lambda rh, ra, neutral: ratings.win_probability(rh, ra, home_bump=c.params.home_bump, neutral=neutral)}
-    if sport == "cfb":
-        from .cfb import api, ratings
-        c = api.get_cache()
-        teams = [{"code": c.names[t][0], "id": t, "name": c.names[t][1], "color": c.colors.get(t)}
-                 for t in sorted(c.fbs_now, key=lambda t: c.names.get(t, ("", ""))[1]) if t in c.names]
-        ids = {x["code"]: x["id"] for x in teams}
-        def rating(code, season):
-            if season is None:
-                return c.current.get(ids[code])
-            pts = c.trajectories.get(season, {}).get(ids[code])
-            return pts[-1].rating if pts else None
-        return {"teams": teams, "seasons": sorted(c.trajectories), "rating": rating,
-                "p": lambda rh, ra, neutral: ratings.win_probability(rh, ra, home_bump=c.params.home_bump, neutral=neutral)}
     raise HTTPException(404, f"unknown sport {sport}")
 
 
@@ -129,12 +116,11 @@ async def matchup(sport: str, home: str, away: str, neutral: bool = False,
 
 async def _slate_rows() -> list[dict]:
     from . import main
-    from .cfb import api as cfb_api
     from .mlb import api as mlb_api
     from .nba import api as nba_api
     from .nfl import api as nfl_api
     calls = {"nhl": main.games_today, "nba": nba_api.games_today, "nfl": nfl_api.games_this_week,
-             "mlb": mlb_api.games_today, "cfb": cfb_api.games_this_week}
+             "mlb": mlb_api.games_today}
     results = await asyncio.gather(*[f() for f in calls.values()], return_exceptions=True)
     rows = []
     for sport, r in zip(calls, results):
@@ -180,7 +166,7 @@ _slate_cache: tuple[float, list[dict]] | None = None
 
 @router.get("/slate")
 async def slate():
-    """Today's games across sports (NFL/CFB: this week). Picks are stored in the browser."""
+    """Today's games across sports (NFL: this week). Picks are stored in the browser."""
     global _slate_cache
     if _slate_cache and time.time() - _slate_cache[0] < 120:
         rows = _slate_cache[1]
@@ -188,7 +174,7 @@ async def slate():
         rows = await _slate_rows()
         _watch_scores(rows)
         _slate_cache = (time.time(), rows)
-    # Watch tonight = the best game on the NEXT day with unplayed games (NFL / college
+    # Watch tonight = the best game on the NEXT day with unplayed games (NFL
     # lists cover the whole week); also the best game per sport on that day.
     pre = [r for r in rows if r["state"] == "PRE" and r.get("watch_score") is not None and r.get("date")]
     day = min((r["date"] for r in pre), default=None)

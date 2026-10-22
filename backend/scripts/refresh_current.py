@@ -49,15 +49,9 @@ async def _mlb() -> dict:
     return {"season": r["season"], "rows": r["rows"], "starter_lines": r["starter_lines"]}
 
 
-async def _cfb() -> dict:
-    from app.cfb import pipeline
-    r = await pipeline.ingest_season(pipeline.current_season())
-    return {"season": pipeline.current_season(), **{k: v for k, v in r.items() if isinstance(v, (int, str))}}
-
-
 async def main() -> int:
     results = {}
-    for name, fn in (("nhl", _nhl), ("nba", _nba), ("nfl", _nfl), ("mlb", _mlb), ("cfb", _cfb)):
+    for name, fn in (("nhl", _nhl), ("nba", _nba), ("nfl", _nfl), ("mlb", _mlb)):
         t0 = time.time()
         try:
             results[name] = {"ok": True, **(await fn()), "seconds": round(time.time() - t0, 1)}

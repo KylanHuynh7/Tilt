@@ -9,11 +9,10 @@ Interpretable rating systems that produce calibrated, game-by-game win probabili
 | **NBA** | Live — v1.1: pre-game model (all §6 targets PASS on test) + live in-game win probability | [`methodology/NBA.md`](./methodology/NBA.md) |
 | **NFL** | Live — v1.1: pre-game model (all §6 targets PASS; playoff ECE flagged) + live win probability (4 of 5 live targets PASS) | [`methodology/NFL.md`](./methodology/NFL.md) |
 | **MLB** | Live — v1.1: pre-game model (all §6 targets PASS; postseason flagged) + live win probability (**5 of 5** live targets PASS) | [`methodology/MLB.md`](./methodology/MLB.md) |
-| **College football** | Live — v1.1: pre-game model (all §6 targets PASS; postseason flagged) + live win probability (4 of 5 live targets PASS; unreliable in overtime) | [`methodology/CFB.md`](./methodology/CFB.md) |
-| **Postseason adjustment** | Live for MLB (λ 0.70) and college football (λ 0.80); NFL off (λ 1.0). Tests after each sport's 2026 postseason | [`methodology/POSTSEASON.md`](./methodology/POSTSEASON.md) |
+| **Postseason adjustment** | Live for MLB (λ 0.70); NFL off (λ 1.0). Tests after each sport's 2026 postseason | [`methodology/POSTSEASON.md`](./methodology/POSTSEASON.md) |
 | **MLB v2** (FIP pitcher rating) | Frozen 2026-10-12; one-shot test on the 2026 season after the World Series. v1 stays live until then | [`methodology/MLB.md`](./methodology/MLB.md) §14 |
 
-Everything below this table describes the NHL model unless stated otherwise. Each sport gets its own methodology document, written and approved before that sport's model code, with its own train/validation/test split and §13-style limitations.
+Everything below this table describes the NHL model unless stated otherwise. Tilt covers professional leagues only. College football was live until 2026-10-21 and was retired (its document stays in [`methodology/CFB.md`](./methodology/CFB.md) as a record). Each sport gets its own methodology document, written and approved before that sport's model code, with its own train/validation/test split and §13-style limitations.
 
 > Student project. Not a betting tool. Not a power ranking. Not a Vegas competitor.
 > Pre-1967 seasons are available in the dashboard for historical exploration only and are excluded from all model evaluation.
@@ -25,14 +24,14 @@ Everything below this table describes the NHL model unless stated otherwise. Eac
 - **Live season: 2026-27.** The dashboard's "current season" is now derived from the latest ingested parquet, not hardcoded.
 - **v3 — frozen and live** (2026-10-11). Roster-move boost and series-context K found essentially no signal on validation (both pre-registered expectations FAIL; `METHODOLOGY.md` §20). Its one-shot test on 2026-27 runs after the 2027 Stanley Cup Final.
 
-**Pending one-shot tests:** MLB v2 + MLB postseason layer (Nov 2026), college football postseason layer (Jan 2027), NFL postseason (Feb 2027, layer off), NHL v3 (June 2027). See `DEPLOY.md` → *Pending one-shot test evaluations*.
+**Pending one-shot tests:** MLB v2 + MLB postseason layer (Nov 2026), NFL postseason (Feb 2027, layer off), NHL v3 (June 2027). See `DEPLOY.md` → *Pending one-shot test evaluations*.
 
 ## Site features beyond the models
 
 None of these is a new model or a tested forecast. Each says so on the page.
 
 - **Game pages** for every sport: lineups and depth charts, injury report, player stat cards, and a **full-game win-probability chart** with the three biggest swings labelled (`METHODOLOGY.md` §13.K2). NHL pages add **scoring chances** from the skater model.
-- **Season / playoff odds** tab: Monte Carlo from the frozen ratings. NFL and NBA full season + bracket, MLB from the current series, college projected records (sport docs §14–§15).
+- **Season / playoff odds** tab: Monte Carlo from the frozen ratings. NFL and NBA full season + bracket, MLB from the current series (sport docs §14–§15).
 - **Report card:** last night's results, upsets and season-to-date accuracy. Seasons that are still a pending test show results only (§13.K4).
 - **Play:** beat the model (picks saved in your browser), watch tonight, matchup machine (any two teams, any season), and rewatch / game of the night (§13.K5).
 - **Operations:** data refreshes nightly, tests gate every deploy, admin endpoints are locked, and hosting stays under $1/month (`DEPLOY.md`).
