@@ -37,7 +37,7 @@ def test_is_admin():
 
 def test_report_card_quarantines_test_seasons():
     from app.core import report_card as rc
-    assert rc.QUARANTINE["nhl"][20262027] and rc.QUARANTINE["mlb"][2026]
+    assert rc.QUARANTINE["nhl"][20262027] and not rc.QUARANTINE["mlb"]   # MLB v2 tested 2026-10-30
     rows = [{"sport": "x", "date": "2026-10-01", "home": "A", "away": "B", "p_home": 0.8, "home_won": False,
              "postseason": False, "game_id": "1"}]
     s = rc._summary(rows)

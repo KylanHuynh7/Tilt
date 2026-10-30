@@ -15,7 +15,7 @@ from datetime import date
 # Seasons that are a pending one-shot test: no aggregate accuracy until it runs.
 QUARANTINE = {
     "nhl": {20262027: "NHL v3's one-time test runs after the 2027 Stanley Cup Final."},
-    "mlb": {2026: "MLB v2's one-time test runs after the 2026 World Series."},
+    "mlb": {},
 }
 SPORTS = ("nhl", "nba", "nfl", "mlb")
 _cache: dict = {}
