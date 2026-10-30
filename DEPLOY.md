@@ -145,7 +145,7 @@ Each script runs exactly once (`--confirm`, never `--force`) and refuses to run 
 
 | When | Command (from `backend/`) |
 |---|---|
-| After the 2026 World Series | `uv run python -m scripts.mlb_v2_evaluate --confirm` and `uv run python -m scripts.postseason_evaluate --sport mlb --confirm` |
+| After the 2026 World Series | `uv run python -m scripts.postseason_evaluate --sport mlb --confirm` (MLB v2 already evaluated 2026-10-30: FAIL) |
 | After Super Bowl LXI | `uv run python -m scripts.postseason_evaluate --sport nfl --confirm` (layer off; records n/a) |
 | After the 2027 Stanley Cup Final | `uv run python -m scripts.evaluate_v3 --confirm` |
 

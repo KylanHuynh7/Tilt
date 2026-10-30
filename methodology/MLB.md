@@ -310,6 +310,19 @@ m   ∈ {20, 50}                   innings
 - **The margin over v1 (0.0003) is below criterion 2's 0.001**, as flagged before the freeze.
 - **v1 stays live until the test.** `scripts/mlb_v2_evaluate.py --confirm` runs once, after the 2026 World Series, and refuses earlier.
 
+### MLB v2 test result (2026-10-30): FAIL
+
+n = 2,469 games (2026 regular season + postseason).
+
+| Model | LL | Brier | ECE |
+| --- | --- | --- | --- |
+| MLB v2 | 0.68296 | 0.24497 | 0.01519 |
+| v1 (frozen) | 0.68167 | 0.24433 | 0.01393 |
+| v2 team-only | 0.68391 | 0.24542 | 0.01207 |
+| Home-rate baseline | 0.69144 | 0.24915 | 0.00061 |
+
+Passes: LL < 0.685, Brier 0.235–0.248, ECE < 0.03, beats home rate. **Fails:** beats v1 by ≥ 0.001 (v2 is 0.0013 worse) and pitcher term ≥ 0.002 (0.0009). v2 is not promoted; v1 stays live. See METHODOLOGY.md §13.K7 for how CI read the data before the official run.
+
 ---
 
 ## 15. Postseason odds (`/mlb/season/odds`) (added 2026-10-12)

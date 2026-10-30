@@ -627,6 +627,13 @@ Introduced 2026-10-10 when the codebase began hosting more than one sport. None 
 - **Trajectory charts** render as two stacked charts: a static one with the team lines and a transparent one on top that owns the hover and tooltip. Under 4× CPU throttling, hover went from 19–27 fps to 58–60 fps. Trade-off: the per-line dots under the cursor are gone; the tooltip lists every value.
 - **Panels and tooltips no longer use `backdrop-filter`**, and the page glow moved off a fixed `body` background onto a fixed layer. Scrolling is a steady 60 fps; the look is unchanged because panels sit on smooth gradients.
 
+### K7. MLB v2 test result, and how the one-shot was triggered (2026-10-30)
+
+- **Result (2026 regular season + postseason, n = 2,469):** v2 FAILS. It passes the four v1 §6 criteria (LL 0.68296, Brier 0.24497, ECE 0.01519, beats the home-rate baseline) but misses both v2-specific criteria: v2 is 0.00129 LL *worse* than frozen v1 (0.68167; required ≥ 0.001 better), and its pitcher term is worth 0.00095 LL (v2 team-only 0.68391; required ≥ 0.002). Results are locked in `results/mlb/test_evaluation_v2.json`. **v1 stays live; v2 is not promoted.** Validation had already shown the margin over v1 was 0.0003, below criterion 2.
+- **The one-shot was first read by CI, not by `--confirm`.** `test_mlb_v2_evaluator_guards` asserted exit code 4 ("World Series not decided") against the real data. The nightly refresh pulled the finished series on 2026-10-29, so the test ran the full evaluation twice (Oct 29 and 30 deploy runs), wrote to a pytest temp dir, and printed the verdict in the CI logs. The official run on 2026-10-30 reproduces those numbers exactly (the evaluation is deterministic), so nothing was tuned in between and the result is unaffected. The test now stubs `season_complete` and never reads the real test season.
+- **Cost:** both nightly deploys failed at the test step, so the live site ran the 2026-10-28 image for two days.
+- **Lesson:** a test of a one-shot guard must not depend on the real data state, because the guard's "refuse" branch is time-limited. Date-dependent test assumptions are a standing risk for NFL (Feb 2027) and NHL (June 2027) postseason guards too; `test_evaluator_guards` already stubs `season_complete`.
+
 ### L. Data gap: the 2020 bubble playoffs were missing (found and fixed 2026-10-11)
 
 - **The gap:** the ingest's season window ended July 31, so the 2019-20 qualifying round and playoffs (130 games, Aug 1 → Sep 28, 2020) were never downloaded.

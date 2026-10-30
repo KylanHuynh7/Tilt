@@ -10,7 +10,7 @@ Interpretable rating systems that produce calibrated, game-by-game win probabili
 | **NFL** | Live — v1.1: pre-game model (all §6 targets PASS; playoff ECE flagged) + live win probability (4 of 5 live targets PASS) | [`methodology/NFL.md`](./methodology/NFL.md) |
 | **MLB** | Live — v1.1: pre-game model (all §6 targets PASS; postseason flagged) + live win probability (**5 of 5** live targets PASS) | [`methodology/MLB.md`](./methodology/MLB.md) |
 | **Postseason adjustment** | Live for MLB (λ 0.70); NFL off (λ 1.0). Tests after each sport's 2026 postseason | [`methodology/POSTSEASON.md`](./methodology/POSTSEASON.md) |
-| **MLB v2** (FIP pitcher rating) | Frozen 2026-10-12; one-shot test on the 2026 season after the World Series. v1 stays live until then | [`methodology/MLB.md`](./methodology/MLB.md) §14 |
+| **MLB v2** (FIP pitcher rating) | Frozen 2026-10-12; tested 2026-10-30: **FAIL** (0.0013 LL worse than v1). v1 stays live | [`methodology/MLB.md`](./methodology/MLB.md) §14 |
 
 Everything below this table describes the NHL model unless stated otherwise. Tilt covers professional leagues only. College football was live until 2026-10-21 and was retired (its document stays in [`methodology/CFB.md`](./methodology/CFB.md) as a record). Each sport gets its own methodology document, written and approved before that sport's model code, with its own train/validation/test split and §13-style limitations.
 
@@ -24,7 +24,7 @@ Everything below this table describes the NHL model unless stated otherwise. Til
 - **Live season: 2026-27.** The dashboard's "current season" is now derived from the latest ingested parquet, not hardcoded.
 - **v3 — frozen and live** (2026-10-11). Roster-move boost and series-context K found essentially no signal on validation (both pre-registered expectations FAIL; `METHODOLOGY.md` §20). Its one-shot test on 2026-27 runs after the 2027 Stanley Cup Final.
 
-**Pending one-shot tests:** MLB v2 + MLB postseason layer (Nov 2026), NFL postseason (Feb 2027, layer off), NHL v3 (June 2027). See `DEPLOY.md` → *Pending one-shot test evaluations*.
+**Pending one-shot tests:** MLB postseason layer (Nov 2026), NFL postseason (Feb 2027, layer off), NHL v3 (June 2027). See `DEPLOY.md` → *Pending one-shot test evaluations*.
 
 ## Site features beyond the models
 

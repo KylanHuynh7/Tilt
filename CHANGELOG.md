@@ -2,6 +2,11 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-10-30 — MLB v2 test result (FAIL); deploy fixed
+
+- **MLB v2 one-shot evaluated** on 2026 (n = 2,469): fails criteria 5 and 6 (v2 0.68296 LL vs v1 0.68167; pitcher term gain 0.00095). v1 stays live. Locked in `results/mlb/test_evaluation_v2.json`; METHODOLOGY §13.K7, `methodology/MLB.md` §14.
+- **Deploy outage (Oct 29–30):** `test_mlb_v2_evaluator_guards` assumed the World Series was undecided; once the nightly refresh ingested it, the test ran the real evaluation and failed, blocking the deploy. The test now stubs `season_complete`. The evaluation had been read by CI before the official run (same numbers); see §13.K7.
+
 ## 2026-10-21 — College football retired; smoother charts and scrolling
 
 - **College football removed** from the site, API, nightly refresh and tests (author decision: professional leagues only). `methodology/CFB.md` is kept, marked retired. The January 2027 CFB postseason test is cancelled. METHODOLOGY §13.K6.
