@@ -329,7 +329,7 @@ Passes: LL < 0.685, Brier 0.235–0.248, ECE < 0.03, beats home rate. **Fails:**
 
 10,000 simulations from the current series state, read live from the MLB schedule (series game numbers and scheduled home teams):
 - **Pitchers:** future starters are unknown, so the pitcher term is 0.
-- **Postseason layer:** published probabilities pass through it (λ 0.70, methodology/POSTSEASON.md); ratings update on the raw p.
+- **Postseason layer:** was λ 0.70 (methodology/POSTSEASON.md). **Switched off 2026-11-04** after it failed its one-shot test (§7 there), so published probabilities are raw; ratings update on the raw p.
 - **Coverage:** supported from the League Championship Series onward. Earlier rounds and preseason regular-season projections are not built yet.
 
 - **Not a forecast with a track record.** Unlike the game probabilities, these odds have never been tested. They are a forward projection from the frozen ratings (the same status as NHL's Cup simulator, METHODOLOGY.md §14), labelled as such on the page.

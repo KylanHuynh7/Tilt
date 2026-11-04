@@ -2,6 +2,13 @@
 
 All meaningful code and methodology changes are recorded here, per Section 11 of `METHODOLOGY.md`.
 
+## 2026-11-04 — MLB postseason layer test (FAIL); layer switched off
+
+- **MLB postseason one-shot run** on the 2026 postseason (n = 40, λ = 0.70): LL raw 0.65643 vs shrunk 0.66522, so it fails. Locked in `results/postseason/mlb_2026.json`; `methodology/POSTSEASON.md` §7, METHODOLOGY §13.K8.
+- **MLB postseason layer switched off** (`active: false` in `artifacts/postseason/lambdas.json`); MLB postseason probabilities and season odds are raw again. λ not refitted.
+- **MLB v2 unchanged:** it failed on 2026-10-30 and v1 stays live, so there was no live switch to make.
+- Local data cache refreshed first (World Series: Milwaukee over Tampa Bay 4–1).
+
 ## 2026-10-30 — MLB v2 test result (FAIL); deploy fixed
 
 - **MLB v2 one-shot evaluated** on 2026 (n = 2,469): fails criteria 5 and 6 (v2 0.68296 LL vs v1 0.68167; pitcher term gain 0.00095). v1 stays live. Locked in `results/mlb/test_evaluation_v2.json`; METHODOLOGY §13.K7, `methodology/MLB.md` §14.

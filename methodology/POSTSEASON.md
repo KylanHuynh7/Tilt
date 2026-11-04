@@ -54,7 +54,7 @@ p_post = σ(λ · logit(p))        0 < λ ≤ 1
 
 | Sport | Test games | Available |
 | --- | --- | --- |
-| MLB | 2026 postseason (in progress; no metric has been computed on it) | after the World Series, ~November 2026 |
+| MLB | 2026 postseason (**tested 2026-11-04: FAIL**, see §7) | done |
 | College football | 2026 bowls + CFP | after the CFP final, ~January 2027 |
 | NFL | 2026 playoffs | after the Super Bowl, ~February 2027 |
 
@@ -83,6 +83,19 @@ p_post = σ(λ · logit(p))        0 < λ ≤ 1
 - **MLB and college football postseason probabilities are now published shrunk**, with "playoff-adjusted" on the game card and the raw Elo value on hover. The live models still take the raw pre-game value they were trained on.
 - **The MLB 2026 test postseason was already under way** when λ was fitted (LCS round). No metric was computed on any 2026 game, and λ was fitted only on 2015–2025.
 - **The one-shot evaluator** (`scripts/postseason_evaluate.py --sport … --confirm`) refuses to run until that sport's final is in the data.
+
+## 7. MLB one-shot test result (2026-11-04)
+
+Run once with `scripts.postseason_evaluate --sport mlb --confirm` after Milwaukee beat Tampa Bay 4–1 in the World Series. Locked in `results/postseason/mlb_2026.json`.
+
+| Sport | Test season | n | λ (frozen) | LL raw | LL shrunk | Verdict |
+| --- | --- | --- | --- | --- | --- | --- |
+| MLB | 2026 | 40 | 0.70 | 0.65643 | 0.66522 | **FAIL** (shrunk is 0.0088 worse) |
+
+- **Per the pass rule (PS-2) and §5, the MLB layer is switched off:** `active: false` in `artifacts/postseason/lambdas.json`. MLB postseason cards and the season-odds simulator publish the raw probability again. λ is not refitted (§10).
+- **Power caveat (§4):** n = 40 games is a very weak test. In 2026 the raw model was already well calibrated in the postseason (0.656, better than the fitting window's 0.689), so there was little overstatement for shrinkage to correct. A failure here rejects "λ = 0.70 helps in 2026"; it does not show that the 2015–2025 pattern was fake. The fitting-window gain was only 0.001 LL.
+- **Accumulation:** later MLB postseasons will still be reported with the frozen raw and λ = 0.70 numbers for the record, but the layer stays off unless a new, pre-registered methodology change is approved.
+- NFL (layer already off, λ = 1) is tested ~February 2027. College football was retired before its test.
 
 ## 10. What I will not do
 

@@ -50,7 +50,7 @@
   },
   "mlb": {
     "lambda": 0.7,
-    "active": true,
+    "active": false,
     "fit_seasons": [
       2015,
       2016,
@@ -81,7 +81,8 @@
       "1.0": 0.688630295265038
     },
     "expectation_met": true,
-    "test_season": 2026
+    "test_season": 2026,
+    "switched_off_reason": "2026 one-shot test FAIL (ll_raw 0.65643 < ll_shrunk 0.66522, n=40); POSTSEASON.md section 5. See results/postseason/mlb_2026.json"
   },
   "cfb": {
     "lambda": 0.8,

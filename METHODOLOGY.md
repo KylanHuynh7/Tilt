@@ -634,6 +634,13 @@ Introduced 2026-10-10 when the codebase began hosting more than one sport. None 
 - **Cost:** both nightly deploys failed at the test step, so the live site ran the 2026-10-28 image for two days.
 - **Lesson:** a test of a one-shot guard must not depend on the real data state, because the guard's "refuse" branch is time-limited. Date-dependent test assumptions are a standing risk for NFL (Feb 2027) and NHL (June 2027) postseason guards too; `test_evaluator_guards` already stubs `season_complete`.
 
+### K8. MLB postseason layer one-shot: FAIL, layer switched off (2026-11-04)
+
+- **Result (2026 postseason, n = 40):** LL raw 0.65643, shrunk (λ = 0.70) 0.66522, a failure under PS-2. Locked in `results/postseason/mlb_2026.json`; details in `methodology/POSTSEASON.md` §7.
+- **Action:** `mlb.active = false` in `artifacts/postseason/lambdas.json`, as `POSTSEASON.md` §5 prescribes. MLB postseason probabilities are raw again. λ is not refitted.
+- **Honest read:** n = 40 is a weak test and the raw model did well this postseason; this rejects the layer's usefulness in 2026 rather than proving the older pattern false.
+- **Process:** the data refresh (`scripts.refresh_current`) was run locally first so the evaluator's guard passed. Each one-shot ran exactly once, without `--force`. The MLB v2 test was already run on 2026-10-30 (§K7); v1 stays live.
+
 ### L. Data gap: the 2020 bubble playoffs were missing (found and fixed 2026-10-11)
 
 - **The gap:** the ingest's season window ended July 31, so the 2019-20 qualifying round and playoffs (130 games, Aug 1 → Sep 28, 2020) were never downloaded.
